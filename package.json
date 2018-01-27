@@ -1,0 +1,26 @@
+{
+  "name": "spymaster",
+  "version": "1.0.0",
+  "description": "Break Codes in Elm",
+  "main": "app.js",
+  "scripts": {
+    "test": "elm-test",
+    "dev": "webpack-dev-server --port 3000",
+    "build": "webpack"
+  },
+  "author": "Brian Watkins",
+  "license": "MIT",
+  "dependencies": {
+    "elm": "^0.18.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "elm-test": "=0.18.11",
+    "elm-webpack-loader": "^4.4.0",
+    "html-webpack-plugin": "^2.30.1",
+    "webpack": "^3.10.0",
+    "webpack-dev-server": "^2.11.1"
+  }
+}
