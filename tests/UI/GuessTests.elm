@@ -10,7 +10,7 @@ import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg)
 import UI
 import Core.Types exposing (GuessFeedback(..), Color(..))
-
+import Core.Clue as Clue
 
 playSpy : GuessFeedback -> Spy
 playSpy feedback =
@@ -23,7 +23,7 @@ guessTests =
   [ test "it executes the playGuess use case with the given guess" <|
     \() ->
       Elmer.given UI.defaultModel UI.view (UI.update <| Spy.callable "play-spy")
-        |> Spy.use [ playSpy Wrong ]
+        |> Spy.use [ playSpy <| wrongFeedback 0 ]
         |> Markup.target "#guess-input"
         |> Event.input "rgby"
         |> Markup.target "#guess-submit"
@@ -31,17 +31,26 @@ guessTests =
         |> Spy.expect "play-spy" (
           wasCalledWith [ typedArg [ Red, Green, Blue, Yellow ] ]
         )
-  , describe "when the guess is wrong"
-    [ test "it reports that the guess is wrong" <|
-      \() ->
+  , describe "when the guess is wrong" <|
+    let
+      state =
         Elmer.given UI.defaultModel UI.view (UI.update <| Spy.callable "play-spy")
-          |> Spy.use [ playSpy Wrong ]
+          |> Spy.use [ playSpy <| wrongFeedback 2 ]
           |> Markup.target "#guess-input"
           |> Event.input "rgby"
           |> Markup.target "#guess-submit"
           |> Event.click
+    in
+    [ test "it records the guess" <|
+      \() ->
+        state
           |> Markup.target "[data-guess-feedback]"
-          |> Markup.expect (element <| hasText "Wrong.")
+          |> Markup.expect (element <| hasText "rgby")
+    , test "it reports that the guess is wrong with a hint" <|
+      \() ->
+        state
+          |> Markup.target "[data-guess-feedback]"
+          |> Markup.expect (element <| hasText "Wrong. 2 colors correct.")
     ]
   , describe "when the guess is correct"
     [ test "it reports that the guess is correct" <|
@@ -64,7 +73,7 @@ guessListTests =
   let
     state =
       Elmer.given UI.defaultModel UI.view (UI.update <| Spy.callable "play-spy")
-        |> Spy.use [ playSpy Wrong ]
+        |> Spy.use [ playSpy <| wrongFeedback 0 ]
         |> Markup.target "#guess-input"
         |> Event.input "rgby"
         |> Markup.target "#guess-submit"
@@ -93,7 +102,7 @@ guessListTests =
         |> Markup.target "[data-guess-feedback]"
         |> Markup.expect (elements <| atIndex 1 <|
           hasText "rggy" <&&>
-          hasText "Wrong."
+          hasText "Wrong. 0 colors correct."
         )
   , test "it shows the first guess last" <|
     \() ->
@@ -101,6 +110,12 @@ guessListTests =
         |> Markup.target "[data-guess-feedback]"
         |> Markup.expect (elements <| atIndex 2 <|
           hasText "rgby" <&&>
-          hasText "Wrong."
+          hasText "Wrong. 0 colors correct."
         )
   ]
+
+
+wrongFeedback : Int -> GuessFeedback
+wrongFeedback colorsCorrect =
+  Clue.withColorsCorrect colorsCorrect
+    |> Wrong

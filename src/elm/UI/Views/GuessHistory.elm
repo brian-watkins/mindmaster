@@ -33,7 +33,7 @@ printHistoryItem index (guess, feedback) =
 printFeedback : GuessFeedback -> String
 printFeedback feedback =
   case feedback of
-    Wrong ->
-      "Wrong."
+    Wrong clue ->
+      "Wrong. " ++ (toString clue.colors) ++ " colors correct."
     Correct ->
       "Correct!"

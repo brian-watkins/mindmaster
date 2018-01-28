@@ -2,6 +2,7 @@ module Core.Code exposing
   ( colors
   , generate
   , equals
+  , correctColors
   )
 
 import Core.Types exposing (Color(..))
@@ -37,3 +38,20 @@ equals expected actual =
             False
         Nothing ->
           False
+
+
+correctColors : List Color -> List Color -> Int
+correctColors =
+  findCorrectColors 0
+
+
+findCorrectColors : Int -> List Color -> List Color -> Int
+findCorrectColors found code guess =
+  case guess of
+    [] ->
+      found
+    x :: xs ->
+      if List.member x code then
+        findCorrectColors (found + 1) code xs
+      else
+        findCorrectColors found code xs

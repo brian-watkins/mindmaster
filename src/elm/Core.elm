@@ -10,6 +10,7 @@ module Core exposing
 
 import Html exposing (Html)
 import Core.Code as Code
+import Core.Clue as Clue
 import Core.Types exposing (GuessFeedback(..), Color(..))
 import Core.Command.EvaluateGuess as EvaluateGuess
 
@@ -70,7 +71,8 @@ evaluateGuess model guess =
     Just code ->
       EvaluateGuess.execute code guess
     Nothing ->
-      Wrong
+      Clue.withColorsCorrect 0
+        |> Wrong
 
 
 type alias ViewView viewModel viewMsg =

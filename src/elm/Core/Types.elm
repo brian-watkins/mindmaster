@@ -1,11 +1,16 @@
 module Core.Types exposing
   ( GuessFeedback(..)
   , Color(..)
+  , Clue
   )
 
 type GuessFeedback
-  = Wrong
+  = Wrong Clue
   | Correct
+
+type alias Clue =
+  { colors : Int
+  }
 
 type Color
   = Red
