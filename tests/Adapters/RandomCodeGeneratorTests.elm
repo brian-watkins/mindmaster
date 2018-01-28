@@ -17,7 +17,7 @@ randomSpy : Spy
 randomSpy =
   Spy.create "random-spy" (\_ -> Random.generate)
     |> andCallFake (\tagger generator ->
-      Random.initialSeed 8745
+      Random.initialSeed 9126
         |> Random.step generator
         |> Tuple.first
         |> tagger
@@ -33,6 +33,6 @@ generateCodeTests =
       Headless.givenCommand (\_ -> RandomCodeGenerator.generate 0 [ 1, 2, 3, 4 ] 5 Code)
         |> Spy.use [ randomSpy ]
         |> Headless.expectMessages (exactly 1 <|
-          Expect.equal (Code [ 3, 3, 1, 2, 3 ])
+          Expect.equal (Code [ 2, 2, 4, 2, 1 ])
         )
   ]

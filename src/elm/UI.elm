@@ -1,4 +1,4 @@
-module View exposing
+module UI exposing
   ( Model
   , Msg
   , defaultModel
@@ -9,7 +9,8 @@ module View exposing
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
-import Core exposing (GuessFeedback(..), Color(..))
+import Core.Types exposing (GuessFeedback(..), Color(..))
+import UI.Code as Code
 
 
 type Msg
@@ -75,7 +76,7 @@ update playGuess msg model =
     SubmitGuess ->
       case model.guess of
         Just guess ->
-          ( { model | feedback = Just <| playGuess <| toCode guess [] }
+          ( { model | feedback = Just <| playGuess <| Code.fromString guess }
           , Cmd.none
           )
         Nothing ->
@@ -84,23 +85,3 @@ update playGuess msg model =
       ( { model | guess = Just text }
       , Cmd.none
       )
-
-
-toCode : String -> List Color -> List Color
-toCode guess code =
-  case String.uncons guess of
-    Just (c, str) ->
-      [ toColor c ]
-        |> List.append code
-        |> toCode str
-    Nothing ->
-      code
-
-toColor : Char -> Color
-toColor c =
-  case c of
-    'r' -> Red
-    'o' -> Orange
-    'y' -> Yellow
-    'g' -> Green
-    _ -> Blue

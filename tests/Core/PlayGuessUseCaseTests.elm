@@ -9,38 +9,11 @@ import Elmer.Html.Matchers exposing (element, hasText)
 import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Spy.Matchers exposing (wasCalledWith, stringArg)
 import Elmer.Platform.Command as Command
-import View
-import Core exposing (GuessFeedback(..), Color(..))
-import Html exposing (Html)
-import Html.Attributes as Attr
-import Html.Events as Events
+import Core
+import Core.Types exposing (GuessFeedback(..), Color(..))
+import Core.Fakes.FakeUI as FakeUI
+import Core.Fakes.FakeCodeGenerator as FakeCodeGenerator
 
-
-type VMsg =
-  PlayGuess
-
-type alias VModel =
-  { feedback : Maybe GuessFeedback
-  }
-
-testVModel : VModel
-testVModel =
-  { feedback = Nothing }
-
-fakeViewUpdate : List Color -> (List Color -> GuessFeedback) -> VMsg -> VModel -> (VModel, Cmd VMsg)
-fakeViewUpdate code playGuess msg model =
-  case msg of
-    PlayGuess ->
-      ( { model | feedback = Just <| playGuess code }, Cmd.none )
-
-fakeView : VModel -> Html VMsg
-fakeView model =
-  Html.div [ Attr.id "submit-code", Events.onClick PlayGuess ] []
-
-
-fakeCodeGenerator : List Color -> Color -> List Color -> Int -> (List Color -> msg) -> Cmd msg
-fakeCodeGenerator code default colors num tagger =
-  Command.fake <| tagger code
 
 yellowCode : List Color
 yellowCode =
@@ -50,6 +23,18 @@ orangeCode : List Color
 orangeCode =
   [ Orange, Yellow, Blue, Green ]
 
+testModel =
+  Core.defaultModel FakeUI.defaultModel
+
+testView =
+  Core.view FakeUI.view
+
+testUpdate code =
+  FakeUI.update code
+    |> Core.update
+
+testInit code =
+  Core.initGame (FakeCodeGenerator.with code) FakeUI.defaultModel
 
 playGuessTests : Test
 playGuessTests =
@@ -57,7 +42,7 @@ playGuessTests =
   [ describe "when there is no code"
     [ test "it returns Wrong" <|
       \() ->
-        Elmer.given (Core.defaultModel testVModel) (Core.view fakeView) (Core.update <| fakeViewUpdate yellowCode)
+        Elmer.given testModel testView (testUpdate yellowCode)
           |> Markup.target "#submit-code"
           |> Event.click
           |> Elmer.expectModel (\model ->
@@ -70,8 +55,8 @@ playGuessTests =
     [ describe "when the guess is wrong"
       [ test "it returns Wrong as the feedback" <|
         \() ->
-          Elmer.given (Core.defaultModel testVModel) (Core.view fakeView) (Core.update <| fakeViewUpdate yellowCode)
-            |> Elmer.init (\_ -> Core.initGame (fakeCodeGenerator orangeCode) testVModel)
+          Elmer.given testModel testView (testUpdate yellowCode)
+            |> Elmer.init (\_ -> testInit orangeCode)
             |> Markup.target "#submit-code"
             |> Event.click
             |> Elmer.expectModel (\model ->
@@ -83,8 +68,8 @@ playGuessTests =
     , describe "when the guess is correct"
       [ test "it returns Correct as the feedback" <|
         \() ->
-          Elmer.given (Core.defaultModel testVModel) (Core.view fakeView) (Core.update <| fakeViewUpdate orangeCode)
-            |> Elmer.init (\_ -> Core.initGame (fakeCodeGenerator orangeCode) testVModel)
+          Elmer.given testModel testView (testUpdate orangeCode)
+            |> Elmer.init (\_ -> testInit orangeCode)
             |> Markup.target "#submit-code"
             |> Event.click
             |> Elmer.expectModel (\model ->

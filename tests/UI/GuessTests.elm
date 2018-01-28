@@ -1,4 +1,4 @@
-module View.GuessTests exposing (..)
+module UI.GuessTests exposing (..)
 
 import Test exposing (..)
 import Expect exposing (Expectation)
@@ -8,8 +8,8 @@ import Elmer.Html.Event as Event
 import Elmer.Html.Matchers exposing (element, hasText)
 import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg)
-import View
-import Core exposing (GuessFeedback(..), Color(..))
+import UI
+import Core.Types exposing (GuessFeedback(..), Color(..))
 
 
 playSpy : GuessFeedback -> Spy
@@ -22,7 +22,7 @@ guessTests =
   describe "when a guess is submitted"
   [ test "it executes the playGuess use case with the given guess" <|
     \() ->
-      Elmer.given View.defaultModel View.view (View.update <| Spy.callable "play-spy")
+      Elmer.given UI.defaultModel UI.view (UI.update <| Spy.callable "play-spy")
         |> Spy.use [ playSpy Wrong ]
         |> Markup.target "#guess-input"
         |> Event.input "rgby"
@@ -34,7 +34,7 @@ guessTests =
   , describe "when the guess is wrong"
     [ test "it reports that the guess is wrong" <|
       \() ->
-        Elmer.given View.defaultModel View.view (View.update <| Spy.callable "play-spy")
+        Elmer.given UI.defaultModel UI.view (UI.update <| Spy.callable "play-spy")
           |> Spy.use [ playSpy Wrong ]
           |> Markup.target "#guess-input"
           |> Event.input "rgby"
@@ -46,7 +46,7 @@ guessTests =
   , describe "when the guess is correct"
     [ test "it reports that the guess is correct" <|
       \() ->
-        Elmer.given View.defaultModel View.view (View.update <| Spy.callable "play-spy")
+        Elmer.given UI.defaultModel UI.view (UI.update <| Spy.callable "play-spy")
           |> Spy.use [ playSpy Correct ]
           |> Markup.target "#guess-input"
           |> Event.input "rgby"

@@ -1,38 +1,18 @@
 module Core exposing
-  ( GuessFeedback(..)
-  , Color(..)
-  , Model
+  ( Model
   , Msg
   , defaultModel
   , initGame
   , update
   , view
   , viewModel
-  , playGuess
   )
 
 import Html exposing (Html)
+import Core.Code as Code
+import Core.Types exposing (GuessFeedback(..), Color(..))
+import Core.Command.EvaluateGuess as EvaluateGuess
 
-
-type GuessFeedback
-  = Wrong
-  | Correct
-
-type Color
-  = Red
-  | Orange
-  | Yellow
-  | Green
-  | Blue
-
-colors : List Color
-colors =
-  [ Red
-  , Orange
-  , Yellow
-  , Green
-  , Blue
-  ]
 
 
 type Msg viewMsg
@@ -61,7 +41,7 @@ type alias CodeGenerator viewMsg =
 
 initGame : CodeGenerator viewMsg -> viewModel -> (Model viewModel, Cmd (Msg viewMsg))
 initGame codeGenerator viewModel =
-  (defaultModel viewModel, codeGenerator Blue colors 5 SetCode)
+  (defaultModel viewModel, Code.generate SetCode codeGenerator)
 
 
 type alias ViewUpdate msg model =
@@ -79,36 +59,19 @@ update viewUpdate msg model =
     ViewMsg viewMsg ->
       let
         (vmodel, vmsg) =
-          viewUpdate (playGuess model) viewMsg model.viewModel
+          viewUpdate (evaluateGuess model) viewMsg model.viewModel
       in
         ( { model | viewModel = vmodel }, Cmd.none )
 
 
-playGuess : Model viewModel -> List Color -> GuessFeedback
-playGuess model guess =
+evaluateGuess : Model viewModel -> List Color -> GuessFeedback
+evaluateGuess model guess =
   case model.code of
     Just code ->
-      if equalsCode code guess then
-        Correct
-      else
-        Wrong
+      EvaluateGuess.execute code guess
     Nothing ->
       Wrong
 
-equalsCode : List Color -> List Color -> Bool
-equalsCode expected actual =
-  case expected of
-    [] ->
-      List.isEmpty actual
-    x :: xl ->
-      case List.head actual of
-        Just h ->
-          if x == h then
-            equalsCode xl (List.drop 1 actual)
-          else
-            False
-        Nothing ->
-          False
 
 type alias ViewView viewModel viewMsg =
   viewModel -> Html viewMsg

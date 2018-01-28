@@ -2,42 +2,15 @@ module Main exposing (..)
 
 import Html exposing (Html)
 import Core
-import View
+import UI
 import RandomCodeGenerator
 
--- type AppMsg
---   = AppMsg
---
--- type alias AppModel =
---   { name: String
---   }
---
--- defaultModel : AppModel
--- defaultModel =
---   { name = "Brian"
---   }
 
--- view : AppModel -> Html AppMsg
--- view model =
---   Html.h1 [] [ Html.text "YO!!" ]
---
--- update : AppMsg -> AppModel -> (AppModel, Cmd AppMsg)
--- update msg model =
---   ( model, Cmd.none )
---
--- init : (AppModel, Cmd AppMsg)
--- init =
---   ( defaultModel, Cmd.none )
-
--- subscriptions : model -> Sub AppMsg
--- subscriptions model =
---   Sub.none
-
-main : Program Never (Core.Model View.Model) (Core.Msg View.Msg)
+main : Program Never (Core.Model UI.Model) (Core.Msg UI.Msg)
 main =
   Html.program
-    { init = Core.initGame RandomCodeGenerator.generate View.defaultModel
-    , view = Core.view View.view
-    , update = Core.update View.update
+    { init = Core.initGame RandomCodeGenerator.generate UI.defaultModel
+    , view = Core.view UI.view
+    , update = Core.update UI.update
     , subscriptions = (\_ -> Sub.none)
     }
