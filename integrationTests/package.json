@@ -1,0 +1,19 @@
+{
+  "name": "integration-tests",
+  "version": "1.0.0",
+  "description": "Integration Tests for MindMaster",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "author": "Brian Watkins",
+  "license": "MIT",
+  "devDependencies": {
+    "jasmine": "^2.9.0",
+    "jasmine-spec-reporter": "^4.2.1",
+    "puppeteer": "^1.0.0"
+  },
+  "dependencies": {
+    "express": "^4.16.2"
+  }
+}
