@@ -1,10 +1,12 @@
 module Core.Clue exposing
-  ( withColorsCorrect
+  ( with
   )
 
 import Core.Types exposing (..)
 
-withColorsCorrect : Int -> Clue
-withColorsCorrect num =
-  { colors = num
+
+with : Int -> Int -> Clue
+with colors positions =
+  { colors = colors
+  , positions = positions
   }

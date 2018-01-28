@@ -3,9 +3,11 @@ module Core.Code exposing
   , generate
   , equals
   , correctColors
+  , correctPositions
   )
 
 import Core.Types exposing (Color(..))
+
 
 colors : List Color
 colors =
@@ -16,8 +18,10 @@ colors =
   , Blue
   ]
 
+
 type alias CodeGenerator a =
   Color -> List Color -> Int -> (List Color -> a) -> Cmd a
+
 
 generate : (List Color -> a) -> CodeGenerator a -> Cmd a
 generate tagger generator =
@@ -52,6 +56,44 @@ findCorrectColors found code guess =
       found
     x :: xs ->
       if List.member x code then
-        findCorrectColors (found + 1) code xs
+        let
+          filtered =
+            removeFirst 0 x code
+        in
+          findCorrectColors (found + 1) filtered xs
       else
         findCorrectColors found code xs
+
+
+removeFirst : Int -> a -> List a -> List a
+removeFirst offset item items =
+  case List.drop offset items of
+    [] ->
+      items
+    x :: xs ->
+      if x == item then
+        List.append (List.take offset items) xs
+      else
+        removeFirst (offset + 1) item items
+
+
+
+correctPositions : List Color -> List Color -> Int
+correctPositions =
+  findCorrectPositions 0
+
+
+findCorrectPositions : Int -> List Color -> List Color -> Int
+findCorrectPositions found code guess =
+  case code of
+    [] ->
+      found
+    x :: xs ->
+      case guess of
+        [] ->
+          found
+        g :: gs ->
+          if x == g then
+            findCorrectPositions (found + 1) xs gs
+          else
+            findCorrectPositions found xs gs

@@ -10,6 +10,7 @@ type GuessFeedback
 
 type alias Clue =
   { colors : Int
+  , positions : Int
   }
 
 type Color

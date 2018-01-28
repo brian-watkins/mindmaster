@@ -4,6 +4,7 @@ module UI.Views.GuessHistory exposing
 
 import Core.Types exposing (GuessFeedback(..))
 import UI.Types exposing (..)
+import UI.Views.Feedback as Feedback
 import Html exposing (Html)
 import Html.Attributes as Attr
 
@@ -26,14 +27,5 @@ printHistoryItem index (guess, feedback) =
   Html.li [ Attr.attribute "data-guess-feedback" <| toString index ]
   [ Html.text guess
   , Html.text " => "
-  , Html.text <| printFeedback feedback
+  , Feedback.view feedback
   ]
-
-
-printFeedback : GuessFeedback -> String
-printFeedback feedback =
-  case feedback of
-    Wrong clue ->
-      "Wrong. " ++ (toString clue.colors) ++ " colors correct."
-    Correct ->
-      "Correct!"

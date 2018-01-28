@@ -22,13 +22,13 @@ playGuessTests =
   [ describe "when there is no code"
     [ test "it returns Wrong" <|
       \() ->
-        Elmer.given testModel testView (testUpdate yellowCode)
+        Elmer.given testModel testView (testUpdate [ Yellow, Blue ])
           |> Markup.target "#submit-code"
           |> Event.click
           |> Elmer.expectModel (\model ->
               Core.viewModel model
                 |> .feedback
-                |> Expect.equal (Just <| wrongFeedback 0)
+                |> Expect.equal (Just <| wrongFeedback 0 0)
             )
     ]
   , describe "when there is a code"
@@ -36,45 +36,63 @@ playGuessTests =
       [ test "it returns Correct as the feedback" <|
         \() ->
           Correct
-            |> expectFeedback orangeCode orangeCode
+            |> expectFeedback [ Orange ] [ Orange ]
       ]
     ]
   ]
 
 
-colorClueTests : Test
-colorClueTests =
-  describe "color clues"
+clueTests : Test
+clueTests =
+  describe "clues"
   [ describe "when no colors are correct"
     [ test "it returns a clue with 0 colors correct" <|
       \() ->
-        wrongFeedback 0
-          |> expectFeedback yellowCode greenCode
+        expectFeedback [ Blue ] [ Green ] <|
+          wrongFeedback 0 0
     ]
-  , describe "when one color is correct"
+  , describe "when only one color is correct"
     [ test "it returns a clue with 1 color correct" <|
       \() ->
-        wrongFeedback 1
-          |> expectFeedback orangeCode greenCode
+        expectFeedback [ Blue, Red ] [ Yellow, Blue ] <|
+          wrongFeedback 1 0
+    ]
+  , describe "when there are matching identical colors in the guess"
+    [ test "it should only match the number in the code" <|
+      \() ->
+        expectFeedback [ Blue, Blue, Yellow, Blue, Orange ] [ Green, Red, Blue, Red, Blue ] <|
+          wrongFeedback 2 0
     ]
   , describe "when more than one color is correct"
     [ test "it returns a clue with the right number of correct colors" <|
       \() ->
-        wrongFeedback 3
-          |> expectFeedback orangeCode yellowCode
+        expectFeedback [ Blue, Yellow, Red ] [ Yellow, Blue, Green ] <|
+          wrongFeedback 2 0
+    ]
+  , describe "when one color is in the right position"
+    [ test "it returns a clue with one in the right position" <|
+      \() ->
+        expectFeedback [ Blue, Yellow, Yellow ] [ Green, Yellow, Blue ] <|
+          wrongFeedback 2 1
+    ]
+  , describe "when more than one color is in the right position"
+    [ test "it returns a clue with the number in the right position" <|
+      \() ->
+        expectFeedback [ Blue, Yellow, Yellow ] [ Green, Yellow, Yellow ] <|
+          wrongFeedback 2 2
     ]
   ]
 
 
-wrongFeedback : Int -> GuessFeedback
-wrongFeedback colorsCorrect =
-  Clue.withColorsCorrect colorsCorrect
+wrongFeedback : Int -> Int -> GuessFeedback
+wrongFeedback colorsCorrect positionsCorrect =
+  Clue.with colorsCorrect positionsCorrect
     |> Wrong
 
 expectFeedback : List Color -> List Color -> GuessFeedback -> Expectation
 expectFeedback code guess expectedFeedback =
-  Elmer.given testModel testView (testUpdate code)
-    |> Elmer.init (\_ -> testInit guess)
+  Elmer.given testModel testView (testUpdate guess)
+    |> Elmer.init (\_ -> testInit code)
     |> Markup.target "#submit-code"
     |> Event.click
     |> Elmer.expectModel (\model ->
@@ -83,17 +101,6 @@ expectFeedback code guess expectedFeedback =
           |> Expect.equal (Just expectedFeedback)
       )
 
-yellowCode : List Color
-yellowCode =
-  [ Yellow, Yellow, Blue, Blue ]
-
-orangeCode : List Color
-orangeCode =
-  [ Yellow, Yellow, Blue, Green ]
-
-greenCode : List Color
-greenCode =
-  [ Green, Green, Green, Green ]
 
 testModel =
   Core.defaultModel FakeUI.defaultModel

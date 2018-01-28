@@ -71,7 +71,7 @@ evaluateGuess model guess =
     Just code ->
       EvaluateGuess.execute code guess
     Nothing ->
-      Clue.withColorsCorrect 0
+      Clue.with 0 0
         |> Wrong
 
 
