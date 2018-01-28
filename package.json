@@ -4,6 +4,7 @@
   "description": "Break Codes in Elm",
   "main": "app.js",
   "scripts": {
+    "postinstall": "cd tests && elm-install",
     "test": "elm-test",
     "dev": "webpack-dev-server --port 3000",
     "build": "webpack"
@@ -17,6 +18,7 @@
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
+    "elm-github-install": "^1.6.1",
     "elm-test": "=0.18.11",
     "elm-webpack-loader": "^4.4.0",
     "html-webpack-plugin": "^2.30.1",
