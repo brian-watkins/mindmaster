@@ -3,10 +3,11 @@ module Main exposing (..)
 import Html exposing (Html)
 import Core
 import UI
+import UI.Types as View
 import RandomCodeGenerator
 
 
-main : Program Never (Core.Model UI.Model) (Core.Msg UI.Msg)
+main : Program Never (Core.Model View.Model) (Core.Msg View.Msg)
 main =
   Html.program
     { init = Core.initGame RandomCodeGenerator.generate UI.defaultModel
