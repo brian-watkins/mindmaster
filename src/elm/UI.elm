@@ -20,14 +20,14 @@ type Msg
 
 type alias Model =
   { guess : Maybe String
-  , feedback : Maybe GuessFeedback
+  , history : List (String, GuessFeedback)
   }
 
 
 defaultModel : Model
 defaultModel =
   { guess = Nothing
-  , feedback = Nothing
+  , history = []
   }
 
 
@@ -41,14 +41,24 @@ view model =
 
 feedbackDisplay : Model -> Html Msg
 feedbackDisplay model =
-  case model.feedback of
-    Just feedback ->
-      Html.div [ Attr.id "feedback" ]
-      [ Html.div [ Attr.attribute "data-guess-feedback" "" ]
-        [ Html.text <| printFeedback feedback ]
-      ]
-    Nothing ->
-      Html.div [] []
+  Html.div [ Attr.id "feedback" ]
+  [ feedbackHistory model ]
+
+
+feedbackHistory : Model -> Html Msg
+feedbackHistory model =
+  model.history
+    |> List.indexedMap printHistoryItem
+    |> Html.ol [ Attr.reversed True ]
+
+
+printHistoryItem : Int -> (String, GuessFeedback) -> Html Msg
+printHistoryItem index (guess, feedback) =
+  Html.li [ Attr.attribute "data-guess-feedback" <| toString index ]
+  [ Html.text guess
+  , Html.text " => "
+  , Html.text <| printFeedback feedback
+  ]
 
 
 printFeedback : GuessFeedback -> String
@@ -76,7 +86,11 @@ update playGuess msg model =
     SubmitGuess ->
       case model.guess of
         Just guess ->
-          ( { model | feedback = Just <| playGuess <| Code.fromString guess }
+          ( { model | history =
+              (guess, Code.fromString guess)
+                |> Tuple.mapSecond playGuess
+                |> flip (::) model.history
+            }
           , Cmd.none
           )
         Nothing ->
