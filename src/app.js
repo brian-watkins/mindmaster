@@ -1,4 +1,4 @@
-import SpyMasterApp from "./elm/Main"
+import MindMasterApp from "./elm/Main"
 
-const mountNode = document.getElementById("spymaster-app")
-SpyMasterApp.Main.embed(mountNode)
+const mountNode = document.getElementById("mindmaster-app")
+MindMasterApp.Main.embed(mountNode)
