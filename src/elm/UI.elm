@@ -7,7 +7,7 @@ module UI exposing
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
-import Core.Types exposing (GuessFeedback(..), Color(..))
+import Core.Types exposing (GuessFeedback(..), Color(..), Code)
 import UI.Types exposing (..)
 import UI.Code as Code
 import UI.Views.GuessHistory as GuessHistory
@@ -29,7 +29,7 @@ view model =
   ]
 
 
-update : (List Color -> GuessFeedback) -> Msg -> Model -> (Model, Cmd Msg)
+update : (Code -> GuessFeedback) -> Msg -> Model -> (Model, Cmd Msg)
 update evaluator msg model =
   case msg of
     SubmitGuess ->
@@ -47,7 +47,7 @@ update evaluator msg model =
       )
 
 
-evaluateGuess : (List Color -> GuessFeedback) -> String -> (String, GuessFeedback)
+evaluateGuess : (Code -> GuessFeedback) -> String -> (String, GuessFeedback)
 evaluateGuess evaluator guess =
   (guess, Code.fromString guess)
     |> Tuple.mapSecond evaluator

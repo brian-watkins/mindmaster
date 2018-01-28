@@ -4,10 +4,10 @@ module Core.Command.EvaluateGuess exposing
 
 import Core.Code as Code
 import Core.Clue as Clue
-import Core.Types exposing (GuessFeedback(..), Color(..))
+import Core.Types exposing (..)
 
 
-execute : List Color -> List Color -> GuessFeedback
+execute : Code -> Code -> GuessFeedback
 execute code guess =
   if Code.equals code guess then
     Correct

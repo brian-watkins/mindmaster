@@ -11,7 +11,7 @@ import Elmer.Spy.Matchers exposing (wasCalledWith, stringArg)
 import Elmer.Platform.Command as Command
 import Core
 import Core.Clue as Clue
-import Core.Types exposing (GuessFeedback(..), Color(..))
+import Core.Types exposing (GuessFeedback(..), Color(..), Code)
 import Core.Fakes.FakeUI as FakeUI
 import Core.Fakes.FakeCodeGenerator as FakeCodeGenerator
 
@@ -89,7 +89,7 @@ wrongFeedback colorsCorrect positionsCorrect =
   Clue.with colorsCorrect positionsCorrect
     |> Wrong
 
-expectFeedback : List Color -> List Color -> GuessFeedback -> Expectation
+expectFeedback : Code -> Code -> GuessFeedback -> Expectation
 expectFeedback code guess expectedFeedback =
   Elmer.given testModel testView (testUpdate guess)
     |> Elmer.init (\_ -> testInit code)

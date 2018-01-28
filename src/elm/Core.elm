@@ -11,17 +11,17 @@ module Core exposing
 import Html exposing (Html)
 import Core.Code as Code
 import Core.Clue as Clue
-import Core.Types exposing (GuessFeedback(..), Color(..))
+import Core.Types exposing (GuessFeedback(..), Color(..), Code)
 import Core.Command.EvaluateGuess as EvaluateGuess
 
 
 
 type Msg viewMsg
-  = SetCode (List Color)
+  = SetCode Code
   | ViewMsg viewMsg
 
 type alias Model vModel =
-  { code : Maybe (List Color)
+  { code : Maybe Code
   , viewModel : vModel
   }
 
@@ -38,7 +38,7 @@ viewModel model =
   model.viewModel
 
 type alias CodeGenerator viewMsg =
-  Color -> List Color -> Int -> (List Color -> Msg viewMsg) -> Cmd (Msg viewMsg)
+  Color -> Code -> Int -> (Code -> Msg viewMsg) -> Cmd (Msg viewMsg)
 
 initGame : CodeGenerator viewMsg -> viewModel -> (Model viewModel, Cmd (Msg viewMsg))
 initGame codeGenerator viewModel =
@@ -46,7 +46,7 @@ initGame codeGenerator viewModel =
 
 
 type alias ViewUpdate msg model =
-  (List Color -> GuessFeedback) -> msg -> model -> (model, Cmd msg)
+  (Code -> GuessFeedback) -> msg -> model -> (model, Cmd msg)
 
 
 update : ViewUpdate viewMsg viewModel -> Msg viewMsg -> Model viewModel -> (Model viewModel, Cmd (Msg viewMsg))
@@ -65,7 +65,7 @@ update viewUpdate msg model =
         ( { model | viewModel = vmodel }, Cmd.none )
 
 
-evaluateGuess : Model viewModel -> List Color -> GuessFeedback
+evaluateGuess : Model viewModel -> Code -> GuessFeedback
 evaluateGuess model guess =
   case model.code of
     Just code ->

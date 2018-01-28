@@ -2,7 +2,11 @@ module Core.Types exposing
   ( GuessFeedback(..)
   , Color(..)
   , Clue
+  , Code
   )
+
+type alias Code =
+  List Color
 
 type GuessFeedback
   = Wrong Clue

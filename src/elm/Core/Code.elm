@@ -6,7 +6,7 @@ module Core.Code exposing
   , correctPositions
   )
 
-import Core.Types exposing (Color(..))
+import Core.Types exposing (..)
 
 
 colors : List Color
@@ -20,15 +20,15 @@ colors =
 
 
 type alias CodeGenerator a =
-  Color -> List Color -> Int -> (List Color -> a) -> Cmd a
+  Color -> Code -> Int -> (Code -> a) -> Cmd a
 
 
-generate : (List Color -> a) -> CodeGenerator a -> Cmd a
+generate : (Code -> a) -> CodeGenerator a -> Cmd a
 generate tagger generator =
   generator Blue colors 5 tagger
 
 
-equals : List Color -> List Color -> Bool
+equals : Code -> Code -> Bool
 equals expected actual =
   case expected of
     [] ->
@@ -44,12 +44,12 @@ equals expected actual =
           False
 
 
-correctColors : List Color -> List Color -> Int
+correctColors : Code -> Code -> Int
 correctColors =
   findCorrectColors 0
 
 
-findCorrectColors : Int -> List Color -> List Color -> Int
+findCorrectColors : Int -> Code -> Code -> Int
 findCorrectColors found code guess =
   case guess of
     [] ->
@@ -78,12 +78,12 @@ removeFirst offset item items =
 
 
 
-correctPositions : List Color -> List Color -> Int
+correctPositions : Code -> Code -> Int
 correctPositions =
   findCorrectPositions 0
 
 
-findCorrectPositions : Int -> List Color -> List Color -> Int
+findCorrectPositions : Int -> Code -> Code -> Int
 findCorrectPositions found code guess =
   case code of
     [] ->
