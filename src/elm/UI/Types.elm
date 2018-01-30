@@ -9,6 +9,7 @@ import Core.Types exposing (GuessFeedback)
 type Msg
   = GuessInput String
   | SubmitGuess
+  | ReceivedFeedback String GuessFeedback
 
 
 type alias Model =

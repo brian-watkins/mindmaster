@@ -1,9 +1,19 @@
 module Core.Types exposing
-  ( GuessFeedback(..)
+  ( GuessEvaluator
+  , GameState(..)
+  , GuessFeedback(..)
   , Color(..)
   , Clue
   , Code
   )
+
+
+type alias GuessEvaluator vmsg msg =
+  (GuessFeedback -> vmsg) -> Code -> Cmd msg
+
+type GameState
+  = Won
+  | InProgress
 
 type alias Code =
   List Color

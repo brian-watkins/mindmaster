@@ -7,9 +7,10 @@ import Elmer.Html as Markup
 import Elmer.Html.Event as Event
 import Elmer.Html.Matchers exposing (element, elements, hasText)
 import Elmer.Spy as Spy exposing (Spy)
-import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg)
+import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, functionArg)
+import Elmer.Platform.Command as Command
 import UI
-import Core.Types exposing (GuessFeedback(..), Color(..))
+import Core.Types exposing (GuessFeedback(..), Color(..), GameState(..))
 import Core.Clue as Clue
 
 
@@ -18,14 +19,14 @@ guessTests =
   describe "when a guess is submitted"
   [ test "it executes the playGuess use case with the given guess" <|
     \() ->
-      Elmer.given UI.defaultModel UI.view (UI.update <| Spy.callable "play-spy")
-        |> Spy.use [ playSpy <| wrongFeedback 0 0 ]
+      Elmer.given UI.defaultModel (UI.view InProgress) (UI.update <| Spy.callable "evaluator-spy")
+        |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
         |> Markup.target "#guess-input"
         |> Event.input "rgby"
         |> Markup.target "#guess-submit"
         |> Event.click
-        |> Spy.expect "play-spy" (
-          wasCalledWith [ typedArg [ Red, Green, Blue, Yellow ] ]
+        |> Spy.expect "evaluator-spy" (
+          wasCalledWith [ functionArg, typedArg [ Red, Green, Blue, Yellow ] ]
         )
   , describe "when the guess is correct"
     [ test "it reports that the guess is correct" <|
@@ -77,8 +78,8 @@ guessListTests =
   describe "when multiple guesses are submitted" <|
   let
     state =
-      Elmer.given UI.defaultModel UI.view (UI.update <| Spy.callable "play-spy")
-        |> Spy.use [ playSpy <| wrongFeedback 0 0 ]
+      Elmer.given UI.defaultModel (UI.view InProgress) (UI.update <| Spy.callable "evaluator-spy")
+        |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
         |> Markup.target "#guess-input"
         |> Event.input "rgby"
         |> Markup.target "#guess-submit"
@@ -87,7 +88,7 @@ guessListTests =
         |> Event.input "rggy"
         |> Markup.target "#guess-submit"
         |> Event.click
-        |> Spy.use [ playSpy Correct ]
+        |> Spy.use [ evaluatorSpy Correct ]
         |> Markup.target "#guess-input"
         |> Event.input "bggy"
         |> Markup.target "#guess-submit"
@@ -120,9 +121,12 @@ guessListTests =
   ]
 
 
-playSpy : GuessFeedback -> Spy
-playSpy feedback =
-  Spy.createWith "play-spy" (\guess -> feedback)
+evaluatorSpy : GuessFeedback -> Spy
+evaluatorSpy feedback =
+  Spy.createWith "evaluator-spy" <|
+    \tagger _ ->
+      tagger feedback
+        |> Command.fake
 
 
 wrongFeedback : Int -> Int -> GuessFeedback
@@ -133,8 +137,8 @@ wrongFeedback colorsCorrect positionsCorrect =
 
 expectClue : String -> GuessFeedback -> Expectation
 expectClue clue feedback =
-  Elmer.given UI.defaultModel UI.view (UI.update <| Spy.callable "play-spy")
-    |> Spy.use [ playSpy <| feedback ]
+  Elmer.given UI.defaultModel (UI.view InProgress) (UI.update <| Spy.callable "evaluator-spy")
+    |> Spy.use [ evaluatorSpy <| feedback ]
     |> Markup.target "#guess-input"
     |> Event.input "rgby"
     |> Markup.target "#guess-submit"

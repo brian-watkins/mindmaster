@@ -7,36 +7,51 @@ import Elmer.Html as Markup
 import Elmer.Html.Event as Event
 import Elmer.Html.Matchers exposing (element, hasText)
 import Elmer.Spy as Spy exposing (Spy)
-import Elmer.Spy.Matchers exposing (wasCalledWith, stringArg)
+import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, anyArg)
 import Elmer.Platform.Command as Command
 import Core
 import Core.Clue as Clue
-import Core.Types exposing (GuessFeedback(..), Color(..), Code)
+import Core.Types exposing (..)
 import Core.Fakes.FakeUI as FakeUI
 import Core.Fakes.FakeCodeGenerator as FakeCodeGenerator
 
 
-playGuessTests : Test
-playGuessTests =
-  describe "when a guess is played"
-  [ describe "when there is no code"
-    [ test "it returns Wrong" <|
+gameStateTests : Test
+gameStateTests =
+  describe "game state"
+  [ describe "when the page loads"
+    [ test "it calls the view adapter with a game state of InProgress" <|
       \() ->
-        Elmer.given testModel testView (testUpdate [ Yellow, Blue ])
-          |> Markup.target "#submit-code"
-          |> Event.click
-          |> Elmer.expectModel (\model ->
-              Core.viewModel model
-                |> .feedback
-                |> Expect.equal (Just <| wrongFeedback 0 0)
-            )
-    ]
-  , describe "when there is a code"
-    [ describe "when the guess is correct"
+        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
+          |> Spy.use [ viewSpy ]
+          |> Elmer.init (\_ -> testInit [ Blue ])
+          |> Markup.render
+          |> Spy.expect "view-spy" (
+            wasCalledWith [ typedArg <| InProgress, anyArg ]
+          )
+    , describe "when the guess is correct" <|
+      let
+        state =
+          Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
+            |> Spy.use [ viewSpy ]
+            |> Elmer.init (\_ -> testInit [ Orange ])
+            |> Markup.target "#submit-code"
+            |> Event.click
+      in
       [ test "it returns Correct as the feedback" <|
         \() ->
-          Correct
-            |> expectFeedback [ Orange ] [ Orange ]
+          state
+            |> Elmer.expectModel (\model ->
+                Core.viewModel model
+                  |> .feedback
+                  |> Expect.equal (Just Correct)
+              )
+      , test "it calls the view adapter with a game state of Won" <|
+        \() ->
+          state
+            |> Spy.expect "view-spy" (
+              wasCalledWith [ typedArg Won, anyArg ]
+            )
       ]
     ]
   ]
@@ -89,6 +104,7 @@ wrongFeedback colorsCorrect positionsCorrect =
   Clue.with colorsCorrect positionsCorrect
     |> Wrong
 
+
 expectFeedback : Code -> Code -> GuessFeedback -> Expectation
 expectFeedback code guess expectedFeedback =
   Elmer.given testModel testView (testUpdate guess)
@@ -101,6 +117,10 @@ expectFeedback code guess expectedFeedback =
           |> Expect.equal (Just expectedFeedback)
       )
 
+
+viewSpy : Spy
+viewSpy =
+  Spy.create "view-spy" (\_ -> FakeUI.view)
 
 testModel =
   Core.defaultModel FakeUI.defaultModel

@@ -1,5 +1,6 @@
 module Core.Code exposing
-  ( colors
+  ( none
+  , colors
   , generate
   , equals
   , correctColors
@@ -7,6 +8,11 @@ module Core.Code exposing
   )
 
 import Core.Types exposing (..)
+
+
+none : Code
+none =
+  []
 
 
 colors : List Color

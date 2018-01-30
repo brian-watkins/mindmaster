@@ -7,7 +7,7 @@ module UI exposing
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
-import Core.Types exposing (GuessFeedback(..), Color(..), Code)
+import Core.Types exposing (..)
 import UI.Types exposing (..)
 import UI.Code as Code
 import UI.Views.GuessHistory as GuessHistory
@@ -21,40 +21,42 @@ defaultModel =
   }
 
 
-view : Model -> Html Msg
-view model =
-  Html.div []
-  [ GuessInput.view
-  , GuessHistory.view model
-  ]
+view : GameState -> Model -> Html Msg
+view gameState model =
+  case gameState of
+    InProgress ->
+      Html.div []
+      [ GuessInput.view
+      , GuessHistory.view model
+      ]
+    Won ->
+      Html.div []
+      [ Html.div [ Attr.id "game-over-message" ] [ Html.text "You win!" ]
+      , GuessHistory.view model
+      ]
 
 
-update : (Code -> GuessFeedback) -> Msg -> Model -> (Model, Cmd Msg)
+update : GuessEvaluator Msg msg -> Msg -> Model -> (Model, Cmd msg)
 update evaluator msg model =
   case msg of
     SubmitGuess ->
       case model.guess of
         Just guess ->
-          ( evaluateGuess evaluator guess
-              |> recordGuess model
-          , Cmd.none
-          )
+          ( model, evaluateGuess evaluator guess )
         Nothing ->
           ( model, Cmd.none )
+    ReceivedFeedback guess feedback ->
+      ( recordGuess model (guess, feedback), Cmd.none )
     GuessInput text ->
-      ( { model | guess = Just text }
-      , Cmd.none
-      )
+      ( { model | guess = Just text }, Cmd.none )
 
 
-evaluateGuess : (Code -> GuessFeedback) -> String -> (String, GuessFeedback)
+evaluateGuess : GuessEvaluator Msg msg -> String -> Cmd msg
 evaluateGuess evaluator guess =
-  (guess, Code.fromString guess)
-    |> Tuple.mapSecond evaluator
+  Code.fromString guess
+    |> evaluator (ReceivedFeedback guess)
 
 
 recordGuess : Model -> (String, GuessFeedback) -> Model
 recordGuess model guessRecord =
-  { model | history =
-    guessRecord :: model.history
-  }
+  { model | history = guessRecord :: model.history }
