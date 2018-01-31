@@ -29,30 +29,48 @@ gameStateTests =
           |> Spy.expect "view-spy" (
             wasCalledWith [ typedArg <| InProgress, anyArg ]
           )
-    , describe "when the guess is correct" <|
-      let
-        state =
-          Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
+    ]
+  , describe "when the guess is correct" <|
+    let
+      state =
+        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
+          |> Spy.use [ viewSpy ]
+          |> Elmer.init (\_ -> testInit [ Orange ])
+          |> Markup.target "#submit-code"
+          |> Event.click
+    in
+    [ test "it returns Correct as the feedback" <|
+      \() ->
+        state
+          |> Elmer.expectModel (\model ->
+              Core.viewModel model
+                |> .feedback
+                |> Expect.equal (Just Correct)
+            )
+    , test "it calls the view adapter with a game state of Won" <|
+      \() ->
+        state
+          |> Spy.expect "view-spy" (
+            wasCalledWith [ typedArg Won, anyArg ]
+          )
+    ]
+  , describe "when the max number of incorrect answers has been given"
+    [ test "it calls the view adapter with a game state of Lost and the code" <|
+      \() ->
+        let
+          generator = FakeCodeGenerator.with [ Orange ]
+          gameConfig = { codeGenerator = generator, maxGuesses = 3 }
+        in
+          Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Blue ])
             |> Spy.use [ viewSpy ]
-            |> Elmer.init (\_ -> testInit [ Orange ])
+            |> Elmer.init (\_ -> Core.initGame gameConfig FakeUI.defaultModel)
             |> Markup.target "#submit-code"
             |> Event.click
-      in
-      [ test "it returns Correct as the feedback" <|
-        \() ->
-          state
-            |> Elmer.expectModel (\model ->
-                Core.viewModel model
-                  |> .feedback
-                  |> Expect.equal (Just Correct)
-              )
-      , test "it calls the view adapter with a game state of Won" <|
-        \() ->
-          state
+            |> Event.click
+            |> Event.click
             |> Spy.expect "view-spy" (
-              wasCalledWith [ typedArg Won, anyArg ]
+              wasCalledWith [ typedArg <| Lost [ Orange ], anyArg ]
             )
-      ]
     ]
   ]
 
@@ -123,7 +141,7 @@ viewSpy =
   Spy.create "view-spy" (\_ -> FakeUI.view)
 
 testModel =
-  Core.defaultModel FakeUI.defaultModel
+  Core.defaultModel 10 FakeUI.defaultModel
 
 testView =
   Core.view FakeUI.view
@@ -133,4 +151,4 @@ testUpdate code =
     |> Core.update
 
 testInit code =
-  Core.initGame (FakeCodeGenerator.with code) FakeUI.defaultModel
+  Core.initGame { codeGenerator = FakeCodeGenerator.with code, maxGuesses = 10 } FakeUI.defaultModel

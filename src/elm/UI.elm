@@ -12,6 +12,7 @@ import UI.Types exposing (..)
 import UI.Code as Code
 import UI.Views.GuessHistory as GuessHistory
 import UI.Views.GuessInput as GuessInput
+import UI.Views.Outcome as Outcome
 
 
 defaultModel : Model
@@ -31,7 +32,12 @@ view gameState model =
       ]
     Won ->
       Html.div []
-      [ Html.div [ Attr.id "game-over-message" ] [ Html.text "You win!" ]
+      [ Outcome.view Win
+      , GuessHistory.view model
+      ]
+    Lost code ->
+      Html.div []
+      [ Outcome.view <| Loss code
       , GuessHistory.view model
       ]
 

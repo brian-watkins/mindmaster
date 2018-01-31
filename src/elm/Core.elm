@@ -21,17 +21,22 @@ type Msg viewMsg
   | UpdateGameState (GuessFeedback -> viewMsg) GuessFeedback
   | ViewMsg viewMsg
 
+
 type alias Model vModel =
   { code : Code
   , gameState : GameState
+  , maxGuesses : Int
+  , guesses : Int
   , viewModel : vModel
   }
 
 
-defaultModel : viewModel -> Model viewModel
-defaultModel vModel =
+defaultModel : Int -> viewModel -> Model viewModel
+defaultModel maxGuesses vModel =
   { code = Code.none
   , gameState = InProgress
+  , maxGuesses = maxGuesses
+  , guesses = 0
   , viewModel = vModel
   }
 
@@ -40,12 +45,12 @@ viewModel : Model viewModel -> viewModel
 viewModel model =
   model.viewModel
 
-type alias CodeGenerator viewMsg =
-  Color -> Code -> Int -> (Code -> Msg viewMsg) -> Cmd (Msg viewMsg)
 
-initGame : CodeGenerator viewMsg -> viewModel -> (Model viewModel, Cmd (Msg viewMsg))
-initGame codeGenerator viewModel =
-  (defaultModel viewModel, Code.generate SetCode codeGenerator)
+initGame : GameConfig (Msg viewMsg) -> viewModel -> (Model viewModel, Cmd (Msg viewMsg))
+initGame config viewModel =
+  ( defaultModel config.maxGuesses viewModel
+  , Code.generate SetCode config.codeGenerator
+  )
 
 
 type alias ViewUpdate msg model =
@@ -56,29 +61,44 @@ update : ViewUpdate viewMsg viewModel -> Msg viewMsg -> Model viewModel -> (Mode
 update viewUpdate msg model =
   case msg of
     SetCode code ->
-      let
-        d = Debug.log "The secret code is" code
-      in
-        ( { model | code = code, gameState = InProgress }, Cmd.none )
+      startGame code model
 
     UpdateGameState tagger feedback ->
-      let
-        command =
-          Command.toCmd tagger feedback
-            |> Cmd.map ViewMsg
-      in
-        case feedback of
-          Wrong _ ->
-            ( model, command )
-          Correct ->
-            ( { model | gameState = Won }, command )
+      ( updateGameState feedback model
+      , Cmd.map ViewMsg <| Command.toCmd tagger feedback
+      )
 
     ViewMsg viewMsg ->
-      let
-        executor = EvaluateGuess.executor UpdateGameState model.code
-        ( vmodel, cmd ) = viewUpdate executor viewMsg model.viewModel
-      in
-        ( { model | viewModel = vmodel }, cmd )
+      EvaluateGuess.executor UpdateGameState model.code
+        |> configure viewUpdate viewMsg model.viewModel
+        |> mapToModel model
+
+
+startGame : Code -> Model viewModel -> ( Model viewModel, Cmd msg )
+startGame code model =
+  ( { model | code = code, gameState = InProgress }, Cmd.none )
+
+
+configure : ( a -> b -> c -> d ) -> b -> c -> a -> d
+configure func b c a =
+  func a b c
+
+
+mapToModel : Model viewModel -> ( viewModel, Cmd msg ) -> ( Model viewModel, Cmd msg )
+mapToModel model ( viewModel, command ) =
+  ( { model | viewModel = viewModel }, command )
+
+
+updateGameState : GuessFeedback -> Model viewModel -> Model viewModel
+updateGameState feedback model =
+  case feedback of
+    Wrong _ ->
+      if model.guesses + 1 == model.maxGuesses then
+        { model | gameState = Lost model.code }
+      else
+        { model | guesses = model.guesses + 1 }
+    Correct ->
+      { model | gameState = Won }
 
 
 type alias ViewAdapter viewModel viewMsg =
