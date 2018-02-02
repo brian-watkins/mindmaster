@@ -13,12 +13,13 @@ import Core.Code as Code
 import Core.Clue as Clue
 import Core.Command as Command
 import Core.Types exposing (..)
-import Core.Command.EvaluateGuess as EvaluateGuess
+import Core.Actions.GuessCode as GuessCode
+import Core.Actions.StartGame as StartGame
 
 
 type Msg viewMsg
   = SetCode Code
-  | UpdateGameState (GuessFeedback -> viewMsg) GuessFeedback
+  | Play (GuessFeedback -> viewMsg) Code
   | ViewMsg viewMsg
 
 
@@ -46,6 +47,11 @@ viewModel model =
   model.viewModel
 
 
+commandForView : Cmd viewMsg -> Cmd (Msg viewMsg)
+commandForView =
+  Cmd.map ViewMsg
+
+
 initGame : GameConfig (Msg viewMsg) -> viewModel -> (Model viewModel, Cmd (Msg viewMsg))
 initGame config viewModel =
   ( defaultModel config.maxGuesses viewModel
@@ -61,44 +67,35 @@ update : ViewUpdate viewMsg viewModel -> Msg viewMsg -> Model viewModel -> (Mode
 update viewUpdate msg model =
   case msg of
     SetCode code ->
-      startGame code model
+      StartGame.update code model
 
-    UpdateGameState tagger feedback ->
-      ( updateGameState feedback model
-      , Cmd.map ViewMsg <| Command.toCmd tagger feedback
-      )
+    Play tagger guess ->
+      GuessCode.update tagger guess model
+        |> mapCommand commandForView
 
     ViewMsg viewMsg ->
-      EvaluateGuess.executor UpdateGameState model.code
-        |> configure viewUpdate viewMsg model.viewModel
-        |> mapToModel model
+      viewUpdate guessEvaluator viewMsg model.viewModel
+        |> mapModel (storeViewModel model)
 
 
-startGame : Code -> Model viewModel -> ( Model viewModel, Cmd msg )
-startGame code model =
-  ( { model | code = code, gameState = InProgress }, Cmd.none )
+guessEvaluator : (GuessFeedback -> vmsg) -> Code -> Cmd (Msg vmsg)
+guessEvaluator tagger guess =
+  Command.toCmd (Play tagger) guess
 
 
-configure : ( a -> b -> c -> d ) -> b -> c -> a -> d
-configure func b c a =
-  func a b c
+mapModel : (model -> mapped) -> (model, cmd) -> (mapped, cmd)
+mapModel =
+  Tuple.mapFirst
 
 
-mapToModel : Model viewModel -> ( viewModel, Cmd msg ) -> ( Model viewModel, Cmd msg )
-mapToModel model ( viewModel, command ) =
-  ( { model | viewModel = viewModel }, command )
+mapCommand : (cmd -> mapped) -> (model, cmd) -> (model, mapped)
+mapCommand =
+  Tuple.mapSecond
 
 
-updateGameState : GuessFeedback -> Model viewModel -> Model viewModel
-updateGameState feedback model =
-  case feedback of
-    Wrong _ ->
-      if model.guesses + 1 == model.maxGuesses then
-        { model | gameState = Lost model.code }
-      else
-        { model | guesses = model.guesses + 1 }
-    Correct ->
-      { model | gameState = Won }
+storeViewModel : Model viewModel -> viewModel -> Model viewModel
+storeViewModel model viewModel =
+  { model | viewModel = viewModel }
 
 
 type alias ViewAdapter viewModel viewMsg =
