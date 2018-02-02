@@ -27,7 +27,7 @@ view gameState model =
   case gameState of
     InProgress ->
       Html.div []
-      [ GuessInput.view
+      [ GuessInput.view model
       , GuessHistory.view model
       ]
     Won ->
@@ -48,7 +48,7 @@ update evaluator msg model =
     SubmitGuess ->
       case model.guess of
         Just guess ->
-          ( model, evaluateGuess evaluator guess )
+          ( { model | guess = Nothing }, evaluateGuess evaluator guess )
         Nothing ->
           ( model, Cmd.none )
     ReceivedFeedback guess feedback ->

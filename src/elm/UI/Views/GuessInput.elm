@@ -8,11 +8,15 @@ import Html.Attributes as Attr
 import Html.Events as Events
 
 
-view : Html Msg
-view =
+view : Model -> Html Msg
+view model =
   Html.div []
   [ Html.text "Enter a guess (r, g, b, y, p, o)"
-  , Html.input [ Attr.id "guess-input", Events.onInput GuessInput ] []
+  , Html.input
+    [ Attr.id "guess-input"
+    , Events.onInput GuessInput
+    , Attr.value <| Maybe.withDefault "" model.guess
+    ] []
   , Html.button [ Attr.id "guess-submit", Events.onClick SubmitGuess ]
     [ Html.text "Submit guess" ]
   ]

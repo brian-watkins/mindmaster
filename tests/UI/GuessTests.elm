@@ -5,7 +5,7 @@ import Expect exposing (Expectation)
 import Elmer exposing ((<&&>), atIndex)
 import Elmer.Html as Markup
 import Elmer.Html.Event as Event
-import Elmer.Html.Matchers exposing (element, elements, hasText)
+import Elmer.Html.Matchers exposing (element, elements, hasText, hasAttribute, hasProperty)
 import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, functionArg)
 import Elmer.Platform.Command as Command
@@ -28,19 +28,29 @@ guessTests =
         |> Spy.expect "evaluator-spy" (
           wasCalledWith [ functionArg, typedArg [ Red, Green, Blue, Yellow ] ]
         )
-  , describe "when the guess is correct"
-    [ test "it reports that the guess is correct" <|
-      \() ->
-        Correct
-          |> expectClue "Correct!"
-    ]
+  , test "it clears the guess input" <|
+    \() ->
+      Elmer.given UI.defaultModel (UI.view InProgress) (UI.update <| Spy.callable "evaluator-spy")
+        |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
+        |> Markup.target "#guess-input"
+        |> Event.input "rgby"
+        |> Markup.target "#guess-submit"
+        |> Event.click
+        |> Markup.target "#guess-input"
+        |> Markup.expect (element <| hasProperty ("value", ""))
   ]
 
 
 cluePresentationTests : Test
 cluePresentationTests =
   describe "when there is a clue"
-  [ describe "when no colors are correct"
+  [ describe "when the guess is correct"
+    [ test "it reports that the guess is correct" <|
+      \() ->
+        Correct
+          |> expectClue "Correct!"
+    ]
+  , describe "when no colors are correct"
     [ test "it says no colors are correct" <|
       \() ->
         wrongFeedback 0 0
