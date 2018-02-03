@@ -3,41 +3,48 @@ module UI.GuessTests exposing (..)
 import Test exposing (..)
 import Expect exposing (Expectation)
 import Elmer exposing ((<&&>), atIndex)
-import Elmer.Html as Markup
+import Elmer.Html as Markup exposing (HtmlElement)
 import Elmer.Html.Event as Event
-import Elmer.Html.Matchers exposing (element, elements, hasText, hasAttribute, hasProperty)
+import Elmer.Html.Matchers exposing (element, elements, hasText, hasClass, hasAttribute, hasProperty)
+import Elmer.Html.Element as Element
 import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, functionArg)
 import Elmer.Platform.Command as Command
 import UI
-import Core.Types exposing (GuessFeedback(..), Color(..), GameState(..))
+import Core.Types exposing (GuessFeedback(..), Color(..), GameState(..), Code)
 import Core.Clue as Clue
 
 
 guessTests : Test
 guessTests =
-  describe "when a guess is submitted"
-  [ test "it executes the playGuess use case with the given guess" <|
-    \() ->
+  describe "when a guess is submitted" <|
+  let
+    state =
       Elmer.given UI.defaultModel (UI.view InProgress) (UI.update <| Spy.callable "evaluator-spy")
         |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
         |> Markup.target "#guess-input"
-        |> Event.input "rgby"
+        |> Event.input "roygb"
         |> Markup.target "#guess-submit"
         |> Event.click
+  in
+  [ test "it executes the playGuess use case with the given guess" <|
+    \() ->
+      state
         |> Spy.expect "evaluator-spy" (
-          wasCalledWith [ functionArg, typedArg [ Red, Green, Blue, Yellow ] ]
+          wasCalledWith [ functionArg, typedArg [ Red, Orange, Yellow, Green, Blue ] ]
         )
   , test "it clears the guess input" <|
     \() ->
-      Elmer.given UI.defaultModel (UI.view InProgress) (UI.update <| Spy.callable "evaluator-spy")
-        |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
-        |> Markup.target "#guess-input"
-        |> Event.input "rgby"
-        |> Markup.target "#guess-submit"
-        |> Event.click
+      state
         |> Markup.target "#guess-input"
         |> Markup.expect (element <| hasProperty ("value", ""))
+  , test "it shows the guess in the list" <|
+    \() ->
+      state
+        |> Markup.target "[data-guess-feedback]"
+        |> Markup.expect (element <|
+          expectGuess [ "red", "orange", "yellow", "green", "blue" ]
+        )
   ]
 
 
@@ -109,7 +116,7 @@ guessListTests =
       state
         |> Markup.target "[data-guess-feedback]"
         |> Markup.expect (elements <| atIndex 0 <|
-          hasText "bggy" <&&>
+          expectGuess [ "blue", "green", "green", "yellow" ] <&&>
           hasText "Correct!"
         )
   , test "it shows the second guess second" <|
@@ -117,7 +124,7 @@ guessListTests =
       state
         |> Markup.target "[data-guess-feedback]"
         |> Markup.expect (elements <| atIndex 1 <|
-          hasText "rggy" <&&>
+          expectGuess [ "red", "green", "green", "yellow" ] <&&>
           hasText "Wrong. 0 colors correct."
         )
   , test "it shows the first guess last" <|
@@ -125,7 +132,7 @@ guessListTests =
       state
         |> Markup.target "[data-guess-feedback]"
         |> Markup.expect (elements <| atIndex 2 <|
-          hasText "rgby" <&&>
+          expectGuess [ "red", "green", "blue", "yellow" ] <&&>
           hasText "Wrong. 0 colors correct."
         )
   ]
@@ -155,6 +162,19 @@ expectClue clue feedback =
     |> Event.click
     |> Markup.target "[data-guess-feedback]"
     |> Markup.expect (element <|
-      hasText "rgby" <&&>
+      expectGuess [ "red", "green", "blue", "yellow" ] <&&>
       hasText clue
     )
+
+expectGuess : List String -> HtmlElement msg -> Expectation
+expectGuess cssCode element =
+  element
+    |> Element.target "[data-guess-element]"
+    |> elements (
+      List.indexedMap expectGuessElement cssCode
+        |> List.foldl (<&&>) (\_ -> Expect.pass)
+    )
+
+expectGuessElement : Int -> String -> Elmer.Matcher (List (HtmlElement msg))
+expectGuessElement index className =
+  atIndex index <| hasAttribute ("class", className)

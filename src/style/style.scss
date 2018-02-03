@@ -1,0 +1,34 @@
+.red {
+  fill: #D50000;
+}
+
+.orange {
+  fill: #FF6D00;
+}
+
+.yellow {
+  fill: #FFD600;
+}
+
+.green {
+  fill: #00C853;
+}
+
+.blue {
+  fill: #2962FF;
+}
+
+.guess {
+  display: flex;
+}
+
+.guess-element {
+  padding: 7px;
+  width: 35px;
+  height: 35px;
+}
+
+#feedback {
+  display: flex;
+  justify-content: center;
+}

@@ -1,6 +1,12 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path')
+const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ExtractTextPlugin = require("extract-text-webpack-plugin")
+
+const extractSass = new ExtractTextPlugin({
+    filename: "[name].[contenthash].css",
+    disable: process.env.NODE_ENV === "development"
+});
 
 module.exports = {
   entry: {
@@ -21,6 +27,18 @@ module.exports = {
 
   module: {
     loaders: [
+      {
+        test: /\.scss$/,
+        exclude: /node_modules/,
+        use: extractSass.extract({
+          use: [{
+            loader: "css-loader"
+          }, {
+            loader: "sass-loader"
+          }],
+          fallback: "style-loader"
+        })
+      },
       {
         test: /\.elm$/,
         exclude: [/elm-stuff/, /node_modules/],
@@ -45,7 +63,8 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/index.html',
       hash: true
-    })
+    }),
+    extractSass
   ],
 
   devServer: {

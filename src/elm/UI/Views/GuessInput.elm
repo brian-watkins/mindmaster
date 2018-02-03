@@ -11,7 +11,7 @@ import Html.Events as Events
 view : Model -> Html Msg
 view model =
   Html.div []
-  [ Html.text "Enter a guess (r, g, b, y, p, o)"
+  [ Html.text "Enter a guess (r, o, y, g, b)"
   , Html.input
     [ Attr.id "guess-input"
     , Events.onInput GuessInput

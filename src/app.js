@@ -1,3 +1,4 @@
+import './style/style.scss'
 import MindMasterApp from "./elm/Main"
 
 const mountNode = document.getElementById("mindmaster-app")
