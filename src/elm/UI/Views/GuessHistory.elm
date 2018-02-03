@@ -25,7 +25,10 @@ feedbackHistory model =
 
 printHistoryItem : Int -> (String, GuessFeedback) -> Html Msg
 printHistoryItem index (guess, feedback) =
-  Html.li [ Attr.attribute "data-guess-feedback" <| toString index ]
-  [ Guess.view guess
-  , Feedback.view feedback
-  ]
+  Html.li
+    [ Attr.class "guess-history-item"
+    , Attr.attribute "data-guess-feedback" <| toString index
+    ]
+    [ Guess.view guess
+    , Feedback.view feedback
+    ]
