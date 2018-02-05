@@ -2,7 +2,7 @@ module UI.GuessTests exposing (..)
 
 import Test exposing (..)
 import Expect exposing (Expectation)
-import Elmer exposing (Matcher, (<&&>), atIndex, hasLength)
+import Elmer exposing (TestState, Matcher, (<&&>), atIndex, hasLength, each)
 import Elmer.Html as Markup exposing (HtmlElement)
 import Elmer.Html.Event as Event
 import Elmer.Html.Matchers exposing (element, elements, hasText, hasClass, hasAttribute, hasProperty)
@@ -11,8 +11,10 @@ import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, functionArg)
 import Elmer.Platform.Command as Command
 import UI
+import UI.Types exposing (Model, Msg)
 import Core.Types exposing (GuessFeedback(..), Color(..), GameState(..), Code)
 import Core.Clue as Clue
+import TestHelpers exposing (..)
 
 
 guessTests : Test
@@ -22,10 +24,7 @@ guessTests =
     state =
       Elmer.given UI.defaultModel (UI.view InProgress) (UI.update <| Spy.callable "evaluator-spy")
         |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
-        |> Markup.target "#guess-input"
-        |> Event.input "roygb"
-        |> Markup.target "#guess-submit"
-        |> Event.click
+        |> selectGuess [ "red", "orange", "yellow", "green", "blue" ]
   in
   [ test "it executes the playGuess use case with the given guess" <|
     \() ->
@@ -36,8 +35,10 @@ guessTests =
   , test "it clears the guess input" <|
     \() ->
       state
-        |> Markup.target "#guess-input"
-        |> Markup.expect (element <| hasProperty ("value", ""))
+        |> Markup.target "[data-guess-input-element]"
+        |> Markup.expect (elements <|
+          each <| hasAttribute ("class", "empty")
+        )
   , test "it shows the guess in the list" <|
     \() ->
       state
@@ -85,26 +86,17 @@ guessListTests =
     state =
       Elmer.given UI.defaultModel (UI.view InProgress) (UI.update <| Spy.callable "evaluator-spy")
         |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
-        |> Markup.target "#guess-input"
-        |> Event.input "rgby"
-        |> Markup.target "#guess-submit"
-        |> Event.click
-        |> Markup.target "#guess-input"
-        |> Event.input "rggy"
-        |> Markup.target "#guess-submit"
-        |> Event.click
+        |> selectGuess [ "red", "green", "blue", "yellow", "yellow" ]
+        |> selectGuess [ "red", "green", "green", "yellow", "yellow" ]
         |> Spy.use [ evaluatorSpy Correct ]
-        |> Markup.target "#guess-input"
-        |> Event.input "bggy"
-        |> Markup.target "#guess-submit"
-        |> Event.click
+        |> selectGuess [ "blue", "green", "green", "yellow", "yellow" ]
   in
   [ test "it shows the third guess first" <|
     \() ->
       state
         |> Markup.target "[data-guess-feedback]"
         |> Markup.expect (elements <| atIndex 0 <|
-          expectGuess [ "blue", "green", "green", "yellow" ] <&&>
+          expectGuess [ "blue", "green", "green", "yellow", "yellow" ] <&&>
           expectClue [ ("black", 5) ]
         )
   , test "it shows the second guess second" <|
@@ -112,7 +104,7 @@ guessListTests =
       state
         |> Markup.target "[data-guess-feedback]"
         |> Markup.expect (elements <| atIndex 1 <|
-          expectGuess [ "red", "green", "green", "yellow" ] <&&>
+          expectGuess [ "red", "green", "green", "yellow", "yellow" ] <&&>
           expectClue [ ("empty", 5) ]
         )
   , test "it shows the first guess last" <|
@@ -120,7 +112,7 @@ guessListTests =
       state
         |> Markup.target "[data-guess-feedback]"
         |> Markup.expect (elements <| atIndex 2 <|
-          expectGuess [ "red", "green", "blue", "yellow" ] <&&>
+          expectGuess [ "red", "green", "blue", "yellow", "yellow" ] <&&>
           expectClue [ ("empty", 5) ]
         )
   ]
@@ -144,10 +136,7 @@ expectFeedback : List (String, Int) -> GuessFeedback -> Expectation
 expectFeedback clueElements feedback =
   Elmer.given UI.defaultModel (UI.view InProgress) (UI.update <| Spy.callable "evaluator-spy")
     |> Spy.use [ evaluatorSpy <| feedback ]
-    |> Markup.target "#guess-input"
-    |> Event.input "rgby"
-    |> Markup.target "#guess-submit"
-    |> Event.click
+    |> selectGuess [ "red", "green", "blue", "yellow", "yellow" ]
     |> Markup.target "[data-guess-feedback]"
     |> Markup.expect (element <|
       expectClue clueElements
@@ -159,7 +148,7 @@ expectClue clueElements element =
     |> Element.target "[data-clue-element]"
     |> elements (
       List.map expectClueElements clueElements
-        |> List.foldl (<&&>) (\_ -> Expect.pass)
+        |> expectAll
     )
 
 expectClueElements : (String, Int) -> Matcher (List (HtmlElement msg))
@@ -175,9 +164,24 @@ expectGuess cssCode element =
     |> Element.target "[data-guess-element]"
     |> elements (
       List.indexedMap expectGuessElement cssCode
-        |> List.foldl (<&&>) (\_ -> Expect.pass)
+        |> expectAll
     )
 
 expectGuessElement : Int -> String -> Matcher (List (HtmlElement msg))
 expectGuessElement index className =
   atIndex index <| hasAttribute ("class", className)
+
+
+selectGuess : List String -> TestState Model Msg -> TestState Model Msg
+selectGuess elements testState =
+  List.indexedMap selectGuessElement elements
+    |> foldStates testState
+    |> Markup.target "#submit-guess"
+    |> Event.click
+
+
+selectGuessElement : Int -> String -> TestState Model Msg -> TestState Model Msg
+selectGuessElement position class testState =
+  testState
+    |> Markup.target ("[data-guess-input='" ++ toString position ++ "'] [class='" ++ class ++ "']")
+    |> Event.click

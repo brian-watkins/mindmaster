@@ -26,8 +26,11 @@ describe("MindMaster", () => {
   })
 
   it('evaluates a guess', async () => {
-    await page.type("#guess-input", 'rrrrr')
-    await page.click('#guess-submit')
+    for (var i = 0; i < 700; i = i + 5) {
+      await page.mouse.click(i, 18)
+    }
+
+    await page.click('#submit-guess')
     await page.waitFor('[data-guess-feedback]')
     const feedback = await page.$('[data-guess-feedback]')
     expect(feedback).not.toBe(null)

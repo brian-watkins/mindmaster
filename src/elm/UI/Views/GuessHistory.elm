@@ -2,17 +2,17 @@ module UI.Views.GuessHistory exposing
   ( view
   )
 
-import Core.Types exposing (GuessFeedback(..))
+import Core.Types exposing (Code, GuessFeedback(..))
 import UI.Types exposing (..)
 import UI.Views.Feedback as Feedback
-import UI.Views.Guess as Guess
+import UI.Views.Guessed as Guessed
 import Html exposing (Html)
 import Html.Attributes as Attr
 
 
 view : Model -> Html Msg
 view model =
-  Html.div [ Attr.id "feedback" ]
+  Html.div [ Attr.id "feedback", Attr.class "row" ]
   [ feedbackHistory model ]
 
 
@@ -20,15 +20,15 @@ feedbackHistory : Model -> Html Msg
 feedbackHistory model =
   model.history
     |> List.indexedMap printHistoryItem
-    |> Html.ol [ Attr.reversed True ]
+    |> Html.ul []
 
 
-printHistoryItem : Int -> (String, GuessFeedback) -> Html Msg
+printHistoryItem : Int -> (Code, GuessFeedback) -> Html Msg
 printHistoryItem index (guess, feedback) =
   Html.li
     [ Attr.class "guess-history-item"
     , Attr.attribute "data-guess-feedback" <| toString index
     ]
-    [ Guess.view guess
+    [ Guessed.view guess
     , Feedback.view feedback
     ]

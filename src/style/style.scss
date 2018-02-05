@@ -1,56 +1,20 @@
-.red {
-  fill: #D50000;
+@import 'colors';
+@import 'guessHistory';
+@import 'guessInput';
+
+
+body {
+  font-family: 'Mukta Mahee', sans-serif;
+  background-color: #fafafa;
 }
 
-.orange {
-  fill: #FF6D00;
-}
-
-.yellow {
-  fill: #FFD600;
-}
-
-.green {
-  fill: #00C853;
-}
-
-.blue {
-  fill: #2962FF;
-}
-
-.guess-history-item {
-  display: flex;
-}
-
-.guess {
-  display: flex;
-}
-
-.guess-element {
-  padding: 7px;
-  width: 50px;
-  height: 50px;
-}
-
-.clue {
-  padding: 7px;
-  width: 50px;
-  height: 50px;
-}
-
-.black {
-  fill: #263238;
-}
-
-.white {
-  fill: #78909C;
-}
-
-.empty {
-  fill: #ECEFF1
-}
-
-#feedback {
+.row {
   display: flex;
   justify-content: center;
+}
+
+ul {
+  margin: 0px;
+  padding: 0px;
+  list-style-type: none;
 }

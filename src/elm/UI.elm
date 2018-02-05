@@ -10,6 +10,7 @@ import Html.Events as Events
 import Core.Types exposing (..)
 import UI.Types exposing (..)
 import UI.Code as Code
+import UI.Guess as Guess
 import UI.Views.GuessHistory as GuessHistory
 import UI.Views.GuessInput as GuessInput
 import UI.Views.Outcome as Outcome
@@ -17,7 +18,7 @@ import UI.Views.Outcome as Outcome
 
 defaultModel : Model
 defaultModel =
-  { guess = Nothing
+  { guess = Guess.none
   , history = []
   }
 
@@ -46,23 +47,22 @@ update : GuessEvaluator Msg msg -> Msg -> Model -> (Model, Cmd msg)
 update evaluator msg model =
   case msg of
     SubmitGuess ->
-      case model.guess of
-        Just guess ->
-          ( { model | guess = Nothing }, evaluateGuess evaluator guess )
-        Nothing ->
-          ( model, Cmd.none )
+      ( { model | guess = Guess.none }, evaluateGuess evaluator model.guess )
     ReceivedFeedback guess feedback ->
       ( recordGuess model (guess, feedback), Cmd.none )
-    GuessInput text ->
-      ( { model | guess = Just text }, Cmd.none )
+    GuessInput position guessColor ->
+      ( { model | guess = Guess.with position guessColor model.guess }, Cmd.none )
 
 
-evaluateGuess : GuessEvaluator Msg msg -> String -> Cmd msg
+evaluateGuess : GuessEvaluator Msg msg -> Guess -> Cmd msg
 evaluateGuess evaluator guess =
-  Code.fromString guess
-    |> evaluator (ReceivedFeedback guess)
+  let
+    guessedCode =
+      Guess.toCode guess
+  in
+    evaluator (ReceivedFeedback guessedCode) guessedCode
 
 
-recordGuess : Model -> (String, GuessFeedback) -> Model
+recordGuess : Model -> (Code, GuessFeedback) -> Model
 recordGuess model guessRecord =
   { model | history = guessRecord :: model.history }

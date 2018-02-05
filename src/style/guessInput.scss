@@ -1,0 +1,20 @@
+.guess-input-element {
+  margin-top: 30px;
+  padding: 7px;
+  width: 100px;
+  height: 100px;
+}
+
+#submit-guess {
+  width: 18em;
+  height: 2em;
+  line-height: 2em;
+  margin: 30px;
+  font-size: 1.5em;
+  color: #fafafa;
+  text-align: center;
+  display: inline-block;
+  background-color: #673AB7;
+  cursor: pointer;
+  border-radius: 8px;
+}
