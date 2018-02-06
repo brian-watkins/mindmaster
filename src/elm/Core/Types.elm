@@ -24,7 +24,7 @@ type alias CodeGenerator msg =
 type GameState
   = Won
   | Lost Code
-  | InProgress
+  | InProgress Int
 
 type alias Code =
   List Color

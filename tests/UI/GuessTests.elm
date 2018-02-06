@@ -22,7 +22,7 @@ guessTests =
   describe "when a guess is submitted" <|
   let
     state =
-      Elmer.given UI.defaultModel (UI.view InProgress) (UI.update <| Spy.callable "evaluator-spy")
+      Elmer.given UI.defaultModel (UI.view <| InProgress 4) (UI.update <| Spy.callable "evaluator-spy")
         |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
         |> selectGuess [ "red", "orange", "yellow", "green", "blue" ]
   in
@@ -48,6 +48,23 @@ guessTests =
         )
   ]
 
+
+remainingGuessesTests : Test
+remainingGuessesTests =
+  describe "remaining guesses"
+  [ test "it shows the guesses remaining" <|
+    \() ->
+      Elmer.given UI.defaultModel (UI.view <| InProgress 4) (UI.update (\_ _ -> Cmd.none))
+        |> Markup.target "#game-progress"
+        |> Markup.expect (element <| hasText "4 guesses remain!")
+  , describe "when 1 guess remains"
+    [ test "it shows that 1 guess remains" <|
+      \() ->
+        Elmer.given UI.defaultModel (UI.view <| InProgress 1) (UI.update (\_ _ -> Cmd.none))
+          |> Markup.target "#game-progress"
+          |> Markup.expect (element <| hasText "Last guess!")
+    ]
+  ]
 
 cluePresentationTests : Test
 cluePresentationTests =
@@ -84,7 +101,7 @@ guessListTests =
   describe "when multiple guesses are submitted" <|
   let
     state =
-      Elmer.given UI.defaultModel (UI.view InProgress) (UI.update <| Spy.callable "evaluator-spy")
+      Elmer.given UI.defaultModel (UI.view <| InProgress 4) (UI.update <| Spy.callable "evaluator-spy")
         |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
         |> selectGuess [ "red", "green", "blue", "yellow", "yellow" ]
         |> selectGuess [ "red", "green", "green", "yellow", "yellow" ]
@@ -134,7 +151,7 @@ wrongFeedback colorsCorrect positionsCorrect =
 
 expectFeedback : List (String, Int) -> GuessFeedback -> Expectation
 expectFeedback clueElements feedback =
-  Elmer.given UI.defaultModel (UI.view InProgress) (UI.update <| Spy.callable "evaluator-spy")
+  Elmer.given UI.defaultModel (UI.view <| InProgress 4) (UI.update <| Spy.callable "evaluator-spy")
     |> Spy.use [ evaluatorSpy <| feedback ]
     |> selectGuess [ "red", "green", "blue", "yellow", "yellow" ]
     |> Markup.target "[data-guess-feedback]"

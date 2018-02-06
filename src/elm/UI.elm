@@ -14,6 +14,7 @@ import UI.Guess as Guess
 import UI.Views.GuessHistory as GuessHistory
 import UI.Views.GuessInput as GuessInput
 import UI.Views.Outcome as Outcome
+import UI.Views.Progress as Progress
 
 
 defaultModel : Model
@@ -26,9 +27,10 @@ defaultModel =
 view : GameState -> Model -> Html Msg
 view gameState model =
   case gameState of
-    InProgress ->
+    InProgress remainingGuesses ->
       Html.div []
       [ GuessInput.view model
+      , Progress.view remainingGuesses
       , GuessHistory.view model
       ]
     Won ->

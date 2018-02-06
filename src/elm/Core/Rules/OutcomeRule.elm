@@ -18,6 +18,6 @@ apply model feedback =
       if model.guesses + 1 == model.maxGuesses then
         Lost model.code
       else
-        InProgress
+        InProgress (model.maxGuesses - model.guesses - 1)
     Correct ->
       Won

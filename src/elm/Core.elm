@@ -35,7 +35,7 @@ type alias Model vModel =
 defaultModel : Int -> viewModel -> Model viewModel
 defaultModel maxGuesses vModel =
   { code = Code.none
-  , gameState = InProgress
+  , gameState = InProgress maxGuesses
   , maxGuesses = maxGuesses
   , guesses = 0
   , viewModel = vModel

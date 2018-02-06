@@ -27,9 +27,24 @@ gameStateTests =
           |> Elmer.init (\_ -> testInit [ Blue ])
           |> Markup.render
           |> Spy.expect "view-spy" (
-            wasCalledWith [ typedArg <| InProgress, anyArg ]
+            wasCalledWith [ typedArg <| InProgress maxGuesses, anyArg ]
           )
     ]
+  , describe "when the guess is wrong"
+    [ test "it decreases the number of remaining guesses by one" <|
+      \() ->
+        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
+          |> Spy.use [ viewSpy ]
+          |> Elmer.init (\_ -> testInit [ Blue ])
+          |> Markup.target "#submit-code"
+          |> Event.click
+          |> Event.click
+          |> Event.click
+          |> Spy.expect "view-spy" (
+            wasCalledWith [ typedArg <| InProgress (maxGuesses - 3), anyArg ]
+          )
+    ]
+
   , describe "when the guess is correct" <|
     let
       state =
@@ -136,12 +151,14 @@ expectFeedback code guess expectedFeedback =
       )
 
 
+maxGuesses = 18
+
 viewSpy : Spy
 viewSpy =
   Spy.create "view-spy" (\_ -> FakeUI.view)
 
 testModel =
-  Core.defaultModel 10 FakeUI.defaultModel
+  Core.defaultModel maxGuesses FakeUI.defaultModel
 
 testView =
   Core.view FakeUI.view
@@ -151,4 +168,4 @@ testUpdate code =
     |> Core.update
 
 testInit code =
-  Core.initGame { codeGenerator = FakeCodeGenerator.with code, maxGuesses = 10 } FakeUI.defaultModel
+  Core.initGame { codeGenerator = FakeCodeGenerator.with code, maxGuesses = maxGuesses } FakeUI.defaultModel
