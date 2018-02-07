@@ -5,6 +5,7 @@ module UI.Views.Feedback exposing
 import Core.Types exposing (GuessFeedback(..))
 import UI.Types exposing (..)
 import UI.Vectors.Circle as Circle
+import UI.Vectors.Arc as Arc
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Svg exposing (Svg)
@@ -22,7 +23,7 @@ type alias Clue =
 view : GuessFeedback -> Html Msg
 view feedback =
     Html.div [ Attr.class "clue" ]
-    [ Svg.svg [ SvgAttr.viewBox "0 0 34 34"] <|
+    [ Svg.svg [ SvgAttr.viewBox "0 0 30 30"] <|
         ( clueList feedback
             |> positioned emptyClues
             |> List.map clueElement
@@ -65,17 +66,20 @@ positioned positionedClues clueClasses =
 
 emptyClues : List Clue
 emptyClues =
-  [ emptyClue 11.25 26
-  , emptyClue 22.75 26
-  , emptyClue 8 15
-  , emptyClue 26 15
-  , emptyClue 17 7
+  [ emptyClue 0.6
+  , emptyClue 0.4
+  , emptyClue 0.8
+  , emptyClue 0.2
+  , emptyClue 0.0
   ]
 
 
-emptyClue : Float -> Float -> Clue
-emptyClue x y =
-  { class = Nothing
-  , x = x
-  , y = y
-  }
+emptyClue : Float -> Clue
+emptyClue extent =
+  let
+    arc = Arc.with 10 extent
+  in
+    { class = Nothing
+    , x = 15 + arc.dx
+    , y = 5 + arc.dy
+    }
