@@ -4,7 +4,10 @@ module UI.Views.GuessInput exposing
 
 import UI.Types exposing (..)
 import UI.Code as Code
+import UI.Guess as Guess
 import UI.Views.SubmitGuess as SubmitGuess
+import UI.Vectors.Circle as Circle
+import UI.Vectors.Wedge as Wedge
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
@@ -34,79 +37,81 @@ guessInput model index =
   , Attr.attribute "data-guess-input" <| toString index
   ]
   [ Svg.svg [ Sattr.viewBox "0 0 30 30" ]
-    [ centeredCircle 15
-      [ Sattr.class "red"
-      , Events.onClick <| GuessInput index Red
-      ]
-    , arcPath index 0.8 Yellow
-    , arcPath index 0.6 Orange
-    , arcPath index 0.4 Blue
-    , arcPath index 0.2 Green
-    , centeredCircle 10
-      [ Sattr.fill "white"
-      ]
-    , centeredCircle 8.5
-      [ Attr.attribute "data-guess-input-element" <| toString index
-      , Sattr.class <| colorToClass (colorAt index model.guess)
-      ]
+    [ selectableColors index colors
+    , boundary
+    , selectedColor index model
     ]
   ]
 
 
-colorAt : Int -> Guess -> Maybe Color
-colorAt position guess =
-  List.drop position guess
-    |> List.head
-    |> Maybe.withDefault Nothing
+selectedColor : Int -> Model -> Svg Msg
+selectedColor index model =
+  Circle.unit 8.5
+    [ Attr.attribute "data-guess-input-element" <| toString index
+    , Sattr.class <| colorToClass (Guess.colorAt index model.guess)
+    ]
+
+
+boundary : Svg Msg
+boundary =
+  Circle.unit 10
+    [ Sattr.fill "white"
+    ]
+
+
+colors : List Color
+colors =
+  [ Red
+  , Orange
+  , Yellow
+  , Green
+  , Blue
+  ]
 
 
 colorToClass : Maybe Color -> String
 colorToClass maybeColor =
-  case maybeColor of
-    Just c ->
-      Code.colorToClass c
-    Nothing ->
-      "empty"
+  Maybe.map Code.colorToClass maybeColor
+    |> Maybe.withDefault "empty"
 
 
-centeredCircle : Float -> List (Attribute Msg) -> Svg Msg
-centeredCircle radius attrs =
-  Svg.circle (
-    List.append attrs
-      [ Sattr.cx "15"
-      , Sattr.cy "15"
-      , Sattr.r <| toString radius
-      ]
-  ) []
+selectableColors : Int -> List Color -> Svg Msg
+selectableColors index colors =
+  Svg.g [] <|
+    [ base index <| List.head colors ] ++
+      divisions index
+        (List.length colors)
+        (List.drop 1 colors)
 
 
-type alias ArcSegment =
-  { x : String
-  , y : String
-  }
+base : Int -> Maybe Color -> Svg Msg
+base index maybeColor =
+  Circle.unit 15 <|
+    case maybeColor of
+      Just baseColor ->
+        [ Sattr.class <| Code.colorToClass baseColor
+        , Events.onClick <| GuessInput index baseColor
+        ]
+      Nothing ->
+        []
 
 
-arcPath : Int -> Float -> Color -> Svg Msg
-arcPath index extent color =
+divisions : Int -> Int -> List Color -> List (Svg Msg)
+divisions index total colors =
   let
-    segment = arcSegment extent
-    switch =
-      if extent > 0.5 then "1" else "0"
+    extent = (toFloat <| List.length colors) / toFloat total
   in
-    Svg.path
-      [ Sattr.d <| "M 15 15 l 0 -15 a 15 15 0 " ++ switch ++ " 1 " ++ segment.x ++ " " ++ segment.y ++ " Z"
-      , Sattr.class <| Code.colorToClass color
-      , Events.onClick <| GuessInput index color
-      ] []
+    case List.head colors of
+      Just wedgeColor ->
+        [ wedge index extent wedgeColor ] ++
+          divisions index total (List.drop 1 colors)
+      Nothing ->
+        []
 
 
-radians : Float -> Float
-radians extent =
-  (pi * 2) * extent
-
-
-arcSegment : Float -> ArcSegment
-arcSegment extent =
-  { x = toString <| sin (radians extent) * 15
-  , y = toString <| 15 - (cos (radians extent) * 15)
-  }
+wedge : Int -> Float -> Color -> Svg Msg
+wedge index extent color =
+  Wedge.vector extent
+    [ Sattr.class <| Code.colorToClass color
+    , Events.onClick <| GuessInput index color
+    ]

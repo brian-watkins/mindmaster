@@ -2,6 +2,7 @@ module UI.Guess exposing
   ( none
   , with
   , toCode
+  , colorAt
   )
 
 import Core.Types exposing (Code, Color(..))
@@ -28,3 +29,10 @@ with position element guess =
 toCode : Guess -> Code
 toCode =
   List.map (Maybe.withDefault Blue)
+
+
+colorAt : Int -> Guess -> Maybe Color
+colorAt position guess =
+  List.drop position guess
+    |> List.head
+    |> Maybe.withDefault Nothing

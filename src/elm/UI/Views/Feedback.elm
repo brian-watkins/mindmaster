@@ -4,6 +4,7 @@ module UI.Views.Feedback exposing
 
 import Core.Types exposing (GuessFeedback(..))
 import UI.Types exposing (..)
+import UI.Vectors.Circle as Circle
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Svg exposing (Svg)
@@ -23,7 +24,7 @@ view feedback =
     Html.div [ Attr.class "clue" ]
     [ Svg.svg [ SvgAttr.viewBox "0 0 34 34"] <|
         ( clueList feedback
-            |> positioned emptyClues 0
+            |> positioned emptyClues
             |> List.map clueElement
         )
     ]
@@ -31,13 +32,10 @@ view feedback =
 
 clueElement : Clue -> Svg Msg
 clueElement clue =
-  Svg.circle
-    [ SvgAttr.cx <| toString clue.x
-    , SvgAttr.cy <| toString clue.y
-    , SvgAttr.r "5"
-    , SvgAttr.class (Maybe.withDefault "empty" clue.class)
+  Circle.vector { x = clue.x, y = clue.y, radius = 5 }
+    [ SvgAttr.class (Maybe.withDefault "empty" clue.class)
     , Attr.attribute "data-clue-element" ""
-    ] []
+    ]
 
 
 clueList : GuessFeedback -> List String
@@ -51,29 +49,28 @@ clueList feedback =
       List.repeat 5 "black"
 
 
-positioned : Array Clue -> Int -> List String -> List Clue
-positioned positionedClues offset clueClasses =
+positioned : List Clue -> List String -> List Clue
+positioned positionedClues clueClasses =
   case clueClasses of
     [] ->
-      Array.toList positionedClues
+      positionedClues
     x :: xs ->
-      let
-        clue =
-          Array.get offset positionedClues
-            |> Maybe.withDefault (emptyClue 0 0)
-      in
-        positioned (Array.set offset { clue | class = Just x } positionedClues) (offset + 1) xs
+      case positionedClues of
+        [] ->
+          []
+        clue :: clues ->
+          { clue | class = Just x } ::
+            positioned clues xs
 
 
-emptyClues : Array Clue
+emptyClues : List Clue
 emptyClues =
-  Array.fromList
-    [ emptyClue 11.25 26
-    , emptyClue 22.75 26
-    , emptyClue 8 15
-    , emptyClue 26 15
-    , emptyClue 17 7
-    ]
+  [ emptyClue 11.25 26
+  , emptyClue 22.75 26
+  , emptyClue 8 15
+  , emptyClue 26 15
+  , emptyClue 17 7
+  ]
 
 
 emptyClue : Float -> Float -> Clue
