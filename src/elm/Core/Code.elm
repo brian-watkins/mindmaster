@@ -51,55 +51,46 @@ equals expected actual =
 
 
 correctColors : Code -> Code -> Int
-correctColors =
-  findCorrectColors 0
-
-
-findCorrectColors : Int -> Code -> Code -> Int
-findCorrectColors found code guess =
+correctColors code guess =
   case guess of
     [] ->
-      found
+      0
     x :: xs ->
       if List.member x code then
         let
-          filtered =
-            removeFirst 0 x code
+          filtered = removeFirst x code
         in
-          findCorrectColors (found + 1) filtered xs
+          1 +
+            correctColors filtered xs
       else
-        findCorrectColors found code xs
+        correctColors code xs
 
 
-removeFirst : Int -> a -> List a -> List a
-removeFirst offset item items =
-  case List.drop offset items of
+removeFirst : a -> List a -> List a
+removeFirst item items =
+  case items of
     [] ->
-      items
+      []
     x :: xs ->
       if x == item then
-        List.append (List.take offset items) xs
+        xs
       else
-        removeFirst (offset + 1) item items
-
+        x ::
+          removeFirst item xs
 
 
 correctPositions : Code -> Code -> Int
-correctPositions =
-  findCorrectPositions 0
-
-
-findCorrectPositions : Int -> Code -> Code -> Int
-findCorrectPositions found code guess =
+correctPositions code guess =
   case code of
     [] ->
-      found
+      0
     x :: xs ->
       case guess of
         [] ->
-          found
+          0
         g :: gs ->
           if x == g then
-            findCorrectPositions (found + 1) xs gs
+            1 +
+              correctPositions xs gs
           else
-            findCorrectPositions found xs gs
+            correctPositions xs gs
