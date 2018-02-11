@@ -19,16 +19,16 @@ view model =
 feedbackHistory : Model -> Html Msg
 feedbackHistory model =
   model.history
-    |> List.indexedMap printHistoryItem
+    |> List.indexedMap (printHistoryItem model.codeLength)
     |> Html.ul []
 
 
-printHistoryItem : Int -> (Code, GuessFeedback) -> Html Msg
-printHistoryItem index (guess, feedback) =
+printHistoryItem : Int -> Int -> (Code, GuessFeedback) -> Html Msg
+printHistoryItem codeLength index (guess, feedback) =
   Html.li
     [ Attr.class "guess-history-item"
     , Attr.attribute "data-guess-feedback" <| toString index
     ]
     [ Guessed.view guess
-    , Feedback.view feedback
+    , Feedback.view codeLength feedback
     ]

@@ -1,16 +1,18 @@
 module RandomCodeGenerator exposing
-  ( generate
+  ( generator
   )
 
 import Random exposing (Generator)
 
-generate : a -> List a -> Int -> (List a -> msg) -> Cmd msg
-generate default items positions tagger =
-  codeGenerator default items positions
+
+generator : Int -> a -> List a -> (List a -> msg) -> Cmd msg
+generator codeLength default items tagger =
+  codeGenerator codeLength default items
     |> Random.generate tagger
 
-codeGenerator : a -> List a -> Int -> Generator (List a)
-codeGenerator default items positions =
+
+codeGenerator : Int -> a -> List a -> Generator (List a)
+codeGenerator codeLength default items =
   List.length items
     |> Random.int 0
     |> Random.map (\num ->
@@ -18,4 +20,4 @@ codeGenerator default items positions =
         |> List.head
         |> Maybe.withDefault default
     )
-    |> Random.list positions
+    |> Random.list codeLength

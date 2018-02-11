@@ -15,12 +15,21 @@ import UI.Views.GuessHistory as GuessHistory
 import UI.Views.GuessInput as GuessInput
 import UI.Views.Outcome as Outcome
 import UI.Views.Progress as Progress
+import UI.Actions.EvaluateGuess as EvaluateGuess
 
 
-defaultModel : Model
-defaultModel =
+type alias UIConfig =
+  { codeLength : Int
+  }
+
+
+defaultModel : UIConfig -> Model
+defaultModel config =
   { guess = Guess.none
   , history = []
+  , codeLength = config.codeLength
+  , validation = Valid
+  , attempts = 0
   }
 
 
@@ -49,20 +58,25 @@ update : GuessEvaluator Msg msg -> Msg -> Model -> (Model, Cmd msg)
 update evaluator msg model =
   case msg of
     SubmitGuess ->
-      ( { model | guess = Guess.none }, evaluateGuess evaluator model.guess )
+      EvaluateGuess.update
+        evaluator
+        (feedbackTagger model.guess)
+        model
+
     ReceivedFeedback guess feedback ->
-      ( recordGuess model (guess, feedback), Cmd.none )
+      ( recordGuess model (guess, feedback)
+      , Cmd.none
+      )
+
     GuessInput position guessColor ->
-      ( { model | guess = Guess.with position guessColor model.guess }, Cmd.none )
+      ( { model | guess = Guess.with position guessColor model.guess }
+      , Cmd.none
+      )
 
 
-evaluateGuess : GuessEvaluator Msg msg -> Guess -> Cmd msg
-evaluateGuess evaluator guess =
-  let
-    guessedCode =
-      Guess.toCode guess
-  in
-    evaluator (ReceivedFeedback guessedCode) guessedCode
+feedbackTagger : Guess -> GuessFeedback -> Msg
+feedbackTagger guess =
+  ReceivedFeedback <| Guess.toCode guess
 
 
 recordGuess : Model -> (Code, GuessFeedback) -> Model

@@ -20,12 +20,12 @@ type alias Clue =
   }
 
 
-view : GuessFeedback -> Html Msg
-view feedback =
+view : Int -> GuessFeedback -> Html Msg
+view codeLength feedback =
     Html.div [ Attr.class "clue" ]
     [ Svg.svg [ SvgAttr.viewBox "0 0 30 30"] <|
-        ( clueList feedback
-            |> positioned emptyClues
+        ( clueList codeLength feedback
+            |> positioned (emptyClues codeLength)
             |> List.map clueElement
         )
     ]
@@ -39,15 +39,15 @@ clueElement clue =
     ]
 
 
-clueList : GuessFeedback -> List String
-clueList feedback =
+clueList : Int -> GuessFeedback -> List String
+clueList codeLength feedback =
   case feedback of
     Wrong clue ->
       List.append
         (List.repeat clue.positions "black")
         (List.repeat (clue.colors - clue.positions) "white")
     Correct ->
-      List.repeat 5 "black"
+      List.repeat codeLength "black"
 
 
 positioned : List Clue -> List String -> List Clue
@@ -64,14 +64,12 @@ positioned positionedClues clueClasses =
             positioned clues xs
 
 
-emptyClues : List Clue
-emptyClues =
-  [ emptyClue 0.6
-  , emptyClue 0.4
-  , emptyClue 0.8
-  , emptyClue 0.2
-  , emptyClue 0.0
-  ]
+emptyClues : Int -> List Clue
+emptyClues total =
+  List.range 0 (total - 1)
+    |> List.map toFloat
+    |> List.map (\d -> d / toFloat total)
+    |> List.map emptyClue
 
 
 emptyClue : Float -> Clue

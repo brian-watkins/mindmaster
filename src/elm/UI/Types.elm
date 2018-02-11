@@ -3,6 +3,7 @@ module UI.Types exposing
   , Model
   , Outcome(..)
   , Guess
+  , Validation(..)
   )
 
 import Core.Types exposing (GuessFeedback, Code, Color)
@@ -23,7 +24,15 @@ type Msg
   | ReceivedFeedback Code GuessFeedback
 
 
+type Validation
+  = Valid
+  | GuessIncomplete
+
+
 type alias Model =
   { guess : Guess
   , history : List (Code, GuessFeedback)
+  , codeLength : Int
+  , validation : Validation
+  , attempts : Int
   }

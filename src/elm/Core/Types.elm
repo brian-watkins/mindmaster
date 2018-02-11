@@ -15,11 +15,14 @@ type alias GameConfig msg =
   , maxGuesses : Int
   }
 
+
 type alias GuessEvaluator vmsg msg =
   (GuessFeedback -> vmsg) -> Code -> Cmd msg
 
+
 type alias CodeGenerator msg =
-  Color -> Code -> Int -> (Code -> msg) -> Cmd msg
+  Color -> List Color -> (Code -> msg) -> Cmd msg
+
 
 type GameState
   = Won

@@ -25,13 +25,9 @@ colors =
   ]
 
 
-type alias CodeGenerator a =
-  Color -> Code -> Int -> (Code -> a) -> Cmd a
-
-
-generate : (Code -> a) -> CodeGenerator a -> Cmd a
+generate : (Code -> msg) -> CodeGenerator msg -> Cmd msg
 generate tagger generator =
-  generator Blue colors 5 tagger
+  generator Blue colors tagger
 
 
 equals : Code -> Code -> Bool

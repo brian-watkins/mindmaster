@@ -8,6 +8,7 @@ import UI.Guess as Guess
 import UI.Views.SubmitGuess as SubmitGuess
 import UI.Vectors.Circle as Circle
 import UI.Vectors.Wedge as Wedge
+import UI.Vectors.Attribute as Vector
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
@@ -46,10 +47,45 @@ guessInput model index =
 
 selectedColor : Int -> Model -> Svg Msg
 selectedColor index model =
-  Circle.unit 8.5
-    [ Attr.attribute "data-guess-input-element" <| toString index
-    , Sattr.class <| colorToClass (Guess.colorAt index model.guess)
-    ]
+  let
+    guessColor =
+      Guess.colorAt index model.guess
+  in
+    Circle.unit 8.5
+      [ Attr.attribute "data-guess-input-element" <| toString index
+      , Vector.classList
+        [ ( colorToClass guessColor
+          , shouldShowColor guessColor model.validation
+          )
+        , ( needsSelectionClass model
+          , shouldShowNeedsSelection guessColor model.validation
+          )
+        ]
+      ]
+
+
+needsSelectionClass : Model -> String
+needsSelectionClass model =
+  "needs-selection-"
+    ++ if model.attempts % 2 == 0 then "even" else "odd"
+
+
+shouldShowColor : Maybe Color -> Validation -> Bool
+shouldShowColor maybeColor validation =
+  case maybeColor of
+    Just _ ->
+      True
+    Nothing ->
+      case validation of
+        GuessIncomplete ->
+          False
+        Valid ->
+          True
+
+
+shouldShowNeedsSelection : Maybe Color -> Validation -> Bool
+shouldShowNeedsSelection maybeColor validation =
+  not <| shouldShowColor maybeColor validation
 
 
 boundary : Svg Msg

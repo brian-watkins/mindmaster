@@ -27,7 +27,7 @@ describe("MindMaster", () => {
 
   it('evaluates a guess', async () => {
     for (var i = 0; i < 700; i = i + 5) {
-      await page.mouse.click(i, 18)
+      await page.mouse.click(i, 50)
     }
 
     await page.click('#submit-guess')

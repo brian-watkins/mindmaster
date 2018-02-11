@@ -3,6 +3,7 @@ module UI.Guess exposing
   , with
   , toCode
   , colorAt
+  , lengthSelected
   )
 
 import Core.Types exposing (Code, Color(..))
@@ -36,3 +37,9 @@ colorAt position guess =
   List.drop position guess
     |> List.head
     |> Maybe.withDefault Nothing
+
+
+lengthSelected : Guess -> Int
+lengthSelected guess =
+   List.filterMap identity guess
+    |> List.length

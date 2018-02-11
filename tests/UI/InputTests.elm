@@ -48,11 +48,16 @@ selectElementTests =
   ]
 
 
+testModel : Model
+testModel =
+  UI.defaultModel { codeLength = 3 }
+
+
 selectColors : List (Maybe String) -> TestState Model Msg
 selectColors classes =
   let
     state =
-      Elmer.given UI.defaultModel (UI.view <| InProgress 3) (UI.update <| (\_ _ -> Cmd.none))
+      Elmer.given testModel (UI.view <| InProgress 3) (UI.update <| (\_ _ -> Cmd.none))
   in
     List.indexedMap selectColor classes
       |> foldStates state

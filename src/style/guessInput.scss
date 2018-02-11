@@ -18,3 +18,31 @@
   cursor: pointer;
   border-radius: 8px;
 }
+
+.needs-selection-odd {
+  fill: #ECEFF1;
+  animation-name: alert_element_odd;
+	animation-duration: .2s;
+	animation-iteration-count: 2;
+	animation-direction: alternate;
+}
+
+.needs-selection-even {
+  fill: #ECEFF1;
+  animation-name: alert_element_even;
+	animation-duration: .2s;
+	animation-iteration-count: 2;
+	animation-direction: alternate;
+}
+
+@keyframes alert_element_even {
+  0% { fill: #ECEFF1; }
+  50% { fill: #607D8B; }
+  100% { fill: #ECEFF1; }
+}
+
+@keyframes alert_element_odd {
+  0% { fill: #ECEFF1; }
+  50% { fill: #607D8B; }
+  100% { fill: #ECEFF1; }
+}

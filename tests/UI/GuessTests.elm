@@ -22,7 +22,7 @@ guessTests =
   describe "when a guess is submitted" <|
   let
     state =
-      Elmer.given UI.defaultModel (UI.view <| InProgress 4) (UI.update <| Spy.callable "evaluator-spy")
+      Elmer.given (testModel 5) testView (UI.update <| Spy.callable "evaluator-spy")
         |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
         |> selectGuess [ "red", "orange", "yellow", "green", "blue" ]
   in
@@ -44,23 +44,65 @@ guessTests =
       state
         |> Markup.target "[data-guess-feedback]"
         |> Markup.expect (element <|
-          expectGuess [ "red", "orange", "yellow", "green", "blue" ]
+          expectGuessed [ "red", "orange", "yellow", "green", "blue" ]
         )
   ]
 
+partialGuessTests : Test
+partialGuessTests =
+  let
+    state =
+      Elmer.given (testModel 3) testView (UI.update <| (\_ _ -> Cmd.none))
+  in
+  describe "when a partial guess is submitted"
+  [ test "it identifies elements that the user needs to select" <|
+    \() ->
+      state
+        |> selectGuessElements [ Nothing, Just "red", Nothing ]
+        |> Markup.target "[data-guess-input-element]"
+        |> Markup.expect (elements <|
+          (atIndex 0 <| hasAttribute ("class", "needs-selection-odd")) <&&>
+          (atIndex 1 <| hasAttribute ("class", "red")) <&&>
+          (atIndex 2 <| hasAttribute ("class", "needs-selection-odd"))
+        )
+  , test "it switches class every other attempt to submit" <|
+    \() ->
+      state
+        |> selectGuessElements [ Nothing, Just "red", Nothing ]
+        |> selectGuessElements [ Nothing, Just "red", Nothing ]
+        |> Markup.target "[data-guess-input-element]"
+        |> Markup.expect (elements <|
+          (atIndex 0 <| hasAttribute ("class", "needs-selection-even")) <&&>
+          (atIndex 1 <| hasAttribute ("class", "red")) <&&>
+          (atIndex 2 <| hasAttribute ("class", "needs-selection-even"))
+        )
+  , describe "when guessing again after submitting a completed partial selection"
+    [ test "it does not show needs selection" <|
+      \() ->
+        state
+          |> selectGuessElements [ Nothing, Just "red", Nothing ]
+          |> selectGuess [ "red", "red", "red" ]
+          |> Markup.target "[data-guess-input-element]"
+          |> Markup.expect (elements <|
+            (atIndex 0 <| hasAttribute ("class", "empty")) <&&>
+            (atIndex 1 <| hasAttribute ("class", "empty")) <&&>
+            (atIndex 2 <| hasAttribute ("class", "empty"))
+          )
+    ]
+  ]
 
 remainingGuessesTests : Test
 remainingGuessesTests =
   describe "remaining guesses"
   [ test "it shows the guesses remaining" <|
     \() ->
-      Elmer.given UI.defaultModel (UI.view <| InProgress 4) (UI.update (\_ _ -> Cmd.none))
+      Elmer.given (testModel 3) testView (UI.update (\_ _ -> Cmd.none))
         |> Markup.target "#game-progress"
         |> Markup.expect (element <| hasText "4 guesses remain!")
   , describe "when 1 guess remains"
     [ test "it shows that 1 guess remains" <|
       \() ->
-        Elmer.given UI.defaultModel (UI.view <| InProgress 1) (UI.update (\_ _ -> Cmd.none))
+        Elmer.given (testModel 3) (UI.view <| InProgress 1) (UI.update (\_ _ -> Cmd.none))
           |> Markup.target "#game-progress"
           |> Markup.expect (element <| hasText "Last guess!")
     ]
@@ -101,38 +143,47 @@ guessListTests =
   describe "when multiple guesses are submitted" <|
   let
     state =
-      Elmer.given UI.defaultModel (UI.view <| InProgress 4) (UI.update <| Spy.callable "evaluator-spy")
+      Elmer.given (testModel 3) testView (UI.update <| Spy.callable "evaluator-spy")
         |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
-        |> selectGuess [ "red", "green", "blue", "yellow", "yellow" ]
-        |> selectGuess [ "red", "green", "green", "yellow", "yellow" ]
+        |> selectGuess [ "red", "green", "blue" ]
+        |> selectGuess [ "red", "green", "green" ]
         |> Spy.use [ evaluatorSpy Correct ]
-        |> selectGuess [ "blue", "green", "green", "yellow", "yellow" ]
+        |> selectGuess [ "blue", "green", "green" ]
   in
   [ test "it shows the third guess first" <|
     \() ->
       state
         |> Markup.target "[data-guess-feedback]"
         |> Markup.expect (elements <| atIndex 0 <|
-          expectGuess [ "blue", "green", "green", "yellow", "yellow" ] <&&>
-          expectClue [ ("black", 5) ]
+          expectGuessed [ "blue", "green", "green" ] <&&>
+          expectClue [ ("black", 3) ]
         )
   , test "it shows the second guess second" <|
     \() ->
       state
         |> Markup.target "[data-guess-feedback]"
         |> Markup.expect (elements <| atIndex 1 <|
-          expectGuess [ "red", "green", "green", "yellow", "yellow" ] <&&>
-          expectClue [ ("empty", 5) ]
+          expectGuessed [ "red", "green", "green" ] <&&>
+          expectClue [ ("empty", 3) ]
         )
   , test "it shows the first guess last" <|
     \() ->
       state
         |> Markup.target "[data-guess-feedback]"
         |> Markup.expect (elements <| atIndex 2 <|
-          expectGuess [ "red", "green", "blue", "yellow", "yellow" ] <&&>
-          expectClue [ ("empty", 5) ]
+          expectGuessed [ "red", "green", "blue" ] <&&>
+          expectClue [ ("empty", 3) ]
         )
   ]
+
+
+testModel : Int -> Model
+testModel codeLength =
+  UI.defaultModel { codeLength = codeLength }
+
+
+testView =
+  UI.view <| InProgress 4
 
 
 evaluatorSpy : GuessFeedback -> Spy
@@ -151,7 +202,7 @@ wrongFeedback colorsCorrect positionsCorrect =
 
 expectFeedback : List (String, Int) -> GuessFeedback -> Expectation
 expectFeedback clueElements feedback =
-  Elmer.given UI.defaultModel (UI.view <| InProgress 4) (UI.update <| Spy.callable "evaluator-spy")
+  Elmer.given (testModel 5) testView (UI.update <| Spy.callable "evaluator-spy")
     |> Spy.use [ evaluatorSpy <| feedback ]
     |> selectGuess [ "red", "green", "blue", "yellow", "yellow" ]
     |> Markup.target "[data-guess-feedback]"
@@ -175,30 +226,40 @@ expectClueElements (clueClass, expectedAmount) elements =
     |> Expect.equal expectedAmount
 
 
-expectGuess : List String -> Matcher (HtmlElement msg)
-expectGuess cssCode element =
+expectGuessed : List String -> Matcher (HtmlElement msg)
+expectGuessed cssCode element =
   element
     |> Element.target "[data-guess-element]"
     |> elements (
-      List.indexedMap expectGuessElement cssCode
+      List.indexedMap expectGuessedElement cssCode
         |> expectAll
     )
 
-expectGuessElement : Int -> String -> Matcher (List (HtmlElement msg))
-expectGuessElement index className =
+expectGuessedElement : Int -> String -> Matcher (List (HtmlElement msg))
+expectGuessedElement index className =
   atIndex index <| hasAttribute ("class", className)
 
 
-selectGuess : List String -> TestState Model Msg -> TestState Model Msg
-selectGuess elements testState =
+selectGuessElements : List (Maybe String) -> TestState Model Msg -> TestState Model Msg
+selectGuessElements elements testState =
   List.indexedMap selectGuessElement elements
     |> foldStates testState
     |> Markup.target "#submit-guess"
     |> Event.click
 
 
-selectGuessElement : Int -> String -> TestState Model Msg -> TestState Model Msg
-selectGuessElement position class testState =
-  testState
-    |> Markup.target ("[data-guess-input='" ++ toString position ++ "'] [class='" ++ class ++ "']")
-    |> Event.click
+selectGuess : List String -> TestState Model Msg -> TestState Model Msg
+selectGuess elements testState =
+  List.map Just elements
+    |> flip selectGuessElements testState
+
+
+selectGuessElement : Int -> Maybe String -> TestState Model Msg -> TestState Model Msg
+selectGuessElement position maybeClass testState =
+  case maybeClass of
+    Just class ->
+      testState
+        |> Markup.target ("[data-guess-input='" ++ toString position ++ "'] [class='" ++ class ++ "']")
+        |> Event.click
+    Nothing ->
+      testState

@@ -9,6 +9,20 @@ import Elmer.Platform.Command as Command
 import Random
 import RandomCodeGenerator
 
+
+generateCodeTests : Test
+generateCodeTests =
+  describe "generate code"
+  [ test "it generates a random code" <|
+    \() ->
+      Headless.givenCommand (\_ -> RandomCodeGenerator.generator 5 0 [ 1, 2, 3, 4 ] Code)
+        |> Spy.use [ randomSpy ]
+        |> Headless.expectMessages (exactly 1 <|
+          Expect.equal (Code [ 2, 2, 4, 2, 1 ])
+        )
+  ]
+
+
 type TestMsg
   = Code (List Int)
 
@@ -23,16 +37,3 @@ randomSpy =
         |> tagger
         |> Command.fake
     )
-
-
-generateCodeTests : Test
-generateCodeTests =
-  describe "generate code"
-  [ test "it generates a random code" <|
-    \() ->
-      Headless.givenCommand (\_ -> RandomCodeGenerator.generate 0 [ 1, 2, 3, 4 ] 5 Code)
-        |> Spy.use [ randomSpy ]
-        |> Headless.expectMessages (exactly 1 <|
-          Expect.equal (Code [ 2, 2, 4, 2, 1 ])
-        )
-  ]
