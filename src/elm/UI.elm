@@ -9,7 +9,6 @@ import Html.Attributes as Attr
 import Html.Events as Events
 import Core.Types exposing (..)
 import UI.Types exposing (..)
-import UI.Code as Code
 import UI.Guess as Guess
 import UI.Views.GuessHistory as GuessHistory
 import UI.Views.GuessInput as GuessInput

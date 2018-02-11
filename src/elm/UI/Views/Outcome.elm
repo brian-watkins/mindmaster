@@ -5,18 +5,22 @@ module UI.Views.Outcome exposing
 import UI.Types exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Attr
-import UI.Code as Code
-
+import UI.Views.Code as Code
+import Svg
+import Svg.Attributes as SvgAttr
+import UI.Vectors.Circle as Circle
+import Core.Types exposing (Code, Color)
 
 view : Outcome -> Html Msg
 view outcome =
   case outcome of
     Win ->
-      "You win!"
-        |> gameOverDisplay
+      gameOverDisplay "You won!"
     Loss code ->
-      "You lost! The code is: " ++ Code.toString code
-        |> gameOverDisplay
+      Html.div []
+      [ gameOverDisplay "You lost!"
+      , Code.view "code" code
+      ]
 
 
 gameOverDisplay : String -> Html Msg

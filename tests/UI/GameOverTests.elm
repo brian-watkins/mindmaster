@@ -2,10 +2,10 @@ module UI.GameOverTests exposing (..)
 
 import Test exposing (..)
 import Expect exposing (Expectation)
-import Elmer exposing (expectNot)
+import Elmer exposing (expectNot, atIndex, (<&&>))
 import Elmer.Html as Markup
 import Elmer.Html.Event as Event
-import Elmer.Html.Matchers exposing (element, elementExists, hasText)
+import Elmer.Html.Matchers exposing (element, elements, elementExists, hasText, hasAttribute)
 import Core.Types exposing (GameState(..), Color(..))
 import UI
 import UI.Types exposing (Model)
@@ -22,7 +22,7 @@ winTests =
     \() ->
       state
         |> Markup.target "#game-over-message"
-        |> Markup.expect (element <| hasText "You win!")
+        |> Markup.expect (element <| hasText "You won!")
   , test "it does not show the guess input" <|
     \() ->
       state
@@ -38,11 +38,21 @@ lostTests =
     state =
       Elmer.given testModel (UI.view <| Lost [ Orange, Blue, Yellow, Red ]) (UI.update <| (\_ _ -> Cmd.none))
   in
-  [ test "it says you lost and shows the code" <|
+  [ test "it says you lost" <|
     \() ->
       state
         |> Markup.target "#game-over-message"
-        |> Markup.expect (element <| hasText "You lost! The code is: obyr")
+        |> Markup.expect (element <| hasText "You lost!")
+  , test "it shows the actual code" <|
+    \() ->
+      state
+        |> Markup.target "[data-code-element]"
+        |> Markup.expect (elements <|
+          (atIndex 0 <| hasAttribute ("class", "orange")) <&&>
+          (atIndex 1 <| hasAttribute ("class", "blue")) <&&>
+          (atIndex 2 <| hasAttribute ("class", "yellow")) <&&>
+          (atIndex 3 <| hasAttribute ("class", "red"))
+        )
   , test "it does not show the guess input" <|
     \() ->
       state

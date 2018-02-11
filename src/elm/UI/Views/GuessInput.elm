@@ -3,7 +3,7 @@ module UI.Views.GuessInput exposing
   )
 
 import UI.Types exposing (..)
-import UI.Code as Code
+import UI.Color as Color
 import UI.Guess as Guess
 import UI.Views.SubmitGuess as SubmitGuess
 import UI.Vectors.Circle as Circle
@@ -97,7 +97,7 @@ boundary =
 
 colorToClass : Maybe Color -> String
 colorToClass maybeColor =
-  Maybe.map Code.colorToClass maybeColor
+  Maybe.map Color.toClass maybeColor
     |> Maybe.withDefault "empty"
 
 
@@ -115,7 +115,7 @@ base index maybeColor =
   Circle.unit 15 <|
     case maybeColor of
       Just baseColor ->
-        [ Sattr.class <| Code.colorToClass baseColor
+        [ Sattr.class <| Color.toClass baseColor
         , Events.onClick <| GuessInput index baseColor
         ]
       Nothing ->
@@ -138,6 +138,6 @@ divisions index total colors =
 wedge : Int -> Float -> Color -> Svg Msg
 wedge index extent color =
   Wedge.vector extent
-    [ Sattr.class <| Code.colorToClass color
+    [ Sattr.class <| Color.toClass color
     , Events.onClick <| GuessInput index color
     ]
