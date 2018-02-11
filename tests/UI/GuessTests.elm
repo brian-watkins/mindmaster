@@ -179,7 +179,12 @@ guessListTests =
 
 testModel : Int -> Model
 testModel codeLength =
-  UI.defaultModel { codeLength = codeLength }
+  UI.defaultModel { codeLength = codeLength, colors = testColors }
+
+
+testColors : List Color
+testColors =
+  [ Red, Orange, Yellow, Blue, Green ]
 
 
 testView =

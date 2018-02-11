@@ -31,7 +31,7 @@ update evaluator feedbackTagger model =
     )
   else
     ( { model
-      | guess = Guess.none
+      | guess = Guess.empty model.codeLength
       , validation = Valid
       , attempts = 0
       }

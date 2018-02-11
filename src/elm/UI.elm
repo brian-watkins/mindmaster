@@ -20,16 +20,18 @@ import UI.Actions.EvaluateGuess as EvaluateGuess
 
 type alias UIConfig =
   { codeLength : Int
+  , colors : List Color
   }
 
 
 defaultModel : UIConfig -> Model
 defaultModel config =
-  { guess = Guess.none
+  { guess = Guess.empty config.codeLength
   , history = []
   , codeLength = config.codeLength
   , validation = Valid
   , attempts = 0
+  , colors = config.colors
   }
 
 

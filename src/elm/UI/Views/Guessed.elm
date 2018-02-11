@@ -5,7 +5,7 @@ module UI.Views.Guessed exposing
 import UI.Types exposing (..)
 import UI.Code as Code
 import UI.Vectors.Circle as Circle
-import Core.Types exposing (Code, Color(..))
+import Core.Types exposing (Code, Color)
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Svg

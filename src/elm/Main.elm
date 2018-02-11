@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Html exposing (Html)
 import Core
-import Core.Types exposing (GameConfig)
+import Core.Types exposing (GameConfig, Color(..))
 import UI
 import UI.Types as View
 import RandomCodeGenerator
@@ -10,13 +10,22 @@ import RandomCodeGenerator
 
 codeLength = 5
 
+colors =
+  [ Red
+  , Orange
+  , Yellow
+  , Green
+  , Blue
+  ]
+
 gameConfig =
-  { codeGenerator = RandomCodeGenerator.generator codeLength
+  { codeGenerator = RandomCodeGenerator.generator codeLength None colors
   , maxGuesses = 10
   }
 
 viewConfig =
   { codeLength = codeLength
+  , colors = colors
   }
 
 defaultUIModel : View.Model

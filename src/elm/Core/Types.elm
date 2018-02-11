@@ -3,6 +3,7 @@ module Core.Types exposing
   , GameState(..)
   , GuessFeedback(..)
   , Color(..)
+  , defaultColor
   , Clue
   , Code
   , GameConfig
@@ -21,7 +22,7 @@ type alias GuessEvaluator vmsg msg =
 
 
 type alias CodeGenerator msg =
-  Color -> List Color -> (Code -> msg) -> Cmd msg
+  (Code -> msg) -> Cmd msg
 
 
 type GameState
@@ -41,8 +42,14 @@ type alias Clue =
   , positions : Int
   }
 
+defaultColor : Color
+defaultColor =
+  None
+
+
 type Color
-  = Red
+  = None
+  | Red
   | Orange
   | Yellow
   | Green

@@ -1,6 +1,5 @@
 module Core.Code exposing
   ( none
-  , colors
   , generate
   , equals
   , correctColors
@@ -15,19 +14,9 @@ none =
   []
 
 
-colors : List Color
-colors =
-  [ Red
-  , Orange
-  , Yellow
-  , Green
-  , Blue
-  ]
-
-
 generate : (Code -> msg) -> CodeGenerator msg -> Cmd msg
 generate tagger generator =
-  generator Blue colors tagger
+  generator tagger
 
 
 equals : Code -> Code -> Bool

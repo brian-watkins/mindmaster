@@ -53,4 +53,8 @@ lostTests =
 
 testModel : Model
 testModel =
-  UI.defaultModel { codeLength = 3 }
+  UI.defaultModel { codeLength = 3, colors = testColors }
+
+testColors : List Color
+testColors =
+  [ Red, Orange, Yellow, Blue, Green ]

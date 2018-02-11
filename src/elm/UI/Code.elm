@@ -7,13 +7,9 @@ import Core.Types exposing (Color(..), Code)
 
 
 colorToClass : Color -> String
-colorToClass c =
-  case c of
-    Red -> "red"
-    Orange -> "orange"
-    Yellow -> "yellow"
-    Green -> "green"
-    Blue -> "blue"
+colorToClass color =
+  Basics.toString color
+    |> String.toLower
 
 
 toString : Code -> String
@@ -25,6 +21,7 @@ toString code =
 colorToString : Color -> Char
 colorToString c =
   case c of
+    None -> ' '
     Red -> 'r'
     Orange -> 'o'
     Yellow -> 'y'

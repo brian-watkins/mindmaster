@@ -14,7 +14,7 @@ import Html.Attributes as Attr
 import Html.Events as Events
 import Svg exposing (Svg, Attribute)
 import Svg.Attributes as Sattr
-import Core.Types exposing (Color(..))
+import Core.Types exposing (Color)
 
 
 view : Model -> Html Msg
@@ -27,7 +27,7 @@ view model =
 
 guessInputs : Model -> List (Html Msg)
 guessInputs model =
-  List.range 0 4
+  List.range 0 (model.codeLength - 1)
     |> List.map (\index -> guessInput model index)
 
 
@@ -38,7 +38,7 @@ guessInput model index =
   , Attr.attribute "data-guess-input" <| toString index
   ]
   [ Svg.svg [ Sattr.viewBox "0 0 30 30" ]
-    [ selectableColors index colors
+    [ selectableColors index model.colors
     , boundary
     , selectedColor index model
     ]
@@ -93,16 +93,6 @@ boundary =
   Circle.unit 10
     [ Sattr.fill "white"
     ]
-
-
-colors : List Color
-colors =
-  [ Red
-  , Orange
-  , Yellow
-  , Green
-  , Blue
-  ]
 
 
 colorToClass : Maybe Color -> String

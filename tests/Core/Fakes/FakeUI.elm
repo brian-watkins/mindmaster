@@ -3,7 +3,7 @@ module Core.Fakes.FakeUI exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
-import Core.Types exposing (GuessFeedback(..), Color(..), Code, GameState(..))
+import Core.Types exposing (GuessFeedback(..), Color, Code, GameState(..))
 
 type Msg
   = PlayGuess

@@ -1,18 +1,18 @@
 module UI.Guess exposing
-  ( none
+  ( empty
   , with
   , toCode
   , colorAt
   , lengthSelected
   )
 
-import Core.Types exposing (Code, Color(..))
+import Core.Types exposing (Code, Color, defaultColor)
 import UI.Types exposing (Guess)
 
 
-none : Guess
-none =
-  [ Nothing, Nothing, Nothing, Nothing, Nothing ]
+empty : Int -> Guess
+empty codeLength =
+  List.repeat codeLength Nothing
 
 
 with : Int -> Color -> Guess -> Guess
@@ -29,7 +29,7 @@ with position element guess =
 
 toCode : Guess -> Code
 toCode =
-  List.map (Maybe.withDefault Blue)
+  List.map (Maybe.withDefault defaultColor)
 
 
 colorAt : Int -> Guess -> Maybe Color

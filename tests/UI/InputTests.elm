@@ -8,7 +8,7 @@ import Elmer.Html.Event as Event
 import Elmer.Html.Matchers exposing (element, elements, hasAttribute)
 import UI
 import UI.Types exposing (Model, Msg)
-import Core.Types exposing (GameState(..))
+import Core.Types exposing (GameState(..), Color(..))
 import TestHelpers exposing (..)
 
 
@@ -50,7 +50,11 @@ selectElementTests =
 
 testModel : Model
 testModel =
-  UI.defaultModel { codeLength = 3 }
+  UI.defaultModel { codeLength = 5, colors = testColors }
+
+testColors : List Color
+testColors =
+  [ Red, Orange, Yellow, Blue, Green ]
 
 
 selectColors : List (Maybe String) -> TestState Model Msg

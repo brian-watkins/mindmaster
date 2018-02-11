@@ -35,4 +35,5 @@ type alias Model =
   , codeLength : Int
   , validation : Validation
   , attempts : Int
+  , colors : List Color
   }
