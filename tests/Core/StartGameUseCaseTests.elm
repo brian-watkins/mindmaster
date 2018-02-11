@@ -18,9 +18,9 @@ startGameTests =
   describe "when the start game command is sent"
   [ test "it restarts the game" <|
     \() ->
-      Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Blue ] [ Orange ])
+      Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Blue ])
         |> Spy.use [ viewSpy ]
-        |> Elmer.init (\_ -> testInit)
+        |> Elmer.init (\_ -> testInit [[Orange]])
         |> Markup.target "#submit-code"
         |> Event.click
         |> Spy.use [ viewSpy ] -- reset spy history
@@ -31,9 +31,9 @@ startGameTests =
         )
   , test "it resets the number of guesses to zero" <|
     \() ->
-      Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Blue ] [ Orange ])
+      Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Blue ])
         |> Spy.use [ viewSpy ]
-        |> Elmer.init (\_ -> testInit)
+        |> Elmer.init (\_ -> testInit [[Orange]])
         |> Markup.target "#submit-code"
         |> Event.click
         |> Event.click
@@ -55,23 +55,25 @@ viewSpy =
   Spy.create "view-spy" (\_ -> FakeUI.view)
 
 testModel =
-  Core.defaultModel testConfig FakeUI.defaultModel
+  FakeUI.defaultModel []
+    |> Core.defaultModel testConfig
 
 testView =
   Core.view FakeUI.view
 
-testUpdate code guess =
-  testAdapters code guess
+testUpdate code =
+  testAdapters code
     |> Core.update
 
-testInit =
-  Core.initGame testConfig FakeUI.defaultModel
+testInit guesses =
+  FakeUI.defaultModel guesses
+    |> Core.initGame testConfig
 
 testConfig =
   { maxGuesses = maxGuesses
   }
 
-testAdapters code guess =
-  { viewUpdate = FakeUI.update guess
+testAdapters code =
+  { viewUpdate = FakeUI.update
   , codeGenerator = FakeCodeGenerator.with code
   }

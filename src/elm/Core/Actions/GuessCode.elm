@@ -14,6 +14,7 @@ type alias Model a =
   , maxGuesses : Int
   , gameState : GameState
   , code : Code
+  , gameTimer : Int
   }
 
 

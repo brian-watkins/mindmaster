@@ -12,17 +12,26 @@ type Msg
 
 type alias Model =
   { feedback : Maybe GuessFeedback
+  , guesses : List Code
   }
 
-defaultModel : Model
-defaultModel =
-  { feedback = Nothing }
+defaultModel : List Code -> Model
+defaultModel guesses =
+  { feedback = Nothing
+  , guesses = guesses
+  }
 
-update : Code -> ViewDependencies Msg msg -> Msg -> Model -> (Model, Cmd msg)
-update code dependencies msg model =
+update : ViewDependencies Msg msg -> Msg -> Model -> (Model, Cmd msg)
+update dependencies msg model =
   case msg of
     PlayGuess ->
-      ( model, dependencies.guessEvaluator HandleFeedback code )
+      case List.head model.guesses of
+        Just guess ->
+          ( { model | guesses = List.drop 1 model.guesses }
+          , dependencies.guessEvaluator HandleFeedback guess
+          )
+        Nothing ->
+          ( model, Cmd.none )
     HandleFeedback feedback ->
       ( { model | feedback = Just feedback }, Cmd.none )
     RestartGame ->

@@ -9,6 +9,7 @@ type alias Model a =
   | guesses : Int
   , maxGuesses : Int
   , code : Code
+  , gameTimer : Int
   }
 
 apply : Model a -> GuessFeedback -> GameState
@@ -20,4 +21,5 @@ apply model feedback =
       else
         InProgress (model.maxGuesses - model.guesses - 1)
     Correct ->
-      Won
+      model.gameTimer + ((model.guesses + 1) * 50)
+        |> Won

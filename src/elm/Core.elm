@@ -6,6 +6,7 @@ module Core exposing
   , update
   , view
   , viewModel
+  , subscriptions
   )
 
 import Html exposing (Html)
@@ -15,6 +16,8 @@ import Core.Command as Command
 import Core.Types exposing (..)
 import Core.Actions.GuessCode as GuessCode
 import Core.Actions.StartGame as StartGame
+import Core.Actions.IncrementTimer as IncrementTimer
+import Time exposing (Time)
 
 
 type Msg viewMsg
@@ -22,6 +25,7 @@ type Msg viewMsg
   | Play (GuessFeedback -> viewMsg) Code
   | ViewMsg viewMsg
   | StartGame ()
+  | GameTimer Time
 
 
 type alias Model vModel =
@@ -30,6 +34,7 @@ type alias Model vModel =
   , maxGuesses : Int
   , guesses : Int
   , viewModel : vModel
+  , gameTimer : Int
   }
 
 
@@ -40,6 +45,7 @@ defaultModel config vModel =
   , maxGuesses = config.maxGuesses
   , guesses = 0
   , viewModel = vModel
+  , gameTimer = 0
   }
 
 
@@ -70,6 +76,9 @@ update adapters msg model =
 
     SetCode code ->
       StartGame.update code model
+
+    GameTimer _ ->
+      IncrementTimer.update model
 
     Play tagger guess ->
       GuessCode.update tagger guess model
@@ -114,3 +123,12 @@ view : ViewAdapter viewModel viewMsg -> Model viewModel -> Html (Msg viewMsg)
 view viewAdapter model =
   viewAdapter model.gameState model.viewModel
     |> Html.map ViewMsg
+
+
+subscriptions : Model viewModel -> Sub (Msg viewMsg)
+subscriptions model =
+  case model.gameState of
+    InProgress _ ->
+      Time.every Time.second GameTimer
+    _ ->
+      Sub.none

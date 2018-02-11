@@ -49,5 +49,5 @@ main =
     { init = Core.initGame gameConfig defaultViewModel
     , view = Core.view UI.view
     , update = Core.update coreAdapters
-    , subscriptions = (\_ -> Sub.none)
+    , subscriptions = Core.subscriptions
     }

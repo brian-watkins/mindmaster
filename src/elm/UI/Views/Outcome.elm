@@ -15,25 +15,31 @@ import Core.Types exposing (Code, Color)
 view : Outcome -> Html Msg
 view outcome =
   case outcome of
-    Win ->
+    Win score ->
       Html.div []
-      [ gameOverDisplay "You won!"
+      [ outcomMessage "You won!"
+      , finalScore score
       , newGameButton
       ]
 
     Loss code ->
       Html.div []
-      [ gameOverDisplay "You lost!"
+      [ outcomMessage "You lost!"
       , Code.view "code" code
       , newGameButton
       ]
 
 
-gameOverDisplay : String -> Html Msg
-gameOverDisplay message =
+outcomMessage : String -> Html Msg
+outcomMessage message =
   Html.div [ Attr.id "game-over-message" ]
     [ Html.text message ]
 
+
+finalScore : Int -> Html Msg
+finalScore score =
+  Html.div [ Attr.id "final-score" ]
+    [ Html.text <| "Final Score: " ++ toString score ]
 
 newGameButton : Html Msg
 newGameButton =

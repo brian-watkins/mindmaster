@@ -14,7 +14,7 @@ type alias Guess =
 
 
 type Outcome
-  = Win
+  = Win Int
   | Loss Code
 
 

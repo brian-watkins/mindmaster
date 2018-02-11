@@ -16,13 +16,18 @@ winTests =
   describe "when the game is won" <|
   let
     state =
-      Elmer.given testModel (UI.view Won) testUpdate
+      Elmer.given testModel (UI.view <| Won 350) testUpdate
   in
   [ test "it shows the You Win message" <|
     \() ->
       state
         |> Markup.target "#game-over-message"
         |> Markup.expect (element <| hasText "You won!")
+  , test "it shows your score" <|
+    \() ->
+      state
+        |> Markup.target "#final-score"
+        |> Markup.expect (element <| hasText "Final Score: 350")
   , test "it does not show the guess input" <|
     \() ->
       state

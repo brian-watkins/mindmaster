@@ -44,9 +44,9 @@ view gameState model =
       , Progress.view remainingGuesses
       , GuessHistory.view model
       ]
-    Won ->
+    Won score ->
       Html.div []
-      [ Outcome.view Win
+      [ Outcome.view <| Win score
       , GuessHistory.view model
       ]
     Lost code ->

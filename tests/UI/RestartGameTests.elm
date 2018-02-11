@@ -17,7 +17,7 @@ restartAfterWinTests =
   describe "start a new game after winning" <|
   let
     state =
-      Elmer.given testModel (UI.view Won) testUpdate
+      Elmer.given testModel (UI.view <| Won 300) testUpdate
   in
   [ restartTests state
   ]

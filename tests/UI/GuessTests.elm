@@ -179,7 +179,7 @@ guessHistoryTests =
       \() ->
         state
           |> Elmer.expectModel (\model ->
-            Elmer.given model (UI.view Won) (testUpdate <| (\_ _ -> Cmd.none))
+            Elmer.given model (UI.view <| Won 87) (testUpdate <| (\_ _ -> Cmd.none))
               |> Markup.target "#new-game"
               |> Event.click
               |> Markup.target "[data-guess-feedback]"

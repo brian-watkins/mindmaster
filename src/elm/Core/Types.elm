@@ -42,7 +42,7 @@ type alias CodeGenerator msg =
 
 
 type GameState
-  = Won
+  = Won Int
   | Lost Code
   | InProgress Int
 
