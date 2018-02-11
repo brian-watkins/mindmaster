@@ -5,6 +5,7 @@ module UI.Views.Outcome exposing
 import UI.Types exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Attr
+import Html.Events as Events
 import UI.Views.Code as Code
 import Svg
 import Svg.Attributes as SvgAttr
@@ -15,11 +16,16 @@ view : Outcome -> Html Msg
 view outcome =
   case outcome of
     Win ->
-      gameOverDisplay "You won!"
+      Html.div []
+      [ gameOverDisplay "You won!"
+      , newGameButton
+      ]
+
     Loss code ->
       Html.div []
       [ gameOverDisplay "You lost!"
       , Code.view "code" code
+      , newGameButton
       ]
 
 
@@ -27,3 +33,11 @@ gameOverDisplay : String -> Html Msg
 gameOverDisplay message =
   Html.div [ Attr.id "game-over-message" ]
     [ Html.text message ]
+
+
+newGameButton : Html Msg
+newGameButton =
+  Html.div [ Attr.class "row" ]
+  [ Html.div [ Attr.id "new-game", Events.onClick RestartGame ]
+    [ Html.text "Play again!" ]
+  ]

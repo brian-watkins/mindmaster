@@ -8,7 +8,7 @@ import Elmer.Html.Event as Event
 import Elmer.Html.Matchers exposing (element, elements, elementExists, hasText, hasAttribute)
 import Core.Types exposing (GameState(..), Color(..))
 import UI
-import UI.Types exposing (Model)
+import UI.Types exposing (Msg, Model)
 
 
 winTests : Test
@@ -16,7 +16,7 @@ winTests =
   describe "when the game is won" <|
   let
     state =
-      Elmer.given testModel (UI.view Won) (UI.update <| (\_ _ -> Cmd.none))
+      Elmer.given testModel (UI.view Won) testUpdate
   in
   [ test "it shows the You Win message" <|
     \() ->
@@ -36,7 +36,7 @@ lostTests =
   describe "when the game is lost" <|
   let
     state =
-      Elmer.given testModel (UI.view <| Lost [ Orange, Blue, Yellow, Red ]) (UI.update <| (\_ _ -> Cmd.none))
+      Elmer.given testModel (UI.view <| Lost [ Orange, Blue, Yellow, Red ]) testUpdate
   in
   [ test "it says you lost" <|
     \() ->
@@ -60,6 +60,13 @@ lostTests =
         |> Markup.expect (expectNot <| elementExists)
   ]
 
+
+testUpdate : Msg -> Model -> (Model, Cmd msg)
+testUpdate =
+  { guessEvaluator = \_ _ -> Cmd.none
+  , restartGameCommand = Cmd.none
+  }
+    |> UI.update
 
 testModel : Model
 testModel =

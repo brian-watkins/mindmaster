@@ -12,7 +12,7 @@ import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, functionArg)
 import Elmer.Platform.Command as Command
 import UI
 import UI.Types exposing (Model, Msg)
-import Core.Types exposing (GuessFeedback(..), Color(..), GameState(..), Code)
+import Core.Types exposing (GuessEvaluator, GuessFeedback(..), Color(..), GameState(..), Code)
 import Core.Clue as Clue
 import TestHelpers exposing (..)
 
@@ -22,7 +22,7 @@ guessTests =
   describe "when a guess is submitted" <|
   let
     state =
-      Elmer.given (testModel 5) testView (UI.update <| Spy.callable "evaluator-spy")
+      Elmer.given (testModel 5) testView (testUpdate <| Spy.callable "evaluator-spy")
         |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
         |> selectGuess [ "red", "orange", "yellow", "green", "blue" ]
   in
@@ -52,7 +52,7 @@ partialGuessTests : Test
 partialGuessTests =
   let
     state =
-      Elmer.given (testModel 3) testView (UI.update <| (\_ _ -> Cmd.none))
+      Elmer.given (testModel 3) testView (testUpdate <| (\_ _ -> Cmd.none))
   in
   describe "when a partial guess is submitted"
   [ test "it identifies elements that the user needs to select" <|
@@ -96,13 +96,13 @@ remainingGuessesTests =
   describe "remaining guesses"
   [ test "it shows the guesses remaining" <|
     \() ->
-      Elmer.given (testModel 3) testView (UI.update (\_ _ -> Cmd.none))
+      Elmer.given (testModel 3) testView (testUpdate (\_ _ -> Cmd.none))
         |> Markup.target "#game-progress"
         |> Markup.expect (element <| hasText "4 guesses remain!")
   , describe "when 1 guess remains"
     [ test "it shows that 1 guess remains" <|
       \() ->
-        Elmer.given (testModel 3) (UI.view <| InProgress 1) (UI.update (\_ _ -> Cmd.none))
+        Elmer.given (testModel 3) (UI.view <| InProgress 1) (testUpdate (\_ _ -> Cmd.none))
           |> Markup.target "#game-progress"
           |> Markup.expect (element <| hasText "Last guess!")
     ]
@@ -138,12 +138,12 @@ cluePresentationTests =
   ]
 
 
-guessListTests : Test
-guessListTests =
+guessHistoryTests : Test
+guessHistoryTests =
   describe "when multiple guesses are submitted" <|
   let
     state =
-      Elmer.given (testModel 3) testView (UI.update <| Spy.callable "evaluator-spy")
+      Elmer.given (testModel 3) testView (testUpdate <| Spy.callable "evaluator-spy")
         |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
         |> selectGuess [ "red", "green", "blue" ]
         |> selectGuess [ "red", "green", "green" ]
@@ -174,6 +174,18 @@ guessListTests =
           expectGuessed [ "red", "green", "blue" ] <&&>
           expectClue [ ("empty", 3) ]
         )
+  , describe "when the game is reset"
+    [ test "it clears the history" <|
+      \() ->
+        state
+          |> Elmer.expectModel (\model ->
+            Elmer.given model (UI.view Won) (testUpdate <| (\_ _ -> Cmd.none))
+              |> Markup.target "#new-game"
+              |> Event.click
+              |> Markup.target "[data-guess-feedback]"
+              |> Markup.expect (elements <| hasLength 0)
+          )
+    ]
   ]
 
 
@@ -185,6 +197,14 @@ testModel codeLength =
 testColors : List Color
 testColors =
   [ Red, Orange, Yellow, Blue, Green ]
+
+
+testUpdate : GuessEvaluator Msg msg -> Msg -> Model -> (Model, Cmd msg)
+testUpdate evaluator =
+  { guessEvaluator = evaluator
+  , restartGameCommand = Cmd.none
+  }
+    |> UI.update
 
 
 testView =
@@ -207,7 +227,7 @@ wrongFeedback colorsCorrect positionsCorrect =
 
 expectFeedback : List (String, Int) -> GuessFeedback -> Expectation
 expectFeedback clueElements feedback =
-  Elmer.given (testModel 5) testView (UI.update <| Spy.callable "evaluator-spy")
+  Elmer.given (testModel 5) testView (testUpdate <| Spy.callable "evaluator-spy")
     |> Spy.use [ evaluatorSpy <| feedback ]
     |> selectGuess [ "red", "green", "blue", "yellow", "yellow" ]
     |> Markup.target "[data-guess-feedback]"

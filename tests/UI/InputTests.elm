@@ -57,11 +57,19 @@ testColors =
   [ Red, Orange, Yellow, Blue, Green ]
 
 
+testUpdate : Msg -> Model -> (Model, Cmd msg)
+testUpdate =
+  { guessEvaluator = \_ _ -> Cmd.none
+  , restartGameCommand = Cmd.none
+  }
+    |> UI.update
+
+
 selectColors : List (Maybe String) -> TestState Model Msg
 selectColors classes =
   let
     state =
-      Elmer.given testModel (UI.view <| InProgress 3) (UI.update <| (\_ _ -> Cmd.none))
+      Elmer.given testModel (UI.view <| InProgress 3) testUpdate
   in
     List.indexedMap selectColor classes
       |> foldStates state

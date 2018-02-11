@@ -1,5 +1,6 @@
 module Core.Types exposing
   ( GuessEvaluator
+  , ViewDependencies
   , GameState(..)
   , GuessFeedback(..)
   , Color(..)
@@ -8,12 +9,27 @@ module Core.Types exposing
   , Code
   , GameConfig
   , CodeGenerator
+  , CoreAdapters
   )
 
 
-type alias GameConfig msg =
+type alias GameConfig =
+  { maxGuesses : Int
+  }
+
+
+type alias CoreAdapters vmsg vmodel msg =
   { codeGenerator : CodeGenerator msg
-  , maxGuesses : Int
+  , viewUpdate : ViewUpdate vmsg msg vmodel
+  }
+
+
+type alias ViewUpdate vmsg msg vmodel =
+  ViewDependencies vmsg msg -> vmsg -> vmodel -> (vmodel, Cmd msg)
+
+type alias ViewDependencies vmsg msg =
+  { guessEvaluator : GuessEvaluator vmsg msg
+  , restartGameCommand : Cmd msg
   }
 
 

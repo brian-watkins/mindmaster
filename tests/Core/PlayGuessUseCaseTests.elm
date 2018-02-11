@@ -22,9 +22,9 @@ gameStateTests =
   [ describe "when the page loads"
     [ test "it calls the view adapter with a game state of InProgress" <|
       \() ->
-        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
+        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ] [ Blue ])
           |> Spy.use [ viewSpy ]
-          |> Elmer.init (\_ -> testInit [ Blue ])
+          |> Elmer.init (\_ -> testInit)
           |> Markup.render
           |> Spy.expect "view-spy" (
             wasCalledWith [ typedArg <| InProgress maxGuesses, anyArg ]
@@ -33,9 +33,9 @@ gameStateTests =
   , describe "when the guess is wrong"
     [ test "it decreases the number of remaining guesses by one" <|
       \() ->
-        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
+        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ] [ Blue ])
           |> Spy.use [ viewSpy ]
-          |> Elmer.init (\_ -> testInit [ Blue ])
+          |> Elmer.init (\_ -> testInit)
           |> Markup.target "#submit-code"
           |> Event.click
           |> Event.click
@@ -48,9 +48,9 @@ gameStateTests =
   , describe "when the guess is correct" <|
     let
       state =
-        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
+        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ] [ Orange ])
           |> Spy.use [ viewSpy ]
-          |> Elmer.init (\_ -> testInit [ Orange ])
+          |> Elmer.init (\_ -> testInit)
           |> Markup.target "#submit-code"
           |> Event.click
     in
@@ -73,10 +73,9 @@ gameStateTests =
     [ test "it calls the view adapter with a game state of Lost and the code" <|
       \() ->
         let
-          generator = FakeCodeGenerator.with [ Orange ]
-          gameConfig = { codeGenerator = generator, maxGuesses = 3 }
+          gameConfig = { maxGuesses = 3 }
         in
-          Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Blue ])
+          Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ] [ Blue ])
             |> Spy.use [ viewSpy ]
             |> Elmer.init (\_ -> Core.initGame gameConfig FakeUI.defaultModel)
             |> Markup.target "#submit-code"
@@ -140,8 +139,8 @@ wrongFeedback colorsCorrect positionsCorrect =
 
 expectFeedback : Code -> Code -> GuessFeedback -> Expectation
 expectFeedback code guess expectedFeedback =
-  Elmer.given testModel testView (testUpdate guess)
-    |> Elmer.init (\_ -> testInit code)
+  Elmer.given testModel testView (testUpdate code guess)
+    |> Elmer.init (\_ -> testInit)
     |> Markup.target "#submit-code"
     |> Event.click
     |> Elmer.expectModel (\model ->
@@ -158,14 +157,23 @@ viewSpy =
   Spy.create "view-spy" (\_ -> FakeUI.view)
 
 testModel =
-  Core.defaultModel maxGuesses FakeUI.defaultModel
+  Core.defaultModel testConfig FakeUI.defaultModel
+
+testConfig =
+  { maxGuesses = maxGuesses
+  }
 
 testView =
   Core.view FakeUI.view
 
-testUpdate code =
-  FakeUI.update code
+testUpdate code guess =
+  testAdapters code guess
     |> Core.update
 
-testInit code =
-  Core.initGame { codeGenerator = FakeCodeGenerator.with code, maxGuesses = maxGuesses } FakeUI.defaultModel
+testAdapters code guess =
+  { viewUpdate = FakeUI.update guess
+  , codeGenerator = FakeCodeGenerator.with code
+  }
+
+testInit =
+  Core.initGame testConfig FakeUI.defaultModel

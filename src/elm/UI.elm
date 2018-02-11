@@ -5,8 +5,6 @@ module UI exposing
   )
 
 import Html exposing (Html)
-import Html.Attributes as Attr
-import Html.Events as Events
 import Core.Types exposing (..)
 import UI.Types exposing (..)
 import UI.Guess as Guess
@@ -15,6 +13,9 @@ import UI.Views.GuessInput as GuessInput
 import UI.Views.Outcome as Outcome
 import UI.Views.Progress as Progress
 import UI.Actions.EvaluateGuess as EvaluateGuess
+import UI.Actions.RestartGame as RestartGame
+import UI.Actions.RecordGuess as RecordGuess
+import UI.Actions.InputGuess as InputGuess
 
 
 type alias UIConfig =
@@ -55,31 +56,25 @@ view gameState model =
       ]
 
 
-update : GuessEvaluator Msg msg -> Msg -> Model -> (Model, Cmd msg)
-update evaluator msg model =
+update : ViewDependencies Msg msg -> Msg -> Model -> (Model, Cmd msg)
+update dependencies msg model =
   case msg of
+    RestartGame ->
+      RestartGame.update dependencies.restartGameCommand model
+
     SubmitGuess ->
       EvaluateGuess.update
-        evaluator
+        dependencies.guessEvaluator
         (feedbackTagger model.guess)
         model
 
     ReceivedFeedback guess feedback ->
-      ( recordGuess model (guess, feedback)
-      , Cmd.none
-      )
+      RecordGuess.update guess feedback model
 
     GuessInput position guessColor ->
-      ( { model | guess = Guess.with position guessColor model.guess }
-      , Cmd.none
-      )
+      InputGuess.update position guessColor model
 
 
 feedbackTagger : Guess -> GuessFeedback -> Msg
 feedbackTagger guess =
   ReceivedFeedback <| Guess.toCode guess
-
-
-recordGuess : Model -> (Code, GuessFeedback) -> Model
-recordGuess model guessRecord =
-  { model | history = guessRecord :: model.history }

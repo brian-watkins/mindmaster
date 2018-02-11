@@ -7,11 +7,25 @@
 .code {
   display: flex;
   justify-content: center;
-  margin-bottom: 60px;
+  margin-bottom: 30px;
 }
 
 .code-element {
   padding: 7px;
   width: 50px;
   height: 50px;
+}
+
+#new-game {
+  width: 18em;
+  height: 2em;
+  line-height: 2em;
+  margin-bottom: 60px;
+  font-size: 1.5em;
+  color: #fafafa;
+  text-align: center;
+  display: inline-block;
+  background-color: #673AB7;
+  cursor: pointer;
+  border-radius: 8px;
 }

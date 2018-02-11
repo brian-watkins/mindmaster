@@ -21,6 +21,7 @@ type Msg viewMsg
   = SetCode Code
   | Play (GuessFeedback -> viewMsg) Code
   | ViewMsg viewMsg
+  | StartGame ()
 
 
 type alias Model vModel =
@@ -32,11 +33,11 @@ type alias Model vModel =
   }
 
 
-defaultModel : Int -> viewModel -> Model viewModel
-defaultModel maxGuesses vModel =
+defaultModel : GameConfig -> viewModel -> Model viewModel
+defaultModel config vModel =
   { code = Code.none
-  , gameState = InProgress maxGuesses
-  , maxGuesses = maxGuesses
+  , gameState = InProgress config.maxGuesses
+  , maxGuesses = config.maxGuesses
   , guesses = 0
   , viewModel = vModel
   }
@@ -52,20 +53,21 @@ commandForView =
   Cmd.map ViewMsg
 
 
-initGame : GameConfig (Msg viewMsg) -> viewModel -> (Model viewModel, Cmd (Msg viewMsg))
+initGame : GameConfig -> viewModel -> (Model viewModel, Cmd (Msg viewMsg))
 initGame config viewModel =
-  ( defaultModel config.maxGuesses viewModel
-  , Code.generate SetCode config.codeGenerator
+  ( defaultModel config viewModel
+  , Command.toCmd StartGame ()
   )
 
 
-type alias ViewUpdate msg model =
-  GuessEvaluator msg (Msg msg) -> msg -> model -> (model, Cmd (Msg msg))
-
-
-update : ViewUpdate viewMsg viewModel -> Msg viewMsg -> Model viewModel -> (Model viewModel, Cmd (Msg viewMsg))
-update viewUpdate msg model =
+update : CoreAdapters viewMsg viewModel (Msg viewMsg) -> Msg viewMsg -> Model viewModel -> (Model viewModel, Cmd (Msg viewMsg))
+update adapters msg model =
   case msg of
+    StartGame _ ->
+      ( model
+      , Code.generate SetCode adapters.codeGenerator
+      )
+
     SetCode code ->
       StartGame.update code model
 
@@ -74,8 +76,15 @@ update viewUpdate msg model =
         |> mapCommand commandForView
 
     ViewMsg viewMsg ->
-      viewUpdate guessEvaluator viewMsg model.viewModel
+      adapters.viewUpdate viewDependencies viewMsg model.viewModel
         |> mapModel (storeViewModel model)
+
+
+viewDependencies : ViewDependencies viewMsg (Msg viewMsg)
+viewDependencies =
+  { guessEvaluator = guessEvaluator
+  , restartGameCommand = Command.toCmd StartGame ()
+  }
 
 
 guessEvaluator : (GuessFeedback -> vmsg) -> Code -> Cmd (Msg vmsg)
