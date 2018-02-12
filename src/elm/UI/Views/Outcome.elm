@@ -25,7 +25,7 @@ view outcome =
     Loss code ->
       Html.div []
       [ outcomMessage "You lost!"
-      , Code.view "code" code
+      , secretCode code
       , newGameButton
       ]
 
@@ -41,9 +41,15 @@ finalScore score =
   Html.div [ Attr.id "final-score" ]
     [ Html.text <| "Final Score: " ++ toString score ]
 
+
 newGameButton : Html Msg
 newGameButton =
   Html.div [ Attr.class "row" ]
   [ Html.div [ Attr.id "new-game", Events.onClick RestartGame ]
     [ Html.text "Play again!" ]
   ]
+
+
+secretCode : Code -> Html Msg
+secretCode =
+  Code.view "code"
