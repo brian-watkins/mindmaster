@@ -12,6 +12,7 @@ import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, functionArg)
 import Elmer.Platform.Command as Command
 import UI
 import UI.Types exposing (Model, Msg)
+import UI.TestHelpers as UIHelpers
 import Core.Types exposing (GuessEvaluator, GuessFeedback(..), Color(..), GameState(..), Code)
 import Core.Clue as Clue
 import TestHelpers exposing (..)
@@ -201,10 +202,11 @@ testColors =
 
 testUpdate : GuessEvaluator Msg msg -> Msg -> Model -> (Model, Cmd msg)
 testUpdate evaluator =
-  { guessEvaluator = evaluator
-  , restartGameCommand = Cmd.none
-  }
-    |> UI.update
+  let
+    dependencies = UIHelpers.viewDependencies
+  in
+    UIHelpers.testUpdate <|
+      { dependencies | guessEvaluator = evaluator }
 
 
 testView =

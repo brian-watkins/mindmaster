@@ -8,11 +8,12 @@
     "install:test:elm": "cd tests && elm-install",
     "install:test:integration": "cd integrationTests && npm install",
     "test": "npm-run-all -s test:elm test:integration",
-    "test:integration": "npm-run-all -s build run:test:integration",
+    "test:integration": "npm-run-all -s build:integrationTest run:test:integration",
     "run:test:integration": "cd integrationTests && npm test",
     "test:elm": "elm-test",
     "dev": "webpack-dev-server --port 3000",
-    "build": "webpack"
+    "build": "webpack",
+    "build:integrationTest": "ENVIRONMENT=integrationTest webpack"
   },
   "author": "Brian Watkins",
   "license": "MIT",

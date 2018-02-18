@@ -7,6 +7,7 @@ module Core exposing
   , view
   , viewModel
   , subscriptions
+  , highScoresTagger
   )
 
 import Html exposing (Html)
@@ -17,6 +18,7 @@ import Core.Types exposing (..)
 import Core.Actions.GuessCode as GuessCode
 import Core.Actions.StartGame as StartGame
 import Core.Actions.IncrementTimer as IncrementTimer
+import Core.Actions.UpdateScoreStore as UpdateScoreStore
 import Time exposing (Time)
 
 
@@ -26,6 +28,7 @@ type Msg viewMsg
   | ViewMsg viewMsg
   | StartGame ()
   | GameTimer Time
+  | UpdateScoreStore ()
 
 
 type alias Model vModel =
@@ -62,7 +65,10 @@ commandForView =
 initGame : GameConfig -> viewModel -> (Model viewModel, Cmd (Msg viewMsg))
 initGame config viewModel =
   ( defaultModel config viewModel
-  , Command.toCmd StartGame ()
+  , Cmd.batch
+    [ Command.toCmd StartGame ()
+    , updateScoreStoreCommand
+    ]
   )
 
 
@@ -74,6 +80,9 @@ update adapters msg model =
       , Code.generate SetCode adapters.codeGenerator
       )
 
+    UpdateScoreStore () ->
+      UpdateScoreStore.update adapters.updateScoreStore model
+
     SetCode code ->
       StartGame.update code model
 
@@ -83,10 +92,16 @@ update adapters msg model =
     Play tagger guess ->
       GuessCode.update tagger guess model
         |> mapCommand commandForView
+        |> mapCommand (\cmd -> Cmd.batch [ cmd, updateScoreStoreCommand ])
 
     ViewMsg viewMsg ->
       adapters.viewUpdate viewDependencies viewMsg model.viewModel
         |> mapModel (storeViewModel model)
+
+
+updateScoreStoreCommand : Cmd (Msg viewMsg)
+updateScoreStoreCommand =
+  Command.toCmd UpdateScoreStore ()
 
 
 viewDependencies : ViewDependencies viewMsg (Msg viewMsg)
@@ -119,6 +134,7 @@ storeViewModel model viewModel =
 type alias ViewAdapter viewModel viewMsg =
   GameState -> viewModel -> Html viewMsg
 
+
 view : ViewAdapter viewModel viewMsg -> Model viewModel -> Html (Msg viewMsg)
 view viewAdapter model =
   viewAdapter model.gameState model.viewModel
@@ -132,3 +148,11 @@ subscriptions model =
       Time.every Time.second GameTimer
     _ ->
       Sub.none
+
+
+highScoresTagger : Int -> (List Score -> viewMsg) -> List Score -> Msg viewMsg
+highScoresTagger top tagger scores =
+  List.sort scores
+    |> List.take top
+    |> tagger
+    |> ViewMsg

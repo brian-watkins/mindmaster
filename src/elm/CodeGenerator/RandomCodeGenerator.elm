@@ -1,4 +1,4 @@
-module RandomCodeGenerator exposing
+module CodeGenerator.RandomCodeGenerator exposing
   ( generator
   )
 

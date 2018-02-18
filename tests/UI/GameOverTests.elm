@@ -6,6 +6,10 @@ import Elmer exposing (expectNot, atIndex, (<&&>))
 import Elmer.Html as Markup
 import Elmer.Html.Event as Event
 import Elmer.Html.Matchers exposing (element, elements, elementExists, hasText, hasAttribute)
+import Elmer.Spy as Spy exposing (Spy)
+import Elmer.Spy.Matchers exposing (wasCalledWith, intArg)
+import Elmer.Platform.Command as Command
+import UI.TestHelpers as UIHelpers
 import Core.Types exposing (GameState(..), Color(..))
 import UI
 import UI.Types exposing (Msg, Model)
@@ -33,6 +37,16 @@ winTests =
       state
         |> Markup.target "#guess-input"
         |> Markup.expect (expectNot <| elementExists)
+  , test "it shows the high scores" <|
+    \() ->
+      state
+        |> Command.send (\() -> Command.fake <| UI.highScoresTagger [ 180, 190, 210 ])
+        |> Markup.target "#high-scores"
+        |> Markup.expect (element <|
+          hasText "180" <&&>
+          hasText "190" <&&>
+          hasText "210"
+        )
   ]
 
 
@@ -68,10 +82,9 @@ lostTests =
 
 testUpdate : Msg -> Model -> (Model, Cmd msg)
 testUpdate =
-  { guessEvaluator = \_ _ -> Cmd.none
-  , restartGameCommand = Cmd.none
-  }
-    |> UI.update
+  UIHelpers.viewDependencies
+    |> UIHelpers.testUpdate
+
 
 testModel : Model
 testModel =

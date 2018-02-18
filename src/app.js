@@ -1,5 +1,8 @@
 import './style/style.scss'
 import MindMasterApp from "./elm/Main"
+import { requestScoresPort } from "./ports/requestScoresPort"
 
 const mountNode = document.getElementById("mindmaster-app")
-MindMasterApp.Main.embed(mountNode)
+
+const app = MindMasterApp.Main.embed(mountNode)
+requestScoresPort(app)

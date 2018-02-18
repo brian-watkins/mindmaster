@@ -11,7 +11,7 @@ const extractSass = new ExtractTextPlugin({
 module.exports = {
   entry: {
     app: [
-      './src/app.js'
+      process.env.ENVIRONMENT === "integrationTest" ? './integrationTests/integrationTestApp.js' : './src/app.js'
     ]
   },
 

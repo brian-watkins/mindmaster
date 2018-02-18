@@ -8,6 +8,7 @@ import Elmer.Html.Event as Event
 import Elmer.Html.Matchers exposing (element, elements, hasAttribute)
 import UI
 import UI.Types exposing (Model, Msg)
+import UI.TestHelpers as UIHelpers
 import Core.Types exposing (GameState(..), Color(..))
 import TestHelpers exposing (..)
 
@@ -59,10 +60,8 @@ testColors =
 
 testUpdate : Msg -> Model -> (Model, Cmd msg)
 testUpdate =
-  { guessEvaluator = \_ _ -> Cmd.none
-  , restartGameCommand = Cmd.none
-  }
-    |> UI.update
+  UIHelpers.viewDependencies
+    |> UIHelpers.testUpdate
 
 
 selectColors : List (Maybe String) -> TestState Model Msg

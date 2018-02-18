@@ -1,4 +1,4 @@
-module Adapters.RandomCodeGeneratorTests exposing (..)
+module Adapters.CodeGenerator.RandomCodeGeneratorTests exposing (..)
 
 import Test exposing (..)
 import Expect exposing (Expectation)
@@ -7,7 +7,7 @@ import Elmer.Headless as Headless
 import Elmer.Spy as Spy exposing (Spy, andCallFake)
 import Elmer.Platform.Command as Command
 import Random
-import RandomCodeGenerator
+import CodeGenerator.RandomCodeGenerator as RandomCodeGenerator
 
 
 generateCodeTests : Test

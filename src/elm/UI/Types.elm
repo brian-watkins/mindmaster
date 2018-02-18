@@ -6,7 +6,7 @@ module UI.Types exposing
   , Validation(..)
   )
 
-import Core.Types exposing (GuessEvaluator, GuessFeedback, Code, Color)
+import Core.Types exposing (GuessEvaluator, GuessFeedback, Code, Color, Score)
 
 
 type alias Guess =
@@ -23,6 +23,7 @@ type Msg
   | SubmitGuess
   | ReceivedFeedback Code GuessFeedback
   | RestartGame
+  | HighScores (List Score)
 
 
 type Validation
@@ -37,4 +38,5 @@ type alias Model =
   , validation : Validation
   , attempts : Int
   , colors : List Color
+  , highScores : List Score
   }

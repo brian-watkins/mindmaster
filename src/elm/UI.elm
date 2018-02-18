@@ -2,16 +2,18 @@ module UI exposing
   ( defaultModel
   , view
   , update
+  , highScoresTagger
   )
 
 import Html exposing (Html)
+import Html.Attributes as Attr
 import Core.Types exposing (..)
 import UI.Types exposing (..)
 import UI.Guess as Guess
-import UI.Views.GuessHistory as GuessHistory
-import UI.Views.GuessInput as GuessInput
-import UI.Views.Outcome as Outcome
-import UI.Views.Progress as Progress
+import UI.Views.Game as Game
+import UI.Views.Instructions as Instructions
+import UI.Views.Title as Title
+import UI.Views.HighScores as HighScores
 import UI.Actions.EvaluateGuess as EvaluateGuess
 import UI.Actions.RestartGame as RestartGame
 import UI.Actions.RecordGuess as RecordGuess
@@ -32,28 +34,25 @@ defaultModel config =
   , validation = Valid
   , attempts = 0
   , colors = config.colors
+  , highScores = []
   }
+
+
+highScoresTagger : List Score -> Msg
+highScoresTagger =
+  HighScores
 
 
 view : GameState -> Model -> Html Msg
 view gameState model =
-  case gameState of
-    InProgress remainingGuesses ->
-      Html.div []
-      [ GuessInput.view model
-      , Progress.view remainingGuesses
-      , GuessHistory.view model
-      ]
-    Won score ->
-      Html.div []
-      [ Outcome.view <| Win score
-      , GuessHistory.view model
-      ]
-    Lost code ->
-      Html.div []
-      [ Outcome.view <| Loss code
-      , GuessHistory.view model
-      ]
+  Html.div []
+  [ Title.view
+  , Html.div [ Attr.class "row" ]
+    [ Instructions.view
+    , Game.view gameState model
+    , HighScores.view model
+    ]
+  ]
 
 
 update : ViewDependencies Msg msg -> Msg -> Model -> (Model, Cmd msg)
@@ -73,6 +72,11 @@ update dependencies msg model =
 
     GuessInput position guessColor ->
       InputGuess.update position guessColor model
+
+    HighScores scores ->
+      ( { model | highScores = scores }
+      , Cmd.none
+      )
 
 
 feedbackTagger : Guess -> GuessFeedback -> Msg

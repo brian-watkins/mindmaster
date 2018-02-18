@@ -9,6 +9,7 @@ import Elmer.Html.Event as Event
 import Elmer.Platform.Command as Command
 import UI
 import UI.Types exposing (..)
+import UI.TestHelpers as UIHelpers
 import Core.Types exposing (GameState(..), Color(..))
 
 
@@ -57,10 +58,11 @@ restartGameCommand =
 
 testUpdate : Msg -> Model -> (Model, Cmd msg)
 testUpdate =
-  { guessEvaluator = \_ _ -> Cmd.none
-  , restartGameCommand = restartGameCommand
-  }
-    |> UI.update
+  let
+    dependencies = UIHelpers.viewDependencies
+  in
+    UIHelpers.testUpdate <|
+      { dependencies | restartGameCommand = restartGameCommand }
 
 
 testModel : Model

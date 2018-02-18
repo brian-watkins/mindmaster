@@ -16,6 +16,7 @@ import Core.Clue as Clue
 import Core.Types exposing (..)
 import Core.Fakes.FakeUI as FakeUI
 import Core.Fakes.FakeCodeGenerator as FakeCodeGenerator
+import Core.TestHelpers as CoreHelpers
 import Time
 
 
@@ -50,8 +51,8 @@ gameStateTests =
   , describe "when the guess is correct" <|
     let
       state =
-        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
-          |> Spy.use [ viewSpy ]
+        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdateWithHighScores [ Orange ])
+          |> Spy.use [ viewSpy, scoreStoreSpy [ 190, 276, 310 ] ]
           |> Elmer.init (\_ -> testInit [[Orange]])
           |> Markup.target "#submit-code"
           |> Event.click
@@ -64,6 +65,12 @@ gameStateTests =
                 |> .feedback
                 |> Expect.equal (Just Correct)
             )
+    , test "it requests the high scores" <|
+      \() ->
+        state
+          |> Spy.expect "update-score-store-spy" (
+            wasCalledWith [ typedArg Nothing ]
+          )
     ]
   , describe "when the max number of incorrect answers has been given"
     [ test "it calls the view adapter with a game state of Lost and the code" <|
@@ -88,11 +95,11 @@ gameStateTests =
 scoreTests : Test
 scoreTests =
   describe "when the guess is correct"
-  [ describe "when one correct guess is made after a few seconds"
-    [ test "the score is 50 plus the number of seconds" <|
-      \() ->
-        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
-          |> Spy.use [ viewSpy, timeSpy ]
+  [ describe "when one correct guess is made after a few seconds" <|
+    let
+      state =
+        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdateWithHighScores [ Orange ])
+          |> Spy.use [ viewSpy, timeSpy, scoreStoreSpy [ 190, 276, 310 ] ]
           |> Elmer.init (\_ -> testInit [[Orange]])
           |> Subscription.with (\_ -> Core.subscriptions)
           |> Subscription.send "time-sub" 1
@@ -101,15 +108,25 @@ scoreTests =
           |> Subscription.send "time-sub" 1
           |> Markup.target "#submit-code"
           |> Event.click
+    in
+    [ test "the score is 50 plus the number of seconds" <|
+      \() ->
+        state
           |> Spy.expect "view-spy" (
             wasCalledWith [ typedArg <| Won 54, anyArg ]
           )
-    ]
-  , describe "when more than one correct guess is made after a few seconds"
-    [ test "the score is 50 * number of guesses plus number of seconds" <|
+    , test "it saves the score" <|
       \() ->
-        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
-          |> Spy.use [ viewSpy, timeSpy ]
+        state
+          |> Spy.expect "update-score-store-spy" (
+            wasCalledWith [ typedArg <| Just 54 ]
+          )
+    ]
+  , describe "when more than one incorrect guess is made after a few seconds" <|
+    let
+      state =
+        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdateWithHighScores [ Orange ])
+          |> Spy.use [ viewSpy, timeSpy, scoreStoreSpy [ 190, 276, 310 ] ]
           |> Elmer.init (\_ -> testInit [[Red], [Green], [Orange]])
           |> Subscription.with (\_ -> Core.subscriptions)
           |> elapseSeconds 4
@@ -121,8 +138,18 @@ scoreTests =
           |> elapseSeconds 6
           |> Markup.target "#submit-code"
           |> Event.click
+    in
+    [ test "the score is 50 * number of guesses plus number of seconds" <|
+      \() ->
+        state
           |> Spy.expect "view-spy" (
             wasCalledWith [ typedArg <| Won 163, anyArg ]
+          )
+    , test "it saves the score" <|
+      \() ->
+        state
+          |> Spy.expect "update-score-store-spy" (
+            wasCalledWith [ typedArg <| Just 163 ]
           )
     ]
   ]
@@ -205,6 +232,12 @@ timeSpy =
 
 maxGuesses = 18
 
+scoreStoreSpy : List Score -> Spy
+scoreStoreSpy scores =
+  Core.highScoresTagger 5 FakeUI.UpdateHighScores
+    |> CoreHelpers.updateScoreStoreSpy scores
+
+
 viewSpy : Spy
 viewSpy =
   Spy.create "view-spy" (\_ -> FakeUI.view)
@@ -220,14 +253,15 @@ testConfig =
 testView =
   Core.view FakeUI.view
 
-testUpdate code =
-  testAdapters code
-    |> Core.update
+testUpdateWithHighScores code =
+  let
+    adapters = CoreHelpers.coreAdapters code
+  in
+    { adapters | updateScoreStore = Spy.callable "update-score-store-spy" }
+      |> Core.update
 
-testAdapters code =
-  { viewUpdate = FakeUI.update
-  , codeGenerator = FakeCodeGenerator.with code
-  }
+testUpdate =
+  CoreHelpers.testUpdate
 
 testInit guesses =
   FakeUI.defaultModel guesses
