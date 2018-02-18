@@ -49,6 +49,8 @@ describe("MindMaster", () => {
   })
 
   it('evaluates a guess', async () => {
+    await page.waitFor('[data-guess-input]')
+
     await clickColorInput(page, 0)
     await clickColorInput(page, 1)
     await clickColorInput(page, 2)
