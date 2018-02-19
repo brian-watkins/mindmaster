@@ -3,7 +3,9 @@ module Core.HighScoreTests exposing (..)
 import Test exposing (..)
 import Expect exposing (Expectation)
 import Elmer
+import Elmer.Html as Markup
 import Elmer.Spy as Spy exposing (Spy)
+import Elmer.Spy.Matchers exposing (wasCalledWith, anyArg, argThat)
 import Core.TestHelpers as CoreHelpers
 import Core.Types exposing (Color(..), Score)
 import Core
@@ -16,16 +18,21 @@ orderTests =
   let
     state =
       Elmer.given testModel testView testUpdate
-        |> Spy.use [ scoreStoreSpy [ 210, 14, 381, 276, 310 ] ]
+        |> Spy.use [ fakeViewSpy, scoreStoreSpy [ 210, 14, 381, 276, 310 ] ]
         |> Elmer.init (\_ -> testInit)
   in
   [ test "it orders the scores from lowest to highest" <|
     \() ->
       state
-        |> Elmer.expectModel (\model ->
-          Core.viewModel model
-            |> .highScores
-            |> Expect.equal [ 14, 210, 276, 310, 381 ]
+        |> Markup.render
+        |> Spy.expect "fake-view-spy" (
+          wasCalledWith
+            [ anyArg
+            , argThat <|
+              \model ->
+                model.highScores
+                  |> Expect.equal [ 14, 210, 276, 310, 381 ]
+            ]
         )
   ]
 
@@ -35,16 +42,21 @@ topTests =
   let
     state =
       Elmer.given testModel testView testUpdate
-        |> Spy.use [ scoreStoreSpy [ 210, 14, 381, 276, 310, 12, 88, 113 ] ]
+        |> Spy.use [ fakeViewSpy, scoreStoreSpy [ 210, 14, 381, 276, 310, 12, 88, 113 ] ]
         |> Elmer.init (\_ -> testInit)
   in
   [ test "it returns only the top scores" <|
     \() ->
       state
-        |> Elmer.expectModel (\model ->
-          Core.viewModel model
-            |> .highScores
-            |> Expect.equal [ 12, 14, 88, 113, 210 ]
+        |> Markup.render
+        |> Spy.expect "fake-view-spy" (
+          wasCalledWith
+            [ anyArg
+            , argThat <|
+              \model ->
+                model.highScores
+                  |> Expect.equal [ 12, 14, 88, 113, 210 ]
+            ]
         )
   ]
 
@@ -56,7 +68,11 @@ scoreStoreSpy scores =
 
 
 testView =
-  Core.view <| FakeUI.view
+  Core.view <| Spy.callable "fake-view-spy"
+
+fakeViewSpy : Spy
+fakeViewSpy =
+  Spy.create "fake-view-spy" (\_ -> FakeUI.view)
 
 testUpdate =
   let

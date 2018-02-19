@@ -7,7 +7,7 @@ import Elmer.Html as Markup
 import Elmer.Html.Event as Event
 import Elmer.Html.Matchers exposing (element, hasText)
 import Elmer.Spy as Spy exposing (Spy, andCallFake)
-import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, anyArg)
+import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, anyArg, argThat)
 import Elmer.Platform.Command as Command
 import Elmer.Platform.Subscription as Subscription
 import TestHelpers
@@ -60,11 +60,15 @@ gameStateTests =
     [ test "it returns Correct as the feedback" <|
       \() ->
         state
-          |> Elmer.expectModel (\model ->
-              Core.viewModel model
-                |> .feedback
-                |> Expect.equal (Just Correct)
-            )
+          |> Spy.expect "view-spy" (
+            wasCalledWith
+              [ anyArg
+              , argThat <|
+                \model ->
+                  model.feedback
+                    |> Expect.equal (Just Correct)
+              ]
+          )
     , test "it requests the high scores" <|
       \() ->
         state
@@ -212,15 +216,20 @@ wrongFeedback colorsCorrect positionsCorrect =
 
 expectFeedback : Code -> Code -> GuessFeedback -> Expectation
 expectFeedback code guess expectedFeedback =
-  Elmer.given testModel testView (testUpdate code)
+  Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate code)
+    |> Spy.use [ viewSpy ]
     |> Elmer.init (\_ -> testInit [guess])
     |> Markup.target "#submit-code"
     |> Event.click
-    |> Elmer.expectModel (\model ->
-        Core.viewModel model
-          |> .feedback
-          |> Expect.equal (Just expectedFeedback)
-      )
+    |> Spy.expect "view-spy" (
+      wasCalledWith
+        [ anyArg
+        , argThat <|
+          \model ->
+            model.feedback
+              |> Expect.equal (Just expectedFeedback)
+        ]
+    )
 
 
 timeSpy : Spy

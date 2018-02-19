@@ -5,7 +5,6 @@ module Core exposing
   , initGame
   , update
   , view
-  , viewModel
   , subscriptions
   , highScoresTagger
   )
@@ -50,11 +49,6 @@ defaultModel config vModel =
   , viewModel = vModel
   , gameTimer = 0
   }
-
-
-viewModel : Model viewModel -> viewModel
-viewModel model =
-  model.viewModel
 
 
 commandForView : Cmd viewMsg -> Cmd (Msg viewMsg)
