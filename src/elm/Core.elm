@@ -23,7 +23,7 @@ import Time exposing (Time)
 
 type Msg viewMsg
   = SetCode Code
-  | Play (GuessFeedback -> viewMsg) Code
+  | Play (GuessResult -> viewMsg) Code
   | ViewMsg viewMsg
   | StartGame ()
   | GameTimer Time
@@ -105,7 +105,7 @@ viewDependencies =
   }
 
 
-guessEvaluator : (GuessFeedback -> vmsg) -> Code -> Cmd (Msg vmsg)
+guessEvaluator : (GuessResult -> vmsg) -> Code -> Cmd (Msg vmsg)
 guessEvaluator tagger guess =
   Command.toCmd (Play tagger) guess
 

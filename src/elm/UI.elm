@@ -67,8 +67,8 @@ update dependencies msg model =
         (feedbackTagger model.guess)
         model
 
-    ReceivedFeedback guess feedback ->
-      RecordGuess.update guess feedback model
+    ReceivedFeedback guess guessResult ->
+      RecordGuess.update guess guessResult model
 
     GuessInput position guessColor ->
       InputGuess.update position guessColor model
@@ -79,6 +79,6 @@ update dependencies msg model =
       )
 
 
-feedbackTagger : Guess -> GuessFeedback -> Msg
+feedbackTagger : Guess -> GuessResult -> Msg
 feedbackTagger guess =
   ReceivedFeedback <| Guess.toCode guess

@@ -2,7 +2,7 @@ module Core.Types exposing
   ( GuessEvaluator
   , ViewDependencies
   , GameState(..)
-  , GuessFeedback(..)
+  , GuessResult(..)
   , Color(..)
   , defaultColor
   , Clue
@@ -43,7 +43,7 @@ type alias ViewDependencies vmsg msg =
 
 
 type alias GuessEvaluator vmsg msg =
-  (GuessFeedback -> vmsg) -> Code -> Cmd msg
+  (GuessResult -> vmsg) -> Code -> Cmd msg
 
 
 type alias CodeGenerator msg =
@@ -64,9 +64,9 @@ type alias Code =
   List Color
 
 
-type GuessFeedback
+type GuessResult
   = Wrong Clue
-  | Correct
+  | Right
 
 
 type alias Clue =

@@ -12,14 +12,14 @@ type alias Model a =
   , gameTimer : Int
   }
 
-apply : Model a -> GuessFeedback -> GameState
-apply model feedback =
-  case feedback of
+apply : Model a -> GuessResult -> GameState
+apply model guessResult =
+  case guessResult of
     Wrong _ ->
       if model.guesses + 1 == model.maxGuesses then
         Lost model.code
       else
         InProgress (model.maxGuesses - model.guesses - 1)
-    Correct ->
+    Right ->
       model.gameTimer + ((model.guesses + 1) * 50)
         |> Won

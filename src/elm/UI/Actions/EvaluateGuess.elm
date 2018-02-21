@@ -2,7 +2,7 @@ module UI.Actions.EvaluateGuess exposing
   ( update
   )
 
-import Core.Types exposing (GuessEvaluator, GuessFeedback)
+import Core.Types exposing (GuessEvaluator, GuessResult)
 import UI.Types exposing (Guess, Validation(..))
 import UI.Guess as Guess
 
@@ -17,7 +17,7 @@ type alias Model a =
 
 
 type alias FeedbackTagger msg =
-  GuessFeedback -> msg
+  GuessResult -> msg
 
 
 update : GuessEvaluator viewMsg msg -> FeedbackTagger viewMsg -> Model a -> ( Model a, Cmd msg )

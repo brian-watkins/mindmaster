@@ -2,7 +2,7 @@ module Core.Actions.GuessCode exposing
   ( update
   )
 
-import Core.Types exposing (Code, GuessFeedback(..), GameState(..))
+import Core.Types exposing (Code, GuessResult(..), GameState(..))
 import Core.Rules.GuessRule as GuessRule
 import Core.Rules.OutcomeRule as OutcomeRule
 import Core.Command as Command
@@ -18,19 +18,19 @@ type alias Model a =
   }
 
 
-update : (GuessFeedback -> vmsg) -> Code -> Model a -> (Model a, Cmd vmsg)
+update : (GuessResult -> vmsg) -> Code -> Model a -> (Model a, Cmd vmsg)
 update tagger guess model =
   let
-    feedback = GuessRule.apply model.code guess
+    guessResult = GuessRule.apply model.code guess
   in
-    ( updateModel feedback model
-    , Command.toCmd tagger feedback
+    ( updateModel guessResult model
+    , Command.toCmd tagger guessResult
     )
 
 
-updateModel : GuessFeedback -> Model a -> Model a
-updateModel feedback model =
+updateModel : GuessResult -> Model a -> Model a
+updateModel guessResult model =
   { model
-  | gameState = OutcomeRule.apply model feedback
+  | gameState = OutcomeRule.apply model guessResult
   , guesses = model.guesses + 1
   }

@@ -13,7 +13,7 @@ import Elmer.Platform.Command as Command
 import UI
 import UI.Types exposing (Model, Msg)
 import UI.TestHelpers as UIHelpers
-import Core.Types exposing (GuessEvaluator, GuessFeedback(..), Color(..), GameState(..), Code)
+import Core.Types exposing (GuessEvaluator, GuessResult(..), Color(..), GameState(..), Code)
 import Core.Clue as Clue
 import TestHelpers exposing (..)
 
@@ -115,7 +115,7 @@ cluePresentationTests =
   [ describe "when the guess is correct"
     [ test "it shows that the guess is correct" <|
       \() ->
-        Correct
+        Right
           |> expectFeedback [ ("black", 5) ]
     ]
   , describe "when no colors are correct"
@@ -148,7 +148,7 @@ guessHistoryTests =
         |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
         |> selectGuess [ "red", "green", "blue" ]
         |> selectGuess [ "red", "green", "green" ]
-        |> Spy.use [ evaluatorSpy Correct ]
+        |> Spy.use [ evaluatorSpy Right ]
         |> selectGuess [ "blue", "green", "green" ]
   in
   [ test "it shows the third guess first" <|
@@ -213,7 +213,7 @@ testView =
   UI.view <| InProgress 4
 
 
-evaluatorSpy : GuessFeedback -> Spy
+evaluatorSpy : GuessResult -> Spy
 evaluatorSpy feedback =
   Spy.createWith "evaluator-spy" <|
     \tagger _ ->
@@ -221,13 +221,13 @@ evaluatorSpy feedback =
         |> Command.fake
 
 
-wrongFeedback : Int -> Int -> GuessFeedback
+wrongFeedback : Int -> Int -> GuessResult
 wrongFeedback colorsCorrect positionsCorrect =
   Clue.with colorsCorrect positionsCorrect
     |> Wrong
 
 
-expectFeedback : List (String, Int) -> GuessFeedback -> Expectation
+expectFeedback : List (String, Int) -> GuessResult -> Expectation
 expectFeedback clueElements feedback =
   Elmer.given (testModel 5) testView (testUpdate <| Spy.callable "evaluator-spy")
     |> Spy.use [ evaluatorSpy <| feedback ]

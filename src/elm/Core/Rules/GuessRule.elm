@@ -8,15 +8,15 @@ import Core.Command as Command
 import Core.Types exposing (..)
 
 
-apply : Code -> Code -> GuessFeedback
+apply : Code -> Code -> GuessResult
 apply code guess =
   if Code.equals code guess then
-    Correct
+    Right
   else
     clueFor code guess
 
 
-clueFor : Code -> Code -> GuessFeedback
+clueFor : Code -> Code -> GuessResult
 clueFor code guess =
   let
     correctColors = Code.correctColors code guess

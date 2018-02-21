@@ -66,7 +66,7 @@ gameStateTests =
               , argThat <|
                 \model ->
                   model.feedback
-                    |> Expect.equal (Just Correct)
+                    |> Expect.equal (Just Right)
               ]
           )
     , test "it requests the high scores" <|
@@ -208,13 +208,13 @@ elapseSeconds seconds testState =
     |> TestHelpers.foldStates testState
 
 
-wrongFeedback : Int -> Int -> GuessFeedback
+wrongFeedback : Int -> Int -> GuessResult
 wrongFeedback colorsCorrect positionsCorrect =
   Clue.with colorsCorrect positionsCorrect
     |> Wrong
 
 
-expectFeedback : Code -> Code -> GuessFeedback -> Expectation
+expectFeedback : Code -> Code -> GuessResult -> Expectation
 expectFeedback code guess expectedFeedback =
   Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate code)
     |> Spy.use [ viewSpy ]

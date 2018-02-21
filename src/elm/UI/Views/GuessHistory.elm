@@ -2,9 +2,9 @@ module UI.Views.GuessHistory exposing
   ( view
   )
 
-import Core.Types exposing (Code, GuessFeedback(..))
+import Core.Types exposing (Code, GuessResult(..))
 import UI.Types exposing (..)
-import UI.Views.Feedback as Feedback
+import UI.Views.GuessResult as GuessResult
 import UI.Views.Code as Code
 import Html exposing (Html)
 import Html.Attributes as Attr
@@ -23,12 +23,12 @@ feedbackHistory model =
     |> Html.ul []
 
 
-printHistoryItem : Int -> Int -> (Code, GuessFeedback) -> Html Msg
-printHistoryItem codeLength index (guess, feedback) =
+printHistoryItem : Int -> Int -> (Code, GuessResult) -> Html Msg
+printHistoryItem codeLength index (guess, guessResult) =
   Html.li
     [ Attr.class "guess-history-item"
     , Attr.attribute "data-guess-feedback" <| toString index
     ]
     [ Code.view "guess" guess
-    , Feedback.view codeLength feedback
+    , GuessResult.view codeLength guessResult
     ]

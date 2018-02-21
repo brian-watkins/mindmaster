@@ -1,8 +1,8 @@
-module UI.Views.Feedback exposing
+module UI.Views.GuessResult exposing
   ( view
   )
 
-import Core.Types exposing (GuessFeedback(..))
+import Core.Types exposing (GuessResult(..))
 import UI.Types exposing (..)
 import UI.Vectors.Circle as Circle
 import UI.Vectors.Arc as Arc
@@ -20,11 +20,11 @@ type alias Clue =
   }
 
 
-view : Int -> GuessFeedback -> Html Msg
-view codeLength feedback =
+view : Int -> GuessResult -> Html Msg
+view codeLength guessResult =
     Html.div [ Attr.class "clue" ]
     [ Svg.svg [ SvgAttr.viewBox "0 0 30 30"] <|
-        ( clueList codeLength feedback
+        ( clueList codeLength guessResult
             |> positioned (emptyClues codeLength)
             |> List.map clueElement
         )
@@ -39,14 +39,14 @@ clueElement clue =
     ]
 
 
-clueList : Int -> GuessFeedback -> List String
-clueList codeLength feedback =
-  case feedback of
+clueList : Int -> GuessResult -> List String
+clueList codeLength guessResult =
+  case guessResult of
     Wrong clue ->
       List.append
         (List.repeat clue.positions "black")
         (List.repeat (clue.colors - clue.positions) "white")
-    Correct ->
+    Right ->
       List.repeat codeLength "black"
 
 

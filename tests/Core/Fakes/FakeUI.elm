@@ -3,16 +3,16 @@ module Core.Fakes.FakeUI exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
-import Core.Types exposing (ViewDependencies, GuessFeedback(..), Color, Code, Score, GameState(..))
+import Core.Types exposing (ViewDependencies, GuessResult(..), Color, Code, Score, GameState(..))
 
 type Msg
   = PlayGuess
-  | HandleFeedback GuessFeedback
+  | HandleFeedback GuessResult
   | RestartGame
   | UpdateHighScores (List Score)
 
 type alias Model =
-  { feedback : Maybe GuessFeedback
+  { feedback : Maybe GuessResult
   , guesses : List Code
   , highScores : List Score
   }
