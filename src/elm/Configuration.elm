@@ -1,4 +1,4 @@
-module MindMaster exposing
+module Configuration exposing
   ( program
   , coreAdapters
   )
