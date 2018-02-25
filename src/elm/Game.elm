@@ -9,7 +9,7 @@ module Game exposing
   , gameState
   )
 
-import Game.Types exposing (..)
+import Game.Types exposing (GameConfig, Code, GameState(..))
 import Game.Code as Code
 import Game.Actions.StartGame as StartGame
 import Game.Actions.IncrementTimer as IncrementTimer

@@ -8,10 +8,9 @@ module Bus exposing
   , uiTagger
   )
 
-import Html exposing (Html)
+import Html
 import UI
 import Game
-import Game.Types exposing (Score, Code, GuessResult, GameState, GameConfig)
 import Util.Command as Command
 
 

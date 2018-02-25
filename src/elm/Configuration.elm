@@ -3,11 +3,10 @@ module Configuration exposing
   , coreAdapters
   )
 
-import Html exposing (Html)
+import Html
 import Bus
-import Game.Types exposing (GameConfig, Color(..))
+import Game.Types exposing (defaultColor, Color(..))
 import UI
-import UI.Types as View
 import CodeGenerator.RandomCodeGenerator as RandomCodeGenerator
 import ScoreStore.LocalStorageScoreStore as LocalStorageScoreStore
 
@@ -41,7 +40,7 @@ defaultViewModel =
 
 
 coreAdapters =
-  { codeGenerator = RandomCodeGenerator.generator codeLength None colors
+  { codeGenerator = RandomCodeGenerator.generator codeLength defaultColor colors
   , updateUI = UI.update
   , guessResultTagger = UI.guessResultTagger
   , updateScoreStore = LocalStorageScoreStore.execute
