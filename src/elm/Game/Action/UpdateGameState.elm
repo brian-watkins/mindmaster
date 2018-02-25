@@ -25,14 +25,14 @@ update guessResult model =
 
 
 updateGameState : GuessResult -> (Model a, Cmd msg) -> (Model a, Cmd msg)
-updateGameState guessResult (model, cmd) =
-  ( { model | gameState = OutcomeRule.apply model guessResult }
-  , cmd
-  )
+updateGameState guessResult =
+  Tuple.mapFirst <|
+    \model ->
+      { model | gameState = OutcomeRule.apply model guessResult }
 
 
 incrementGuesses : (Model a, Cmd msg) -> (Model a, Cmd msg)
-incrementGuesses (model, cmd) =
-  ( { model | guesses = model.guesses + 1 }
-  , cmd
-  )
+incrementGuesses =
+  Tuple.mapFirst <|
+    \model ->
+      { model | guesses = model.guesses + 1 }
