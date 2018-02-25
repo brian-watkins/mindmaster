@@ -2,7 +2,7 @@ module UI.Actions.EvaluateGuess exposing
   ( update
   )
 
-import Core.Types exposing (GuessEvaluator, GuessResult)
+import Game.Types exposing (GuessEvaluator, GuessResult)
 import UI.Types exposing (Guess, Validation(..))
 import UI.Guess as Guess
 
@@ -20,8 +20,8 @@ type alias FeedbackTagger msg =
   GuessResult -> msg
 
 
-update : GuessEvaluator viewMsg msg -> FeedbackTagger viewMsg -> Model a -> ( Model a, Cmd msg )
-update evaluator feedbackTagger model =
+update : GuessEvaluator msg -> Model a -> ( Model a, Cmd msg )
+update evaluator model =
   if isGuessComplete model then
     ( { model
       | validation = GuessIncomplete
@@ -35,7 +35,7 @@ update evaluator feedbackTagger model =
       , validation = Valid
       , attempts = 0
       }
-    , evaluateGuess evaluator feedbackTagger model.guess
+    , evaluateGuess evaluator model.guess
     )
 
 
@@ -44,7 +44,7 @@ isGuessComplete model =
   Guess.lengthSelected model.guess < model.codeLength
 
 
-evaluateGuess : GuessEvaluator viewMsg msg -> FeedbackTagger viewMsg -> Guess -> Cmd msg
-evaluateGuess evaluator feedbackTagger guess =
+evaluateGuess : GuessEvaluator msg -> Guess -> Cmd msg
+evaluateGuess evaluator guess =
   Guess.toCode guess
-    |> evaluator feedbackTagger
+    |> evaluator

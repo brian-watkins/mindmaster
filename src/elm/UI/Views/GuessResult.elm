@@ -2,7 +2,7 @@ module UI.Views.GuessResult exposing
   ( view
   )
 
-import Core.Types exposing (GuessResult(..))
+import Game.Types exposing (GuessResult(..))
 import UI.Types exposing (..)
 import UI.Vectors.Circle as Circle
 import UI.Vectors.Arc as Arc

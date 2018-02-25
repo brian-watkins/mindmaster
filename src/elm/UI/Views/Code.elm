@@ -5,7 +5,7 @@ module UI.Views.Code exposing
 import UI.Types exposing (..)
 import UI.Color as Color
 import UI.Vectors.Circle as Circle
-import Core.Types exposing (Code, Color)
+import Game.Types exposing (Code, Color)
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Svg

@@ -10,7 +10,7 @@ import UI.Views.Code as Code
 import Svg
 import Svg.Attributes as SvgAttr
 import UI.Vectors.Circle as Circle
-import Core.Types exposing (Code, Color)
+import Game.Types exposing (Code, Color)
 
 view : Outcome -> Html Msg
 view outcome =

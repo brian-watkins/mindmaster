@@ -1,4 +1,4 @@
-module Core.Command exposing
+module Util.Command exposing
   ( toCmd
   )
 

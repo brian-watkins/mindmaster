@@ -2,7 +2,7 @@ module UI.Actions.RecordGuess exposing
   ( update
   )
 
-import Core.Types exposing (Code, GuessResult)
+import Game.Types exposing (Code, GuessResult)
 
 
 type alias Model a =

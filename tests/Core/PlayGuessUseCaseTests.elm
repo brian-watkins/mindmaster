@@ -11,13 +11,13 @@ import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, anyArg, argThat)
 import Elmer.Platform.Command as Command
 import Elmer.Platform.Subscription as Subscription
 import TestHelpers
-import Core
-import Core.Clue as Clue
-import Core.Types exposing (..)
+import Game.Clue as Clue
+import Game.Types exposing (..)
 import Core.Fakes.FakeUI as FakeUI
 import Core.Fakes.FakeCodeGenerator as FakeCodeGenerator
 import Core.TestHelpers as CoreHelpers
 import Time
+import Bus
 
 
 gameStateTests : Test
@@ -26,38 +26,38 @@ gameStateTests =
   [ describe "when the page loads"
     [ test "it calls the view adapter with a game state of InProgress" <|
       \() ->
-        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
-          |> Spy.use [ viewSpy ]
-          |> Elmer.init (\_ -> testInit [[Blue]])
+        Elmer.given CoreHelpers.testModel (Bus.view <| Spy.callable "view-spy") (CoreHelpers.testUpdate [ Orange ])
+          |> Spy.use [ CoreHelpers.viewSpy ]
+          |> Elmer.init (\_ -> CoreHelpers.testInitWithMax 21 [[Blue]] [ Orange ])
           |> Markup.render
           |> Spy.expect "view-spy" (
-            wasCalledWith [ typedArg <| InProgress maxGuesses, anyArg ]
+            wasCalledWith [ typedArg <| InProgress 21, anyArg ]
           )
     ]
   , describe "when the guess is wrong"
     [ test "it decreases the number of remaining guesses by one" <|
       \() ->
-        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
-          |> Spy.use [ viewSpy ]
-          |> Elmer.init (\_ -> testInit [[Blue], [Green], [Red]])
+        Elmer.given CoreHelpers.testModel (Bus.view <| Spy.callable "view-spy") (CoreHelpers.testUpdate [ Orange ])
+          |> Spy.use [ CoreHelpers.viewSpy ]
+          |> Elmer.init (\_ -> CoreHelpers.testInitWithMax 15 [[Blue], [Green], [Red]] [ Orange ])
           |> Markup.target "#submit-code"
           |> Event.click
           |> Event.click
           |> Event.click
           |> Spy.expect "view-spy" (
-            wasCalledWith [ typedArg <| InProgress (maxGuesses - 3), anyArg ]
+            wasCalledWith [ typedArg <| InProgress 12, anyArg ]
           )
     ]
   , describe "when the guess is correct" <|
     let
       state =
-        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdateWithHighScores [ Orange ])
-          |> Spy.use [ viewSpy, scoreStoreSpy [ 190, 276, 310 ] ]
-          |> Elmer.init (\_ -> testInit [[Orange]])
+        Elmer.given CoreHelpers.testModel (Bus.view <| Spy.callable "view-spy") (testUpdateWithHighScores [ Orange ])
+          |> Spy.use [ CoreHelpers.viewSpy, scoreStoreSpy ]
+          |> Elmer.init (\_ -> CoreHelpers.testInit [[Orange]] [ Orange ])
           |> Markup.target "#submit-code"
           |> Event.click
     in
-    [ test "it returns Correct as the feedback" <|
+    [ test "it returns Right as the feedback" <|
       \() ->
         state
           |> Spy.expect "view-spy" (
@@ -66,32 +66,23 @@ gameStateTests =
               , argThat <|
                 \model ->
                   model.feedback
-                    |> Expect.equal (Just Right)
+                    |> Expect.equal (Just ([Orange], Right))
               ]
-          )
-    , test "it requests the high scores" <|
-      \() ->
-        state
-          |> Spy.expect "update-score-store-spy" (
-            wasCalledWith [ typedArg Nothing ]
           )
     ]
   , describe "when the max number of incorrect answers has been given"
     [ test "it calls the view adapter with a game state of Lost and the code" <|
       \() ->
-        let
-          gameConfig = { maxGuesses = 3 }
-        in
-          Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Orange ])
-            |> Spy.use [ viewSpy ]
-            |> Elmer.init (\_ -> Core.initGame gameConfig <| FakeUI.defaultModel [[Blue], [Red], [Green]])
-            |> Markup.target "#submit-code"
-            |> Event.click
-            |> Event.click
-            |> Event.click
-            |> Spy.expect "view-spy" (
-              wasCalledWith [ typedArg <| Lost [ Orange ], anyArg ]
-            )
+        Elmer.given CoreHelpers.testModel (Bus.view <| Spy.callable "view-spy") (CoreHelpers.testUpdate [ Orange ])
+          |> Spy.use [ CoreHelpers.viewSpy ]
+          |> Elmer.init (\_ -> CoreHelpers.testInitWithMax 3 [[Blue], [Red], [Green]] [ Orange ])
+          |> Markup.target "#submit-code"
+          |> Event.click
+          |> Event.click
+          |> Event.click
+          |> Spy.expect "view-spy" (
+            wasCalledWith [ typedArg <| Lost [ Orange ], anyArg ]
+          )
     ]
   ]
 
@@ -102,10 +93,10 @@ scoreTests =
   [ describe "when one correct guess is made after a few seconds" <|
     let
       state =
-        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdateWithHighScores [ Orange ])
-          |> Spy.use [ viewSpy, timeSpy, scoreStoreSpy [ 190, 276, 310 ] ]
-          |> Elmer.init (\_ -> testInit [[Orange]])
-          |> Subscription.with (\_ -> Core.subscriptions)
+        Elmer.given CoreHelpers.testModel (Bus.view <| Spy.callable "view-spy") (testUpdateWithHighScores [ Orange ])
+          |> Spy.use [ CoreHelpers.viewSpy, timeSpy, scoreStoreSpy ]
+          |> Elmer.init (\_ -> CoreHelpers.testInit [[Orange]] [ Orange ])
+          |> Subscription.with (\_ -> Bus.subscriptions)
           |> Subscription.send "time-sub" 1
           |> Subscription.send "time-sub" 1
           |> Subscription.send "time-sub" 1
@@ -129,10 +120,10 @@ scoreTests =
   , describe "when more than one incorrect guess is made after a few seconds" <|
     let
       state =
-        Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdateWithHighScores [ Orange ])
-          |> Spy.use [ viewSpy, timeSpy, scoreStoreSpy [ 190, 276, 310 ] ]
-          |> Elmer.init (\_ -> testInit [[Red], [Green], [Orange]])
-          |> Subscription.with (\_ -> Core.subscriptions)
+        Elmer.given CoreHelpers.testModel (Bus.view <| Spy.callable "view-spy") (testUpdateWithHighScores [ Orange ])
+          |> Spy.use [ CoreHelpers.viewSpy, timeSpy, scoreStoreSpy ]
+          |> Elmer.init (\_ -> CoreHelpers.testInit [[Red], [Green], [Orange]] [Orange])
+          |> Subscription.with (\_ -> Bus.subscriptions)
           |> elapseSeconds 4
           |> Markup.target "#submit-code"
           |> Event.click
@@ -216,9 +207,9 @@ wrongFeedback colorsCorrect positionsCorrect =
 
 expectFeedback : Code -> Code -> GuessResult -> Expectation
 expectFeedback code guess expectedFeedback =
-  Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate code)
-    |> Spy.use [ viewSpy ]
-    |> Elmer.init (\_ -> testInit [guess])
+  Elmer.given CoreHelpers.testModel (Bus.view <| Spy.callable "view-spy") (CoreHelpers.testUpdate code)
+    |> Spy.use [ CoreHelpers.viewSpy ]
+    |> Elmer.init (\_ -> CoreHelpers.testInit [guess] code)
     |> Markup.target "#submit-code"
     |> Event.click
     |> Spy.expect "view-spy" (
@@ -227,7 +218,7 @@ expectFeedback code guess expectedFeedback =
         , argThat <|
           \model ->
             model.feedback
-              |> Expect.equal (Just expectedFeedback)
+              |> Expect.equal (Just (guess, expectedFeedback))
         ]
     )
 
@@ -239,39 +230,15 @@ timeSpy =
       Subscription.fake "time-sub" tagger
     )
 
-maxGuesses = 18
 
-scoreStoreSpy : List Score -> Spy
-scoreStoreSpy scores =
-  Core.highScoresTagger 5 FakeUI.UpdateHighScores
-    |> CoreHelpers.updateScoreStoreSpy scores
+scoreStoreSpy : Spy
+scoreStoreSpy =
+  CoreHelpers.updateScoreStoreSpy
 
-
-viewSpy : Spy
-viewSpy =
-  Spy.create "view-spy" (\_ -> FakeUI.view)
-
-testModel =
-  FakeUI.defaultModel []
-    |> Core.defaultModel testConfig
-
-testConfig =
-  { maxGuesses = maxGuesses
-  }
-
-testView =
-  Core.view FakeUI.view
 
 testUpdateWithHighScores code =
   let
     adapters = CoreHelpers.coreAdapters code
   in
     { adapters | updateScoreStore = Spy.callable "update-score-store-spy" }
-      |> Core.update
-
-testUpdate =
-  CoreHelpers.testUpdate
-
-testInit guesses =
-  FakeUI.defaultModel guesses
-    |> Core.initGame testConfig
+      |> Bus.update

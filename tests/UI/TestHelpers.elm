@@ -3,17 +3,17 @@ module UI.TestHelpers exposing
   , testUpdate
   )
 
-import Core.Types exposing (..)
+import Game.Types exposing (..)
 import UI.Types exposing (..)
 import UI
 
 
-testUpdate : ViewDependencies Msg msg -> Msg -> Model -> (Model, Cmd msg)
+testUpdate : UseCases msg -> Msg -> Model -> (Model, Cmd msg)
 testUpdate =
   UI.update
 
 
 viewDependencies =
-  { guessEvaluator = \_ _ -> Cmd.none
-  , restartGameCommand = Cmd.none
+  { guessEvaluator = \_ -> Cmd.none
+  , restartGame = Cmd.none
   }

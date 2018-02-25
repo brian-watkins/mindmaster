@@ -5,7 +5,7 @@ module UI.Views.HighScores exposing
 import Html exposing (Html)
 import Html.Attributes as Attr
 import UI.Types exposing (..)
-import Core.Types exposing (Score)
+import Game.Types exposing (Score)
 
 
 view : Model -> Html Msg

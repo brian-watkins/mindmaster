@@ -6,7 +6,7 @@ module UI.Types exposing
   , Validation(..)
   )
 
-import Core.Types exposing (GuessEvaluator, GuessResult, Code, Color, Score)
+import Game.Types exposing (GuessEvaluator, GuessResult, Code, Color, Score)
 
 
 type alias Guess =

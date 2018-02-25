@@ -4,8 +4,8 @@ module Configuration exposing
   )
 
 import Html exposing (Html)
-import Core
-import Core.Types exposing (GameConfig, Color(..), CoreAdapters)
+import Bus
+import Game.Types exposing (GameConfig, Color(..))
 import UI
 import UI.Types as View
 import CodeGenerator.RandomCodeGenerator as RandomCodeGenerator
@@ -36,32 +36,29 @@ viewConfig =
   }
 
 
-defaultViewModel : View.Model
 defaultViewModel =
   UI.defaultModel viewConfig
 
 
-coreAdapters : CoreAdapters View.Msg View.Model (Core.Msg View.Msg)
 coreAdapters =
   { codeGenerator = RandomCodeGenerator.generator codeLength None colors
-  , viewUpdate = UI.update
-  , highScoresTagger = UI.highScoresTagger
+  , updateUI = UI.update
+  , guessResultTagger = UI.guessResultTagger
   , updateScoreStore = LocalStorageScoreStore.execute
   }
 
 
-subscriptions : (Core.Model View.Model) -> Sub (Core.Msg View.Msg)
 subscriptions model =
   Sub.batch
-  [ Core.subscriptions model
-  , LocalStorageScoreStore.subscriptions (Core.highScoresTagger topScores UI.highScoresTagger)
+  [ Bus.subscriptions model
+  , LocalStorageScoreStore.subscriptions topScores (Bus.uiTagger << UI.highScoresTagger)
   ]
 
 
 program adapters =
   Html.program
-    { init = Core.initGame gameConfig defaultViewModel
-    , view = Core.view UI.view
-    , update = Core.update adapters
+    { init = Bus.init gameConfig adapters defaultViewModel
+    , view = Bus.view UI.view
+    , update = Bus.update adapters
     , subscriptions = subscriptions
     }

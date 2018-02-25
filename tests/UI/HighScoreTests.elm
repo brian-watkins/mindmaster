@@ -8,7 +8,7 @@ import Elmer.Html.Matchers exposing (element, hasText)
 import Elmer.Platform.Command as Command
 import UI
 import UI.Types exposing (..)
-import Core.Types exposing (Color(..), GameState(..))
+import Game.Types exposing (Color(..), GameState(..))
 import UI.TestHelpers as UIHelpers
 
 

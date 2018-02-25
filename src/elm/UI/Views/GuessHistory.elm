@@ -2,7 +2,7 @@ module UI.Views.GuessHistory exposing
   ( view
   )
 
-import Core.Types exposing (Code, GuessResult(..))
+import Game.Types exposing (Code, GuessResult(..))
 import UI.Types exposing (..)
 import UI.Views.GuessResult as GuessResult
 import UI.Views.Code as Code

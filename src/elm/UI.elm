@@ -3,11 +3,12 @@ module UI exposing
   , view
   , update
   , highScoresTagger
+  , guessResultTagger
   )
 
 import Html exposing (Html)
 import Html.Attributes as Attr
-import Core.Types exposing (..)
+import Game.Types exposing (..)
 import UI.Types exposing (..)
 import UI.Guess as Guess
 import UI.Views.Game as Game
@@ -43,6 +44,11 @@ highScoresTagger =
   HighScores
 
 
+guessResultTagger : Code -> GuessResult -> Msg
+guessResultTagger =
+  ReceivedFeedback
+
+
 view : GameState -> Model -> Html Msg
 view gameState model =
   Html.div []
@@ -55,17 +61,14 @@ view gameState model =
   ]
 
 
-update : ViewDependencies Msg msg -> Msg -> Model -> (Model, Cmd msg)
-update dependencies msg model =
+update : UseCases msg -> Msg -> Model -> (Model, Cmd msg)
+update adapters msg model =
   case msg of
     RestartGame ->
-      RestartGame.update dependencies.restartGameCommand model
+      RestartGame.update adapters.restartGame model
 
     SubmitGuess ->
-      EvaluateGuess.update
-        dependencies.guessEvaluator
-        (feedbackTagger model.guess)
-        model
+      EvaluateGuess.update adapters.guessEvaluator model
 
     ReceivedFeedback guess guessResult ->
       RecordGuess.update guess guessResult model
@@ -74,11 +77,4 @@ update dependencies msg model =
       InputGuess.update position guessColor model
 
     HighScores scores ->
-      ( { model | highScores = scores }
-      , Cmd.none
-      )
-
-
-feedbackTagger : Guess -> GuessResult -> Msg
-feedbackTagger guess =
-  ReceivedFeedback <| Guess.toCode guess
+      ( { model | highScores = scores }, Cmd.none )

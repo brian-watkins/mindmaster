@@ -2,7 +2,7 @@ module UI.Color exposing
   ( toClass
   )
 
-import Core.Types exposing (Color)
+import Game.Types exposing (Color)
 
 
 toClass : Color -> String

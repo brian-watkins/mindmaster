@@ -10,7 +10,7 @@ import Elmer.Platform.Command as Command
 import UI
 import UI.Types exposing (..)
 import UI.TestHelpers as UIHelpers
-import Core.Types exposing (GameState(..), Color(..))
+import Game.Types exposing (GameState(..), Color(..))
 
 
 restartAfterWinTests : Test
@@ -62,7 +62,7 @@ testUpdate =
     dependencies = UIHelpers.viewDependencies
   in
     UIHelpers.testUpdate <|
-      { dependencies | restartGameCommand = restartGameCommand }
+      { dependencies | restartGame = restartGameCommand }
 
 
 testModel : Model

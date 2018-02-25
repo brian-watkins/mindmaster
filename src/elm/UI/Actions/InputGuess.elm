@@ -2,7 +2,7 @@ module UI.Actions.InputGuess exposing
   ( update
   )
 
-import Core.Types exposing (Color)
+import Game.Types exposing (Color)
 import UI.Guess as Guess
 import UI.Types exposing (Guess)
 

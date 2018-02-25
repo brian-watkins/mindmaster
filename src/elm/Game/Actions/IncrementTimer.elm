@@ -1,16 +1,16 @@
-module Core.Actions.IncrementTimer exposing
+module Game.Actions.IncrementTimer exposing
   ( update
   )
 
 
 type alias Model a =
   { a
-  | gameTimer : Int
+  | timer : Int
   }
 
 
 update : Model a -> (Model a, Cmd msg)
 update model =
-  ( { model | gameTimer = model.gameTimer + 1 }
+  ( { model | timer = model.timer + 1 }
   , Cmd.none
   )

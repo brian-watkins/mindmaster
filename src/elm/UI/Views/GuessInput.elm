@@ -14,7 +14,7 @@ import Html.Attributes as Attr
 import Html.Events as Events
 import Svg exposing (Svg, Attribute)
 import Svg.Attributes as Sattr
-import Core.Types exposing (Color)
+import Game.Types exposing (Color)
 
 
 view : Model -> Html Msg

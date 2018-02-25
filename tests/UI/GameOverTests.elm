@@ -10,7 +10,7 @@ import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Spy.Matchers exposing (wasCalledWith, intArg)
 import Elmer.Platform.Command as Command
 import UI.TestHelpers as UIHelpers
-import Core.Types exposing (GameState(..), Color(..))
+import Game.Types exposing (GameState(..), Color(..))
 import UI
 import UI.Types exposing (Msg, Model)
 

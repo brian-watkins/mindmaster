@@ -1,25 +1,27 @@
-module Core.Rules.OutcomeRule exposing
+module Game.Rules.OutcomeRule exposing
   ( apply
   )
 
-import Core.Types exposing (..)
+import Game.Types exposing (..)
+import Game.Rules.ScoringRule as ScoringRule
+
 
 type alias Model a =
   { a
   | guesses : Int
   , maxGuesses : Int
   , code : Code
-  , gameTimer : Int
+  , timer : Int
   }
 
 apply : Model a -> GuessResult -> GameState
 apply model guessResult =
   case guessResult of
     Wrong _ ->
-      if model.guesses + 1 == model.maxGuesses then
+      if model.guesses == model.maxGuesses then
         Lost model.code
       else
-        InProgress (model.maxGuesses - model.guesses - 1)
+        InProgress (model.maxGuesses - model.guesses)
     Right ->
-      model.gameTimer + ((model.guesses + 1) * 50)
+      ScoringRule.apply model
         |> Won

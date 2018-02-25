@@ -3,16 +3,16 @@ module Core.Fakes.FakeUI exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
-import Core.Types exposing (ViewDependencies, GuessResult(..), Color, Code, Score, GameState(..))
+import Game.Types exposing (UseCases, GuessResult(..), Color, Code, Score, GameState(..))
 
 type Msg
   = PlayGuess
-  | HandleFeedback GuessResult
+  | HandleFeedback Code GuessResult
   | RestartGame
   | UpdateHighScores (List Score)
 
 type alias Model =
-  { feedback : Maybe GuessResult
+  { feedback : Maybe (Code, GuessResult)
   , guesses : List Code
   , highScores : List Score
   }
@@ -24,21 +24,21 @@ defaultModel guesses =
   , highScores = []
   }
 
-update : ViewDependencies Msg msg -> Msg -> Model -> (Model, Cmd msg)
+update : UseCases msg -> Msg -> Model -> (Model, Cmd msg)
 update dependencies msg model =
   case msg of
     PlayGuess ->
       case List.head model.guesses of
         Just guess ->
           ( { model | guesses = List.drop 1 model.guesses }
-          , dependencies.guessEvaluator HandleFeedback guess
+          , dependencies.guessEvaluator guess
           )
         Nothing ->
           ( model, Cmd.none )
-    HandleFeedback feedback ->
-      ( { model | feedback = Just feedback }, Cmd.none )
+    HandleFeedback guess feedback ->
+      ( { model | feedback = Just (guess, feedback) }, Cmd.none )
     RestartGame ->
-      ( model, dependencies.restartGameCommand )
+      ( model, dependencies.restartGame )
     UpdateHighScores scores ->
       ( { model | highScores = scores }, Cmd.none )
 

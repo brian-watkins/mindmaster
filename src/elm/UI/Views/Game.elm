@@ -9,7 +9,7 @@ import UI.Views.GuessInput as GuessInput
 import UI.Views.Outcome as Outcome
 import UI.Views.Progress as Progress
 import UI.Types exposing (..)
-import Core.Types exposing (GameState(..))
+import Game.Types exposing (GameState(..))
 
 
 view : GameState -> Model -> Html Msg

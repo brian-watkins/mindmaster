@@ -1,4 +1,4 @@
-module Core.Code exposing
+module Game.Code exposing
   ( none
   , generate
   , equals
@@ -6,7 +6,7 @@ module Core.Code exposing
   , correctPositions
   )
 
-import Core.Types exposing (..)
+import Game.Types exposing (..)
 
 
 none : Code

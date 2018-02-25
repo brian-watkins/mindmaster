@@ -1,8 +1,8 @@
-module Core.Actions.StartGame exposing
+module Game.Actions.StartGame exposing
   ( update
   )
 
-import Core.Types exposing (Code, GameState(..))
+import Game.Types exposing (Code, GameState(..))
 
 
 type alias Model a =

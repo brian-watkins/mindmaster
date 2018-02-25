@@ -8,7 +8,7 @@ import Elmer.Spy as Spy exposing (Spy, andCallFake)
 import Elmer.Spy.Matchers exposing (wasCalled, wasCalledWith, typedArg)
 import Elmer.Platform.Subscription as Subscription
 import ScoreStore.LocalStorageScoreStore as ScoreStore
-import Core.Types exposing (Score)
+import Game.Types exposing (Score)
 
 
 requestScoresTests : Test
@@ -18,18 +18,18 @@ requestScoresTests =
     testState =
       Headless.givenCommand (\_ -> ScoreStore.execute Nothing)
         |> Spy.use [ requestScoresSpy, getScoresSpy ]
-        |> Subscription.with (\_ -> (\_ -> ScoreStore.subscriptions ScoreTagger))
-        |> Subscription.send "scores-sub" [ 190, 218, 332 ]
+        |> Subscription.with (\_ -> (\_ -> ScoreStore.subscriptions 5 ScoreTagger))
+        |> Subscription.send "scores-sub" [ 190, 124, 218, 887, 332, 97, 814 ]
   in
     [ test "it requests the scores" <|
       \() ->
         testState
           |> Spy.expect "request-scores-spy" (wasCalled 1)
-    , test "it tags the scores" <|
+    , test "it sends the top scores in order" <|
       \() ->
         testState
           |> Headless.expectMessages (exactly 1 <|
-              Expect.equal (ScoreTagger [ 190, 218, 332 ])
+              Expect.equal (ScoreTagger [ 97, 124, 190, 218, 332 ])
           )
     ]
 
@@ -41,7 +41,7 @@ storeScoresTests =
     testState =
       Headless.givenCommand (\_ -> ScoreStore.execute <| Just 217)
         |> Spy.use [ requestScoresSpy, getScoresSpy ]
-        |> Subscription.with (\_ -> (\_ -> ScoreStore.subscriptions ScoreTagger))
+        |> Subscription.with (\_ -> (\_ -> ScoreStore.subscriptions 3 ScoreTagger))
         |> Subscription.send "scores-sub" [ 190, 218, 332, 217 ]
   in
     [ test "it requests the scores" <|
@@ -50,11 +50,11 @@ storeScoresTests =
           |> Spy.expect "request-scores-spy" (
             wasCalledWith [ typedArg <| Just 217 ]
           )
-    , test "it tags the scores" <|
+    , test "it sends the top scores in order" <|
       \() ->
         testState
           |> Headless.expectMessages (exactly 1 <|
-              Expect.equal (ScoreTagger [ 190, 218, 332, 217 ])
+              Expect.equal (ScoreTagger [ 190, 217, 218 ])
           )
     ]
 

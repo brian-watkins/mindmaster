@@ -2,7 +2,7 @@ module CodeGenerator.StaticCodeGenerator exposing
   ( generator
   )
 
-import Core.Command as Command
+import Util.Command as Command
 
 
 generator : List a -> (List a -> msg) -> Cmd msg

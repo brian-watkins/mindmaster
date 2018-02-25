@@ -1,31 +1,73 @@
 module Core.TestHelpers exposing
   ( testUpdate
+  , testModel
+  , testModelWithMax
+  , viewSpy
+  , testView
+  , testConfig
   , coreAdapters
   , updateScoreStoreSpy
+  , testInit
+  , testInitWithMax
   )
 
-import Core.Types exposing (..)
-import Core
+import Game.Types exposing (..)
 import Core.Fakes.FakeUI as FakeUI
 import Core.Fakes.FakeCodeGenerator as FakeCodeGenerator
 import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Platform.Command as Command
+import Bus
 
 
 coreAdapters code =
-  { viewUpdate = FakeUI.update
+  { updateUI = FakeUI.update
   , highScoresTagger = FakeUI.UpdateHighScores
   , codeGenerator = FakeCodeGenerator.with code
   , updateScoreStore = (\_ -> Cmd.none)
+  , guessResultTagger = FakeUI.HandleFeedback
   }
+
+testModel =
+  testModelWithMax 18
+
+
+testModelWithMax maxGuesses =
+  FakeUI.defaultModel []
+    |> Bus.init (testConfig 18) (coreAdapters [])
+    |> Tuple.first
+
+
+viewSpy : Spy
+viewSpy =
+  Spy.create "view-spy" (\_ -> FakeUI.view)
+
+
+testView =
+  Bus.view FakeUI.view
+
 
 testUpdate code =
   coreAdapters code
-    |> Core.update
+    |> Bus.update
 
 
-updateScoreStoreSpy : List Score -> (List Score -> msg) -> Spy
-updateScoreStoreSpy scores tagger =
+testConfig maxGuesses =
+  { maxGuesses = maxGuesses
+  }
+
+
+updateScoreStoreSpy : Spy
+updateScoreStoreSpy =
   Spy.createWith "update-score-store-spy" <|
     \_ ->
-      Command.fake <| tagger scores
+      Cmd.none
+
+
+testInit guesses code =
+  FakeUI.defaultModel guesses
+    |> Bus.init (testConfig 18) (coreAdapters code)
+
+
+testInitWithMax maxGuesses guesses code =
+  FakeUI.defaultModel guesses
+    |> Bus.init (testConfig maxGuesses) (coreAdapters code)

@@ -2,12 +2,10 @@ module IntegrationTestMain exposing (..)
 
 import Configuration
 import CodeGenerator.StaticCodeGenerator as StaticCodeGenerator
-import Core.Types exposing (Color(..))
-import Core
+import Game.Types exposing (Color(..))
 import UI.Types as View
 
 
-main : Program Never (Core.Model View.Model) (Core.Msg View.Msg)
 main =
   let
     coreAdapters = Configuration.coreAdapters

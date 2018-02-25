@@ -7,8 +7,8 @@ import Elmer.Html as Markup
 import Elmer.Html.Event as Event
 import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, anyArg)
-import Core
-import Core.Types exposing (..)
+import Bus
+import Game.Types exposing (..)
 import Core.Fakes.FakeUI as FakeUI
 import Core.Fakes.FakeCodeGenerator as FakeCodeGenerator
 import Core.TestHelpers as CoreHelpers
@@ -18,20 +18,20 @@ startGameTests =
   describe "when the core is initialized" <|
   let
     state =
-      Elmer.given testModel (Core.view <| Spy.callable "view-spy") (testUpdate [ Blue ])
-        |> Spy.use [ viewSpy, scoreStoreSpy [ 190, 276, 310 ] ]
-        |> Elmer.init (\_ -> testInit [[Orange]])
+      Elmer.given (CoreHelpers.testModelWithMax 8) (Bus.view <| Spy.callable "view-spy") (testUpdate [ Blue ])
+        |> Spy.use [ CoreHelpers.viewSpy, scoreStoreSpy ]
+        |> Elmer.init (\_ -> testInitWithMax 8 [[Orange]] [Blue])
   in
   [ test "it restarts the game" <|
     \() ->
       state
         |> Markup.target "#submit-code"
         |> Event.click
-        |> Spy.use [ viewSpy ] -- reset spy history
+        |> Spy.use [ CoreHelpers.viewSpy ] -- reset spy history
         |> Markup.target "#restart-game"
         |> Event.click
         |> Spy.expect "view-spy" (
-          wasCalledWith [ typedArg <| InProgress maxGuesses, anyArg ]
+          wasCalledWith [ typedArg <| InProgress 8, anyArg ]
         )
   , test "it resets the number of guesses to zero" <|
     \() ->
@@ -40,13 +40,13 @@ startGameTests =
         |> Event.click
         |> Event.click
         |> Event.click
-        |> Spy.use [ viewSpy ] -- reset spy history
+        |> Spy.use [ CoreHelpers.viewSpy ] -- reset spy history
         |> Markup.target "#restart-game"
         |> Event.click
         |> Markup.target "#submit-code"
         |> Event.click
         |> Spy.expect "view-spy" (
-          wasCalledWith [ typedArg <| InProgress (maxGuesses - 1), anyArg ]
+          wasCalledWith [ typedArg <| InProgress 7, anyArg ]
         )
   , test "it requests the high scores" <|
     \() ->
@@ -56,38 +56,23 @@ startGameTests =
         )
   ]
 
-maxGuesses = 18
 
-viewSpy : Spy
-viewSpy =
-  Spy.create "view-spy" (\_ -> FakeUI.view)
-
-scoreStoreSpy : List Score -> Spy
-scoreStoreSpy scores =
-  Core.highScoresTagger 5 FakeUI.UpdateHighScores
-    |> CoreHelpers.updateScoreStoreSpy scores
-
-
-testModel =
-  FakeUI.defaultModel []
-    |> Core.defaultModel testConfig
-
-testView =
-  Core.view FakeUI.view
+scoreStoreSpy : Spy
+scoreStoreSpy =
+  CoreHelpers.updateScoreStoreSpy
 
 
 testUpdate code =
+  Bus.update (adapters code)
+
+
+adapters code =
   let
     adapters = CoreHelpers.coreAdapters code
   in
     { adapters | updateScoreStore = Spy.callable "update-score-store-spy" }
-      |> Core.update
 
 
-testInit guesses =
+testInitWithMax maxGuesses guesses code =
   FakeUI.defaultModel guesses
-    |> Core.initGame testConfig
-
-testConfig =
-  { maxGuesses = maxGuesses
-  }
+    |> Bus.init (CoreHelpers.testConfig maxGuesses) (adapters code)

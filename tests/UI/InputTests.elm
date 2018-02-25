@@ -9,7 +9,7 @@ import Elmer.Html.Matchers exposing (element, elements, hasAttribute)
 import UI
 import UI.Types exposing (Model, Msg)
 import UI.TestHelpers as UIHelpers
-import Core.Types exposing (GameState(..), Color(..))
+import Game.Types exposing (GameState(..), Color(..))
 import TestHelpers exposing (..)
 
 

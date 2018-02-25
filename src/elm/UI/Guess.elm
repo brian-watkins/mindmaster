@@ -6,7 +6,7 @@ module UI.Guess exposing
   , lengthSelected
   )
 
-import Core.Types exposing (Code, Color, defaultColor)
+import Game.Types exposing (Code, Color, defaultColor)
 import UI.Types exposing (Guess)
 
 
