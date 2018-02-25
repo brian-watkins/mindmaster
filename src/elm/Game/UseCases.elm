@@ -18,7 +18,6 @@ startGame adapters =
   adapters.codeGenerator Start
 
 
-evaluateGuess : (Msg -> msg) -> Code -> Cmd msg
-evaluateGuess tagger code =
+evaluateGuess : Code -> Cmd Msg
+evaluateGuess code =
   Command.toCmd Judge code
-    |> Cmd.map tagger

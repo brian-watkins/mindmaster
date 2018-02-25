@@ -45,11 +45,11 @@ update adapters msg model =
   case msg of
     GameMsg gameMsg ->
       Game.Action.update (gameAdapters adapters) gameMsg model.game
-        |> Tuple.mapFirst (\m -> { model | game = m })
+        |> storeGameModel model
 
     UIMsg uiMsg ->
       adapters.updateUI (uiAdapters adapters) uiMsg model.ui
-        |> Tuple.mapFirst (\m -> { model | ui = m })
+        |> storeUIModel model
 
 
 subscriptions model =
@@ -73,8 +73,18 @@ gameAdapters adapters =
 
 uiAdapters adapters =
   { guessEvaluator =
-      Game.UseCases.evaluateGuess GameMsg
+      \guess ->
+        Game.UseCases.evaluateGuess guess
+          |> Cmd.map GameMsg
   , restartGame =
       Game.UseCases.startGame adapters
         |> Cmd.map GameMsg
   }
+
+
+storeGameModel model =
+  Tuple.mapFirst (\m -> { model | game = m })
+
+
+storeUIModel model =
+  Tuple.mapFirst (\m -> { model | ui = m })
