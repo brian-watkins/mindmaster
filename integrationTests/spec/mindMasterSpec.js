@@ -68,6 +68,20 @@ describe("MindMaster", () => {
 
     expect(highScores.length).toBe(4)
   })
+
+  it('persists the high scores', async () => {
+    await page.close()
+
+    const newPage = await browser.newPage()
+
+    await newPage.goto('http://localhost:4001/index.html')
+
+    await newPage.waitForSelector('.high-score')
+
+    const highScores = await getHighScores(newPage)
+
+    expect(highScores.length).toBe(4)
+  })
 })
 
 const clickColorInput = async (page, index) => {
