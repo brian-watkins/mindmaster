@@ -19,9 +19,13 @@ describe("MindMaster", () => {
     })
 
     page = await browser.newPage()
+    await page.setViewport({
+      width: 1024,
+      height: 800
+    })
 
     page.on('console', msg => {
-      console.log("Console", msg.text())
+      console.log("==>", msg.text())
     });
 
     await page.goto('http://localhost:4001/index.html')
@@ -31,7 +35,7 @@ describe("MindMaster", () => {
     })
 
     await page.goto('http://localhost:4001/index.html')
-
+    await page.waitFor(500)
   })
 
   afterAll(async () => {
@@ -58,9 +62,9 @@ describe("MindMaster", () => {
     await clickColorInput(page, 4)
 
     await page.click('#submit-guess')
-    await page.waitFor('[data-guess-feedback]')
-    const feedback = await page.$('[data-guess-feedback]')
-    expect(feedback).not.toBe(null)
+    await page.waitFor('#feedback li')
+    const historyItems = await page.$$('#feedback li')
+    expect(historyItems.length).toBe(1)
   })
 
   it('shows the new high score in the list', async () => {
@@ -88,10 +92,10 @@ const clickColorInput = async (page, index) => {
   const colorInput = await page.$(`[data-guess-input="${index}"]`)
   const boundingBox = await colorInput.boundingBox()
 
-  return page.mouse.click(
-    boundingBox.x + (boundingBox.width / 2),
-    boundingBox.y + (boundingBox.height - 15)
-  )
+  const x = boundingBox.x + (boundingBox.width / 2)
+  const y = boundingBox.y + (boundingBox.height - 20)
+
+  return page.mouse.click(x, y)
 }
 
 const getHighScores = (page) => {
