@@ -6,6 +6,7 @@ port module ScoreStore.LocalStorageScoreStore exposing
   )
 
 import Game.Types exposing (Score, UpdateScoreStore)
+import ScoreStore.Filter as Filter
 
 
 port requestScores : Maybe Score -> Cmd msg
@@ -27,6 +28,5 @@ subscriptions top tagger =
 
 highScores : Int -> (List Score -> msg) -> List Score -> msg
 highScores top tagger scores =
-  List.sort scores
-    |> List.take top
+  Filter.highScores top scores
     |> tagger
