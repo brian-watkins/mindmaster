@@ -14,7 +14,7 @@ import UI
 import UI.Types exposing (Model, Msg)
 import UI.TestHelpers as UIHelpers
 import Game.Types exposing (GuessEvaluator, GuessResult(..), Color(..), GameState(..), Code)
-import Game.Clue as Clue
+import Game.Entity.Clue as Clue
 import TestHelpers exposing (..)
 
 

@@ -11,7 +11,7 @@ import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, anyArg, argThat)
 import Elmer.Platform.Command as Command
 import Elmer.Platform.Subscription as Subscription
 import TestHelpers
-import Game.Clue as Clue
+import Game.Entity.Clue as Clue
 import Game.Types exposing (..)
 import Core.Fakes.FakeUI as FakeUI
 import Core.Fakes.FakeCodeGenerator as FakeCodeGenerator

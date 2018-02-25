@@ -1,10 +1,10 @@
-module Game.Clue exposing
+module Game.Entity.Clue exposing
   ( with
   , for
   )
 
 import Game.Types exposing (..)
-import Game.Code as Code
+import Game.Entity.Code as Code
 
 
 with : Int -> Int -> Clue

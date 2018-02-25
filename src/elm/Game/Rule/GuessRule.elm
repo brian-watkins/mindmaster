@@ -1,9 +1,9 @@
-module Game.Rules.GuessRule exposing
+module Game.Rule.GuessRule exposing
   ( apply
   )
 
-import Game.Code as Code
-import Game.Clue as Clue
+import Game.Entity.Code as Code
+import Game.Entity.Clue as Clue
 import Util.Command as Command
 import Game.Types exposing (..)
 

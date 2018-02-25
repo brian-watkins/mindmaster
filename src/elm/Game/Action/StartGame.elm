@@ -1,4 +1,4 @@
-module Game.Actions.StartGame exposing
+module Game.Action.StartGame exposing
   ( update
   )
 

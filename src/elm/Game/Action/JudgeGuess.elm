@@ -1,10 +1,10 @@
-module Game.Actions.JudgeGuess exposing
+module Game.Action.JudgeGuess exposing
   ( update
   )
 
 import Game.Types exposing (Code, GameState(..))
-import Game.Actions.UpdateGameState as UpdateGameState
-import Game.Rules.GuessRule as GuessRule
+import Game.Action.UpdateGameState as UpdateGameState
+import Game.Rule.GuessRule as GuessRule
 
 
 type alias Model a =

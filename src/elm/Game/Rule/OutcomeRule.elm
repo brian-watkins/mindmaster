@@ -1,9 +1,9 @@
-module Game.Rules.OutcomeRule exposing
+module Game.Rule.OutcomeRule exposing
   ( apply
   )
 
 import Game.Types exposing (..)
-import Game.Rules.ScoringRule as ScoringRule
+import Game.Rule.ScoringRule as ScoringRule
 
 
 type alias Model a =

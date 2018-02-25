@@ -9,8 +9,10 @@ module Bus exposing
   )
 
 import Html
-import UI
 import Game
+import Game.Action
+import Game.Subscriptions
+import Game.UseCases
 import Util.Command as Command
 
 
@@ -30,19 +32,19 @@ uiTagger =
 
 
 init config adapters uiModel =
-  Game.init config (gameAdapters adapters)
+  Game.Action.init config (gameAdapters adapters)
     |> Tuple.mapFirst (\gameModel -> { game = gameModel, ui = uiModel })
 
 
 view uiAdapter model =
-  uiAdapter (Game.gameState model.game) model.ui
+  uiAdapter (Game.UseCases.gameState model.game) model.ui
     |> Html.map UIMsg
 
 
 update adapters msg model =
   case msg of
     GameMsg gameMsg ->
-      Game.update (gameAdapters adapters) gameMsg model.game
+      Game.Action.update (gameAdapters adapters) gameMsg model.game
         |> Tuple.mapFirst (\m -> { model | game = m })
 
     UIMsg uiMsg ->
@@ -51,7 +53,7 @@ update adapters msg model =
 
 
 subscriptions model =
-  Game.subscriptions model.game
+  Game.Subscriptions.for model.game
     |> Sub.map GameMsg
 
 
@@ -71,8 +73,8 @@ gameAdapters adapters =
 
 uiAdapters adapters =
   { guessEvaluator =
-      Game.evaluateGuess GameMsg
+      Game.UseCases.evaluateGuess GameMsg
   , restartGame =
-      Game.startGame adapters
+      Game.UseCases.startGame adapters
         |> Cmd.map GameMsg
   }

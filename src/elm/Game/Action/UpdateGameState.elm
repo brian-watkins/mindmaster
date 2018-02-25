@@ -1,9 +1,9 @@
-module Game.Actions.UpdateGameState exposing
+module Game.Action.UpdateGameState exposing
   ( update
   )
 
 import Game.Types exposing (Code, GuessResult(..), GameState(..))
-import Game.Rules.OutcomeRule as OutcomeRule
+import Game.Rule.OutcomeRule as OutcomeRule
 import Util.Command as Command
 
 

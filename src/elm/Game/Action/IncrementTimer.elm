@@ -1,4 +1,4 @@
-module Game.Actions.IncrementTimer exposing
+module Game.Action.IncrementTimer exposing
   ( update
   )
 

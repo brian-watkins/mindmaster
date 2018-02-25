@@ -1,4 +1,4 @@
-module Game.Rules.ScoringRule exposing
+module Game.Rule.ScoringRule exposing
   ( apply
   )
 

@@ -1,4 +1,4 @@
-module Game.Code exposing
+module Game.Entity.Code exposing
   ( none
   , generate
   , equals
