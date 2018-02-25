@@ -1,4 +1,4 @@
-module UI.Color exposing
+module UI.Entity.Color exposing
   ( toClass
   )
 

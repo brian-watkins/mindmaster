@@ -1,13 +1,13 @@
-module UI.Views.Game exposing
+module UI.View.Game exposing
   ( view
   )
 
 import Html exposing (Html)
 import Html.Attributes as Attr
-import UI.Views.GuessHistory as GuessHistory
-import UI.Views.GuessInput as GuessInput
-import UI.Views.Outcome as Outcome
-import UI.Views.Progress as Progress
+import UI.View.GuessHistory as GuessHistory
+import UI.View.GuessInput as GuessInput
+import UI.View.Outcome as Outcome
+import UI.View.Progress as Progress
 import UI.Types exposing (..)
 import Game.Types exposing (GameState(..))
 

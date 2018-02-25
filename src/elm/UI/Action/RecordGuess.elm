@@ -1,4 +1,4 @@
-module UI.Actions.RecordGuess exposing
+module UI.Action.RecordGuess exposing
   ( update
   )
 

@@ -1,11 +1,11 @@
-module UI.Views.GuessHistory exposing
+module UI.View.GuessHistory exposing
   ( view
   )
 
 import Game.Types exposing (Code, GuessResult(..))
 import UI.Types exposing (..)
-import UI.Views.GuessResult as GuessResult
-import UI.Views.Code as Code
+import UI.View.GuessResult as GuessResult
+import UI.View.Code as Code
 import Html exposing (Html)
 import Html.Attributes as Attr
 

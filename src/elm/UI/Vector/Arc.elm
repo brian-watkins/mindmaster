@@ -1,4 +1,4 @@
-module UI.Vectors.Arc exposing
+module UI.Vector.Arc exposing
   ( Arc
   , with
   , definition

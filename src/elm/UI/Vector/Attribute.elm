@@ -1,4 +1,4 @@
-module UI.Vectors.Attribute exposing
+module UI.Vector.Attribute exposing
   ( classList
   )
 

@@ -1,4 +1,4 @@
-module UI.Views.Instructions exposing
+module UI.View.Instructions exposing
   ( view
   )
 

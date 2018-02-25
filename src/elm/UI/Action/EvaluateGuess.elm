@@ -1,10 +1,10 @@
-module UI.Actions.EvaluateGuess exposing
+module UI.Action.EvaluateGuess exposing
   ( update
   )
 
 import Game.Types exposing (GuessEvaluator, GuessResult)
 import UI.Types exposing (Guess, Validation(..))
-import UI.Guess as Guess
+import UI.Entity.Guess as Guess
 
 
 type alias Model a =

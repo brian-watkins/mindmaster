@@ -68,7 +68,7 @@ selectColors : List (Maybe String) -> TestState Model Msg
 selectColors classes =
   let
     state =
-      Elmer.given testModel (UI.view <| InProgress 3) testUpdate
+      Elmer.given testModel (UIHelpers.testView <| InProgress 3) testUpdate
   in
     List.indexedMap selectColor classes
       |> foldStates state

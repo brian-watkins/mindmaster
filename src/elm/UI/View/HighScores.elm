@@ -1,4 +1,4 @@
-module UI.Views.HighScores exposing
+module UI.View.HighScores exposing
   ( view
   )
 

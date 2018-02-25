@@ -1,4 +1,4 @@
-module UI.Actions.RestartGame exposing
+module UI.Action.RestartGame exposing
   ( update
   )
 

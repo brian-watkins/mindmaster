@@ -1,4 +1,4 @@
-module UI.Views.Outcome exposing
+module UI.View.Outcome exposing
   ( view
   )
 
@@ -6,10 +6,10 @@ import UI.Types exposing (..)
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events
-import UI.Views.Code as Code
+import UI.View.Code as Code
 import Svg
 import Svg.Attributes as SvgAttr
-import UI.Vectors.Circle as Circle
+import UI.Vector.Circle as Circle
 import Game.Types exposing (Code, Color)
 
 view : Outcome -> Html Msg

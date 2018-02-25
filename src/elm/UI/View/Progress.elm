@@ -1,4 +1,4 @@
-module UI.Views.Progress exposing
+module UI.View.Progress exposing
   ( view
   )
 

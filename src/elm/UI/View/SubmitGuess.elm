@@ -1,4 +1,4 @@
-module UI.Views.SubmitGuess exposing
+module UI.View.SubmitGuess exposing
   ( view
   )
 

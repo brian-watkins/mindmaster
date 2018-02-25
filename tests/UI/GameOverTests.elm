@@ -20,7 +20,7 @@ winTests =
   describe "when the game is won" <|
   let
     state =
-      Elmer.given testModel (UI.view <| Won 350) testUpdate
+      Elmer.given testModel (UIHelpers.testView <| Won 350) testUpdate
   in
   [ test "it shows the You Win message" <|
     \() ->
@@ -55,7 +55,7 @@ lostTests =
   describe "when the game is lost" <|
   let
     state =
-      Elmer.given testModel (UI.view <| Lost [ Orange, Blue, Yellow, Red ]) testUpdate
+      Elmer.given testModel (UIHelpers.testView <| Lost [ Orange, Blue, Yellow, Red ]) testUpdate
   in
   [ test "it says you lost" <|
     \() ->

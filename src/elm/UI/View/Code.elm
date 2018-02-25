@@ -1,10 +1,10 @@
-module UI.Views.Code exposing
+module UI.View.Code exposing
   ( view
   )
 
 import UI.Types exposing (..)
-import UI.Color as Color
-import UI.Vectors.Circle as Circle
+import UI.Entity.Color as Color
+import UI.Vector.Circle as Circle
 import Game.Types exposing (Code, Color)
 import Html exposing (Html)
 import Html.Attributes as Attr

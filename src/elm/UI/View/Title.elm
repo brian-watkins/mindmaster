@@ -1,4 +1,4 @@
-module UI.Views.Title exposing
+module UI.View.Title exposing
   ( view
   )
 

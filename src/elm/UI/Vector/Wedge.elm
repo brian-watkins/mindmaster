@@ -1,10 +1,10 @@
-module UI.Vectors.Wedge exposing
+module UI.Vector.Wedge exposing
   ( vector
   )
 
 import Svg exposing (Svg, Attribute)
 import Svg.Attributes as Attr
-import UI.Vectors.Arc as Arc
+import UI.Vector.Arc as Arc
 
 
 vector : Float -> List (Attribute msg) -> Svg msg

@@ -1,11 +1,11 @@
-module UI.Views.GuessResult exposing
+module UI.View.GuessResult exposing
   ( view
   )
 
 import Game.Types exposing (GuessResult(..))
 import UI.Types exposing (..)
-import UI.Vectors.Circle as Circle
-import UI.Vectors.Arc as Arc
+import UI.Vector.Circle as Circle
+import UI.Vector.Arc as Arc
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Svg exposing (Svg)

@@ -1,9 +1,9 @@
-module UI.Actions.InputGuess exposing
+module UI.Action.InputGuess exposing
   ( update
   )
 
 import Game.Types exposing (Color)
-import UI.Guess as Guess
+import UI.Entity.Guess as Guess
 import UI.Types exposing (Guess)
 
 

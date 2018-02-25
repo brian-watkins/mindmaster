@@ -1,14 +1,14 @@
-module UI.Views.GuessInput exposing
+module UI.View.GuessInput exposing
   ( view
   )
 
 import UI.Types exposing (..)
-import UI.Color as Color
-import UI.Guess as Guess
-import UI.Views.SubmitGuess as SubmitGuess
-import UI.Vectors.Circle as Circle
-import UI.Vectors.Wedge as Wedge
-import UI.Vectors.Attribute as Vector
+import UI.Entity.Color as Color
+import UI.Entity.Guess as Guess
+import UI.View.SubmitGuess as SubmitGuess
+import UI.Vector.Circle as Circle
+import UI.Vector.Wedge as Wedge
+import UI.Vector.Attribute as Vector
 import Html exposing (Html)
 import Html.Attributes as Attr
 import Html.Events as Events

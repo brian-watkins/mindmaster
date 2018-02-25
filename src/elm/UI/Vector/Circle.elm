@@ -1,4 +1,4 @@
-module UI.Vectors.Circle exposing
+module UI.Vector.Circle exposing
   ( unit
   , vector
   )

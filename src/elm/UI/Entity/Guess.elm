@@ -1,4 +1,4 @@
-module UI.Guess exposing
+module UI.Entity.Guess exposing
   ( empty
   , with
   , toCode

@@ -11,6 +11,7 @@ import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, functionArg)
 import Elmer.Platform.Command as Command
 import UI
+import UI.View
 import UI.Types exposing (Model, Msg)
 import UI.TestHelpers as UIHelpers
 import Game.Types exposing (GuessEvaluator, GuessResult(..), Color(..), GameState(..), Code)
@@ -103,7 +104,7 @@ remainingGuessesTests =
   , describe "when 1 guess remains"
     [ test "it shows that 1 guess remains" <|
       \() ->
-        Elmer.given (testModel 3) (UI.view <| InProgress 1) (testUpdate emptyEvaluator)
+        Elmer.given (testModel 3) (UIHelpers.testView <| InProgress 1) (testUpdate emptyEvaluator)
           |> Markup.target "#game-progress"
           |> Markup.expect (element <| hasText "Last guess!")
     ]
@@ -180,7 +181,7 @@ guessHistoryTests =
       \() ->
         state
           |> Elmer.expectModel (\model ->
-            Elmer.given model (UI.view <| Won 87) (testUpdate emptyEvaluator)
+            Elmer.given model (UIHelpers.testView <| Won 87) (testUpdate emptyEvaluator)
               |> Markup.target "#new-game"
               |> Event.click
               |> Markup.target "[data-guess-feedback]"
@@ -210,7 +211,7 @@ testUpdate evaluator =
 
 
 testView =
-  UI.view <| InProgress 4
+  UI.View.for <| InProgress 4
 
 
 evaluatorSpy : GuessResult -> Spy
