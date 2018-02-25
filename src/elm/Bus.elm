@@ -60,7 +60,7 @@ subscriptions model =
 gameAdapters adapters =
   { updateScoreStore =
       adapters.updateScoreStore
-  , updateUIWithGuessResult =
+  , guessResultNotifier =
       \guess result ->
         Command.toCmd (adapters.guessResultTagger guess) result
           |> Cmd.map UIMsg

@@ -23,14 +23,14 @@ update adapters guess model =
     guessResult = GuessRule.apply model.code guess
   in
     UpdateGameState.update guessResult model
-      |> sendGuessResultToUI adapters.updateUIWithGuessResult guess guessResult
+      |> sendGuessResultNotification adapters.guessResultNotifier guess guessResult
       |> refreshScores adapters.updateScoreStore
 
 
-sendGuessResultToUI guessResultCommand guess guessResult =
+sendGuessResultNotification guessResultNotifier guess guessResult =
   Tuple.mapSecond <|
     \cmd ->
-      guessResultCommand guess guessResult
+      guessResultNotifier guess guessResult
         |> Command.add cmd
 
 
