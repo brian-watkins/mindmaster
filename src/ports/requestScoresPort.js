@@ -1,4 +1,4 @@
-export const requestScoresPort = (app) => {
+export const attachRequestScoresPort = (app) => {
   app.ports.requestScores.subscribe(function (score) {
     let scores = JSON.parse(window.localStorage.getItem("scores")) || []
 
