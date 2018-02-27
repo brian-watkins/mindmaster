@@ -21,11 +21,11 @@ import Bus
 
 coreAdapters code =
   { updateUI = FakeUI.update
-  , highScoresTagger = FakeUI.UpdateHighScores
   , codeGenerator = FakeCodeGenerator.with code
   , updateScoreStore = (\_ -> Cmd.none)
   , guessResultTagger = FakeUI.HandleFeedback
   }
+
 
 testModel =
   testModelWithMax 18
