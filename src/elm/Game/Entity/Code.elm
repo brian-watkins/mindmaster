@@ -1,22 +1,16 @@
 module Game.Entity.Code exposing
   ( none
-  , generate
   , equals
-  , correctColors
-  , correctPositions
+  , difference
   )
 
 import Game.Types exposing (..)
+import Game.Entity.Clue as Clue
 
 
 none : Code
 none =
   []
-
-
-generate : (Code -> msg) -> CodeGenerator msg -> Cmd msg
-generate tagger generator =
-  generator tagger
 
 
 equals : Code -> Code -> Bool
@@ -33,6 +27,13 @@ equals expected actual =
             False
         Nothing ->
           False
+
+
+difference : Code -> Code -> Clue
+difference code guess =
+  Clue.with
+    (correctColors code guess)
+    (correctPositions code guess)
 
 
 correctColors : Code -> Code -> Int

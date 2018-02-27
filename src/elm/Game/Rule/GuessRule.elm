@@ -3,7 +3,6 @@ module Game.Rule.GuessRule exposing
   )
 
 import Game.Entity.Code as Code
-import Game.Entity.Clue as Clue
 import Util.Command as Command
 import Game.Types exposing (..)
 
@@ -14,4 +13,4 @@ apply code guess =
     Right
   else
     Wrong <|
-      Clue.for code guess
+      Code.difference code guess
