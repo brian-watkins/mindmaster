@@ -1,5 +1,5 @@
 module UI.View exposing
-  ( for
+  ( with
   )
 
 import Html exposing (Html)
@@ -12,8 +12,8 @@ import UI.View.HighScores as HighScores
 import Game.Types exposing (GameState)
 
 
-for : GameState -> Model -> Html Msg
-for gameState model =
+with : GameState -> Model -> Html Msg
+with gameState model =
   Html.div []
   [ Title.view
   , Html.div [ Attr.class "row" ]

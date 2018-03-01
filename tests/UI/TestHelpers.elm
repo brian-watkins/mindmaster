@@ -15,7 +15,7 @@ testUpdate =
   UI.Action.update
 
 testView =
-  UI.View.for
+  UI.View.with
 
 viewDependencies =
   { guessEvaluator = \_ -> Cmd.none

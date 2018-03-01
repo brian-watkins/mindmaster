@@ -211,7 +211,7 @@ testUpdate evaluator =
 
 
 testView =
-  UI.View.for <| InProgress 4
+  UI.View.with <| InProgress 4
 
 
 evaluatorSpy : GuessResult -> Spy

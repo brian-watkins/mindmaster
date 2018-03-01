@@ -12,6 +12,7 @@ import UI.Action
 import UI.View
 import CodeGenerator.RandomCodeGenerator as RandomCodeGenerator
 import ScoreStore.LocalStorageScoreStore as LocalStorageScoreStore
+import Configuration.Program as ConfigurableProgram
 
 
 colors =
@@ -21,12 +22,6 @@ colors =
   , Green
   , Blue
   ]
-
-
-type alias Model =
-  { bus : Bus.Model UI.Model
-  , config : Config
-  }
 
 
 type alias Config =
@@ -42,9 +37,9 @@ viewConfig config =
   }
 
 
-defaultViewModel config =
-  viewConfig config
-    |> UI.defaultModel
+gameConfig config =
+  { maxGuesses = config.maxGuesses
+  }
 
 
 coreAdapters config =
@@ -56,32 +51,24 @@ coreAdapters config =
 
 
 init adapters config =
-  Bus.init { maxGuesses = config.maxGuesses } (adapters config) (defaultViewModel config)
-    |> Tuple.mapFirst (\m -> { bus = m, config = config })
+  Bus.init
+    (gameConfig config)
+    (adapters config)
+    (UI.defaultModel <| viewConfig config)
 
 
-view : Model -> Html (Bus.Msg UI.Msg)
-view model =
-  Bus.view UI.View.for model.bus
-
-
-update adapters msg model =
-  Bus.update (adapters model.config) msg model.bus
-    |> Tuple.mapFirst (\m -> { model | bus = m })
-
-
-subscriptions : Model -> Sub (Bus.Msg UI.Msg)
-subscriptions model =
+subscriptions : Config -> Bus.Model UI.Model -> Sub (Bus.Msg UI.Msg)
+subscriptions config model =
   Sub.batch
-  [ Bus.subscriptions model.bus
-  , LocalStorageScoreStore.subscriptions model.config.topScores (Bus.uiTagger << UI.highScoresTagger)
+  [ Bus.subscriptions model
+  , LocalStorageScoreStore.subscriptions config.topScores (Bus.uiTagger << UI.highScoresTagger)
   ]
 
 
 program adapters =
-  Html.programWithFlags
+  ConfigurableProgram.with
     { init = init adapters
-    , view = view
-    , update = update adapters
+    , view = \_ -> Bus.view UI.View.with
+    , update = \config -> Bus.update (adapters config)
     , subscriptions = subscriptions
     }
