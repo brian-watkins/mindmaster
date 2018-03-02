@@ -1,4 +1,4 @@
-module Bus exposing
+module Configuration.Bus exposing
   ( Msg
   , Model
   , init

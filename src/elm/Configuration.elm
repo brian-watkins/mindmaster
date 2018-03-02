@@ -4,7 +4,6 @@ module Configuration exposing
   )
 
 import Html exposing (Html)
-import Bus
 import Game.Types exposing (defaultColor, Color(..))
 import UI
 import UI.Types as UI
@@ -13,6 +12,7 @@ import UI.View
 import CodeGenerator.RandomCodeGenerator as RandomCodeGenerator
 import ScoreStore.LocalStorageScoreStore as LocalStorageScoreStore
 import Configuration.Program as ConfigurableProgram
+import Configuration.Bus as Bus
 
 
 colors =

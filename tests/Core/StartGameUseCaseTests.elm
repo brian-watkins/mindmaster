@@ -7,7 +7,7 @@ import Elmer.Html as Markup
 import Elmer.Html.Event as Event
 import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, anyArg)
-import Bus
+import Configuration.Bus as Bus
 import Game.Types exposing (..)
 import Core.Fakes.FakeUI as FakeUI
 import Core.Fakes.FakeCodeGenerator as FakeCodeGenerator

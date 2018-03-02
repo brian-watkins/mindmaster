@@ -17,7 +17,7 @@ import Core.Fakes.FakeUI as FakeUI
 import Core.Fakes.FakeCodeGenerator as FakeCodeGenerator
 import Core.TestHelpers as CoreHelpers
 import Time
-import Bus
+import Configuration.Bus as Bus
 
 
 gameStateTests : Test

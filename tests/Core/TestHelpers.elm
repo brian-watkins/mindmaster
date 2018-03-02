@@ -16,7 +16,7 @@ import Core.Fakes.FakeUI as FakeUI
 import Core.Fakes.FakeCodeGenerator as FakeCodeGenerator
 import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Platform.Command as Command
-import Bus
+import Configuration.Bus as Bus
 
 
 coreAdapters code =
