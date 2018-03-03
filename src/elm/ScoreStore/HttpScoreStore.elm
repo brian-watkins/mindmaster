@@ -12,14 +12,19 @@ import Json.Decode as Json
 
 execute : String -> Int -> (List Score -> msg) -> UpdateScoreStore msg
 execute uri top tagger maybeScore =
-  case maybeScore of
-    Just score ->
-      storeScoreTask uri score
-        |> Task.andThen (\_ -> getScoresTask uri)
-        |> Task.attempt (highScoreTagger top tagger)
-    Nothing ->
-      getScoresTask uri
-        |> Task.attempt (highScoreTagger top tagger)
+  let
+    tagHighScores = highScoreTagger top tagger
+    storeScore = storeScoreTask uri
+    getScores = getScoresTask uri
+  in
+    case maybeScore of
+      Just score ->
+        storeScore score
+          |> Task.andThen (\_ -> getScores)
+          |> Task.attempt tagHighScores
+      Nothing ->
+        getScores
+          |> Task.attempt tagHighScores
 
 
 storeScoreTask : String -> Score -> Task Http.Error ()
