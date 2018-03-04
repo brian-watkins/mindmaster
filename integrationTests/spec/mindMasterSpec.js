@@ -42,58 +42,77 @@ describe("MindMaster", () => {
     await browser.close()
   })
 
-  it('shows the current high scores', async () => {
-    await page.waitForSelector('.high-score')
+  describe("when the game is initialized", () => {
+    it('shows the current high scores', async () => {
+      await page.waitForSelector('.high-score')
 
-    const highScores = await getHighScores(page)
+      const highScores = await getHighScores(page)
 
-    expect(highScores).toContain("190")
-    expect(highScores).toContain("210")
-    expect(highScores).toContain("650");
+      expect(highScores).toContain("190")
+      expect(highScores).toContain("210")
+      expect(highScores).toContain("650");
+    })
   })
 
-  it('evaluates a correct guess', async () => {
-    await page.waitFor('[data-guess-input]')
+  describe("when a correct guess is submitted", () => {
+    beforeAll(async () => {
+      await page.waitFor('[data-guess-input]')
 
-    await clickColorInput(page, 0)
-    await clickColorInput(page, 1)
-    await clickColorInput(page, 2)
-    await clickColorInput(page, 3)
-    await clickColorInput(page, 4)
+      await clickColorInput(page, 0)
+      await clickColorInput(page, 1)
+      await clickColorInput(page, 2)
+      await clickColorInput(page, 3)
+      await clickColorInput(page, 4)
 
-    await page.click('#submit-guess')
-    await page.waitFor('#feedback li')
-    const historyItems = await page.$$('#feedback li')
-    expect(historyItems.length).toBe(1)
+      await page.click('#submit-guess')
+    })
+
+    it('displays the guess in the history', async () => {
+      await page.waitFor('#feedback li')
+      const historyItems = await page.$$('#feedback li')
+      expect(historyItems.length).toBe(1)
+    })
+
+    it('shows that the game is over', async () => {
+      await page.waitFor('#game-over-message')
+      expect(page.$('#game-over-message')).toBeTruthy()
+    })
+
+    it('shows the new high score in the list', async () => {
+      const highScores = await getHighScores(page)
+      expect(highScores.length).toBe(4)
+    })
   })
 
-  it('shows the new high score in the list', async () => {
-    const highScores = await getHighScores(page)
+  describe("when the new game button is clicked", () => {
+    beforeEach(async () => {
+      await page.click('#new-game')
+    })
 
-    expect(highScores.length).toBe(4)
+    it('starts a new game', async () => {
+      await page.waitFor('[data-guess-input]')
+
+      const historyItems = await page.$$('#feedback li')
+      expect(historyItems.length).toBe(0)
+    })
   })
 
-  it('starts a new game', async () => {
-    await page.click('#new-game')
+  describe("when the page is reloaded", () => {
+    let newPage
 
-    await page.waitFor(100)
+    beforeEach(async () => {
+      await page.close()
 
-    const historyItems = await page.$$('#feedback li')
-    expect(historyItems.length).toBe(0)
-  })
+      newPage = await browser.newPage()
+      await newPage.goto('http://localhost:4001/index.html')
+    })
 
-  it('persists the high scores', async () => {
-    await page.close()
+    it('still shows all the high scores', async () => {
+      await newPage.waitForSelector('.high-score')
 
-    const newPage = await browser.newPage()
-
-    await newPage.goto('http://localhost:4001/index.html')
-
-    await newPage.waitForSelector('.high-score')
-
-    const highScores = await getHighScores(newPage)
-
-    expect(highScores.length).toBe(4)
+      const highScores = await getHighScores(newPage)
+      expect(highScores.length).toBe(4)
+    })
   })
 })
 
