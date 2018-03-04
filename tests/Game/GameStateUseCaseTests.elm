@@ -22,7 +22,7 @@ gameStateTests =
   [ describe "when the page loads"
     [ test "it reports the GameState to be InProgress with the max remaining guesses" <|
       \() ->
-        Headless.given testModel (testUpdate [ Orange ])
+        Headless.given testModel testUpdate
           |> Elmer.init (\_ -> testInit 21 [ Orange ])
           |> Elmer.expectModel (\model ->
             UseCases.gameState model
@@ -32,7 +32,7 @@ gameStateTests =
   , describe "when the guess is wrong"
     [ test "it decreases the number of remaining guesses by one" <|
       \() ->
-        Headless.given testModel (testUpdate [ Orange ])
+        Headless.given testModel testUpdate
           |> Elmer.init (\_ -> testInit 21 [ Orange ])
           |> Command.send (\() -> UseCases.evaluateGuess [ Blue ])
           |> Command.send (\() -> UseCases.evaluateGuess [ Green ])
@@ -45,7 +45,7 @@ gameStateTests =
   , describe "when the guess is correct" <|
     [ test "it reports the GameState to be Won" <|
       \() ->
-        Headless.given testModel (testUpdate [ Orange ])
+        Headless.given testModel testUpdate
           |> Elmer.init (\_ -> testInit 21 [ Orange ])
           |> Command.send (\() -> UseCases.evaluateGuess [ Orange ])
           |> Elmer.expectModel (\model ->
@@ -59,7 +59,7 @@ gameStateTests =
   , describe "when the max number of incorrect answers has been given"
     [ test "it reports the game state of Lost along with the code" <|
       \() ->
-        Headless.given testModel (testUpdate [ Orange ])
+        Headless.given testModel testUpdate
           |> Elmer.init (\_ -> testInit 2 [ Orange ])
           |> Command.send (\() -> UseCases.evaluateGuess [ Blue ])
           |> Command.send (\() -> UseCases.evaluateGuess [ Green ])
@@ -77,7 +77,7 @@ scoreTests =
   [ describe "when one correct guess is made after a few seconds" <|
     let
       state =
-        Headless.given testModel (testUpdateWithHighScores [ Orange ])
+        Headless.given testModel testUpdateWithHighScores
           |> Spy.use [ timeSpy, updateScoreStoreSpy ]
           |> Elmer.init (\_ -> testInit 2 [ Orange ])
           |> Subscription.with (\_ -> Game.Subscriptions.for)
@@ -104,7 +104,7 @@ scoreTests =
   , describe "when more than one incorrect guess is made after a few seconds" <|
     let
       state =
-        Headless.given testModel (testUpdateWithHighScores [ Orange ])
+        Headless.given testModel testUpdateWithHighScores
           |> Spy.use [ timeSpy, updateScoreStoreSpy ]
           |> Elmer.init (\_ -> testInit 10 [ Orange ])
           |> Subscription.with (\_ -> Game.Subscriptions.for)

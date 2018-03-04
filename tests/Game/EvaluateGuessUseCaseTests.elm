@@ -64,7 +64,7 @@ evaluateGuessTests =
 
 expectGuessResult : Code -> Code -> GuessResult -> Expectation
 expectGuessResult code guess expectedGuessResult =
-  Headless.given testModel (Game.update <| gameAdaptersWithGuessResultNotifier code)
+  Headless.given testModel testUpdateWithGuessResultNotifier
     |> Spy.use [ guessResultSpy ]
     |> Elmer.init (\_ -> testInit 5 code)
     |> Command.send (\() -> UseCases.evaluateGuess guess)
@@ -88,8 +88,9 @@ guessResultSpy =
     \_ _ -> Cmd.none
 
 
-gameAdaptersWithGuessResultNotifier code =
+testUpdateWithGuessResultNotifier =
   let
-    adapters = gameAdapters code
+    adapters = gameAdapters []
   in
     { adapters | guessResultNotifier = Spy.callable "guess-result-spy" }
+      |> Game.update

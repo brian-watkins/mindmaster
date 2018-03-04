@@ -56,14 +56,14 @@ gameAdaptersWithHighScore code =
   }
 
 
-testUpdateWithHighScores code =
+testUpdateWithHighScores =
   let
-    adapters = gameAdapters code
+    adapters = gameAdapters []
   in
     { adapters | updateScoreStore = Spy.callable "update-score-store-spy" }
       |> Game.update
 
 
-testUpdate code =
-  gameAdapters code
+testUpdate =
+  gameAdapters []
     |> Game.update
