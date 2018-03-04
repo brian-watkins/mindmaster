@@ -1,4 +1,4 @@
-module Game.Rule.OutcomeRule exposing
+module Game.Rule.GameStateRule exposing
   ( apply
   )
 

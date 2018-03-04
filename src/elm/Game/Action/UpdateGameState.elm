@@ -3,7 +3,7 @@ module Game.Action.UpdateGameState exposing
   )
 
 import Game.Types exposing (Code, GuessResult(..), GameState(..))
-import Game.Rule.OutcomeRule as OutcomeRule
+import Game.Rule.GameStateRule as GameStateRule
 import Util.Command as Command
 
 
@@ -28,7 +28,7 @@ updateGameState : GuessResult -> (Model a, Cmd msg) -> (Model a, Cmd msg)
 updateGameState guessResult =
   Tuple.mapFirst <|
     \model ->
-      { model | gameState = OutcomeRule.apply model guessResult }
+      { model | gameState = GameStateRule.apply model guessResult }
 
 
 incrementGuesses : (Model a, Cmd msg) -> (Model a, Cmd msg)
