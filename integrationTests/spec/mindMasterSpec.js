@@ -52,7 +52,7 @@ describe("MindMaster", () => {
     expect(highScores).toContain("650");
   })
 
-  it('evaluates a guess', async () => {
+  it('evaluates a correct guess', async () => {
     await page.waitFor('[data-guess-input]')
 
     await clickColorInput(page, 0)
@@ -71,6 +71,15 @@ describe("MindMaster", () => {
     const highScores = await getHighScores(page)
 
     expect(highScores.length).toBe(4)
+  })
+
+  it('starts a new game', async () => {
+    await page.click('#new-game')
+
+    await page.waitFor(100)
+
+    const historyItems = await page.$$('#feedback li')
+    expect(historyItems.length).toBe(0)
   })
 
   it('persists the high scores', async () => {

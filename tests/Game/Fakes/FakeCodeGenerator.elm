@@ -1,4 +1,4 @@
-module Core.Fakes.FakeCodeGenerator exposing (..)
+module Game.Fakes.FakeCodeGenerator exposing (..)
 
 import Elmer.Platform.Command as Command
 import Game.Types exposing (Color, Code)
