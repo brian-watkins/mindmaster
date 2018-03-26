@@ -134,6 +134,6 @@ scoreTests =
 
 elapseSeconds : Int -> TestState model msg -> TestState model msg
 elapseSeconds seconds testState =
-  (\state -> Subscription.send "time-sub" 1 state)
+  Subscription.send "time-sub" 1
     |> List.repeat seconds
     |> TestHelpers.foldStates testState
