@@ -29,5 +29,5 @@ highScores model =
 highScoreView : Score -> Html Msg
 highScoreView score =
   Html.li [ Attr.class "high-score" ]
-  [ Html.text <| toString score
+  [ Html.text <| String.fromInt score
   ]

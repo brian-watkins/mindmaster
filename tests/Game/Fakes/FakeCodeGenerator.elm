@@ -1,6 +1,6 @@
 module Game.Fakes.FakeCodeGenerator exposing (..)
 
-import Elmer.Platform.Command as Command
+import Elmer.Command as Command
 import Game.Types exposing (Color, Code)
 
 with : Code -> (Code -> msg) -> Cmd msg

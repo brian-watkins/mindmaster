@@ -27,6 +27,6 @@ subscriptions top tagger =
 
 
 highScores : Int -> (List Score -> msg) -> List Score -> msg
-highScores top tagger scores =
-  Filter.highScores top scores
+highScores top tagger scoreList =
+  Filter.highScores top scoreList
     |> tagger

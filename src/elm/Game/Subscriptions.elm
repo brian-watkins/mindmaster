@@ -11,6 +11,6 @@ for : Model -> Sub Msg
 for model =
   case model.gameState of
     InProgress _ ->
-      Time.every Time.second IncrementTimer
+      Time.every 1000 IncrementTimer
     _ ->
       Sub.none

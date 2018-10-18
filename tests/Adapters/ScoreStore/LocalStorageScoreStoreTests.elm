@@ -3,10 +3,10 @@ module Adapters.ScoreStore.LocalStorageScoreStoreTests exposing (..)
 import Test exposing (..)
 import Expect exposing (Expectation)
 import Elmer exposing (exactly)
-import Elmer.Headless as Headless
+import Elmer.Command as Command
 import Elmer.Spy as Spy exposing (Spy, andCallFake)
 import Elmer.Spy.Matchers exposing (wasCalled, wasCalledWith, typedArg)
-import Elmer.Platform.Subscription as Subscription
+import Elmer.Subscription as Subscription
 import ScoreStore.LocalStorageScoreStore as ScoreStore
 import Game.Types exposing (Score)
 
@@ -16,7 +16,7 @@ requestScoresTests =
   describe "when no score is passed" <|
   let
     testState =
-      Headless.givenCommand (\_ -> ScoreStore.execute Nothing)
+      Command.given (\_ -> ScoreStore.execute Nothing)
         |> Spy.use [ requestScoresSpy, getScoresSpy ]
         |> Subscription.with (\_ -> (\_ -> ScoreStore.subscriptions 5 ScoreTagger))
         |> Subscription.send "scores-sub" [ 190, 124, 218, 887, 332, 97, 814 ]
@@ -28,7 +28,7 @@ requestScoresTests =
     , test "it sends the top scores in order" <|
       \() ->
         testState
-          |> Headless.expectMessages (exactly 1 <|
+          |> Command.expectMessages (exactly 1 <|
               Expect.equal (ScoreTagger [ 97, 124, 190, 218, 332 ])
           )
     ]
@@ -39,7 +39,7 @@ storeScoresTests =
   describe "when a score is stored" <|
   let
     testState =
-      Headless.givenCommand (\_ -> ScoreStore.execute <| Just 217)
+      Command.given (\_ -> ScoreStore.execute <| Just 217)
         |> Spy.use [ requestScoresSpy, getScoresSpy ]
         |> Subscription.with (\_ -> (\_ -> ScoreStore.subscriptions 3 ScoreTagger))
         |> Subscription.send "scores-sub" [ 190, 218, 332, 217 ]
@@ -53,7 +53,7 @@ storeScoresTests =
     , test "it sends the top scores in order" <|
       \() ->
         testState
-          |> Headless.expectMessages (exactly 1 <|
+          |> Command.expectMessages (exactly 1 <|
               Expect.equal (ScoreTagger [ 190, 217, 218 ])
           )
     ]

@@ -39,7 +39,7 @@ outcomMessage message =
 finalScore : Int -> Html Msg
 finalScore score =
   Html.div [ Attr.id "final-score" ]
-    [ Html.text <| "Final Score: " ++ toString score ]
+    [ Html.text <| "Final Score: " ++ String.fromInt score ]
 
 
 newGameButton : Html Msg

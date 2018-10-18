@@ -2,13 +2,14 @@ module UI.GameOverTests exposing (..)
 
 import Test exposing (..)
 import Expect exposing (Expectation)
-import Elmer exposing (expectNot, atIndex, (<&&>))
+import Elmer exposing (expectNot, atIndex, expectAll)
 import Elmer.Html as Markup
 import Elmer.Html.Event as Event
 import Elmer.Html.Matchers exposing (element, elements, elementExists, hasText, hasAttribute)
+import Elmer.Html.Selector exposing (..)
 import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Spy.Matchers exposing (wasCalledWith, intArg)
-import Elmer.Platform.Command as Command
+import Elmer.Command as Command
 import UI.TestHelpers as UIHelpers
 import Game.Types exposing (GameState(..), Color(..))
 import UI
@@ -25,27 +26,28 @@ winTests =
   [ test "it shows the You Win message" <|
     \() ->
       state
-        |> Markup.target "#game-over-message"
+        |> Markup.target << by [ id "game-over-message" ]
         |> Markup.expect (element <| hasText "You won!")
   , test "it shows your score" <|
     \() ->
       state
-        |> Markup.target "#final-score"
+        |> Markup.target << by [ id "final-score" ]
         |> Markup.expect (element <| hasText "Final Score: 350")
   , test "it does not show the guess input" <|
     \() ->
       state
-        |> Markup.target "#guess-input"
+        |> Markup.target << by [ id "guess-input" ]
         |> Markup.expect (expectNot <| elementExists)
   , test "it shows the high scores" <|
     \() ->
       state
         |> Command.send (\() -> Command.fake <| UI.highScoresTagger [ 180, 190, 210 ])
-        |> Markup.target "#high-scores"
-        |> Markup.expect (element <|
-          hasText "180" <&&>
-          hasText "190" <&&>
-          hasText "210"
+        |> Markup.target << by [ id "high-scores" ]
+        |> Markup.expect (element <| expectAll
+          [ hasText "180"
+          , hasText "190"
+          , hasText "210"
+          ]
         )
   ]
 
@@ -60,22 +62,23 @@ lostTests =
   [ test "it says you lost" <|
     \() ->
       state
-        |> Markup.target "#game-over-message"
+        |> Markup.target << by [ id "game-over-message" ]
         |> Markup.expect (element <| hasText "You lost!")
   , test "it shows the actual code" <|
     \() ->
       state
-        |> Markup.target "[data-code-element]"
-        |> Markup.expect (elements <|
-          (atIndex 0 <| hasAttribute ("class", "orange")) <&&>
-          (atIndex 1 <| hasAttribute ("class", "blue")) <&&>
-          (atIndex 2 <| hasAttribute ("class", "yellow")) <&&>
-          (atIndex 3 <| hasAttribute ("class", "red"))
+        |> Markup.target << by [ attributeName "data-code-element" ]
+        |> Markup.expect (elements <| expectAll
+          [ atIndex 0 <| hasAttribute ("class", "orange")
+          , atIndex 1 <| hasAttribute ("class", "blue")
+          , atIndex 2 <| hasAttribute ("class", "yellow")
+          , atIndex 3 <| hasAttribute ("class", "red")
+          ]
         )
   , test "it does not show the guess input" <|
     \() ->
       state
-        |> Markup.target "#guess-input"
+        |> Markup.target << by [ id "guess-input" ]
         |> Markup.expect (expectNot <| elementExists)
   ]
 

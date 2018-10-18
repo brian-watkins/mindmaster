@@ -25,15 +25,15 @@ with radius extent =
 definition : Arc -> String
 definition arc =
   "a "
-    ++ toString arc.radius
+    ++ String.fromFloat arc.radius
     ++ " "
-    ++ toString arc.radius
+    ++ String.fromFloat arc.radius
     ++ " 0 "
-    ++ toString arc.largeArcFlag
+    ++ String.fromInt arc.largeArcFlag
     ++ " 1 "
-    ++ toString arc.dx
+    ++ String.fromFloat arc.dx
     ++ " "
-    ++ toString arc.dy
+    ++ String.fromFloat arc.dy
 
 
 radians : Float -> Float

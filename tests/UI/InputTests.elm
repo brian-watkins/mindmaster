@@ -2,10 +2,11 @@ module UI.InputTests exposing (..)
 
 import Test exposing (..)
 import Expect exposing (Expectation)
-import Elmer exposing (TestState, Matcher, (<&&>), exactly)
+import Elmer exposing (TestState, Matcher, expectAll, exactly)
 import Elmer.Html as Markup exposing (HtmlElement)
 import Elmer.Html.Event as Event
 import Elmer.Html.Matchers exposing (element, elements, hasAttribute)
+import Elmer.Html.Selector exposing (..)
 import UI
 import UI.Types exposing (Model, Msg)
 import UI.TestHelpers as UIHelpers
@@ -79,7 +80,9 @@ selectColor position maybeClass testState =
   case maybeClass of
     Just class ->
       testState
-        |> Markup.target ("[data-guess-input='" ++ toString position ++ "'] [class='" ++ class ++ "']")
+        |> Markup.target 
+          << descendantsOf [ attribute ("data-guess-input", String.fromInt position) ]
+          << by [ attribute ("class", class) ]
         |> Event.click
     Nothing ->
       testState
@@ -88,7 +91,7 @@ selectColor position maybeClass testState =
 expectSelected : List String -> TestState Model Msg -> Expectation
 expectSelected classes testState =
   testState
-    |> Markup.target "[data-guess-input-element]"
+    |> Markup.target << by [ attributeName "data-guess-input-element" ]
     |> Markup.expect (elements <|
       expectElementsSelected classes
     )
@@ -102,7 +105,7 @@ expectElementsSelected classes =
 
 expectElementSelected : Int -> String -> Matcher (List (HtmlElement Msg))
 expectElementSelected position class =
-  exactly 1 (
-    hasAttribute ("data-guess-input-element", toString position) <&&>
-    hasAttribute ("class", class)
-  )
+  exactly 1 <| expectAll
+    [ hasAttribute ("data-guess-input-element", String.fromInt position)
+    , hasAttribute ("class", class)
+    ]

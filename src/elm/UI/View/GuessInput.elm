@@ -35,7 +35,7 @@ guessInput : Model -> Int -> Html Msg
 guessInput model index =
   Html.div
   [ Attr.class "guess-input-element"
-  , Attr.attribute "data-guess-input" <| toString index
+  , Attr.attribute "data-guess-input" <| String.fromInt index
   ]
   [ Svg.svg [ Sattr.viewBox "0 0 30 30" ]
     [ selectableColors index model.colors
@@ -52,7 +52,7 @@ selectedColor index model =
       Guess.colorAt index model.guess
   in
     Circle.unit 8.5
-      [ Attr.attribute "data-guess-input-element" <| toString index
+      [ Attr.attribute "data-guess-input-element" <| String.fromInt index
       , Vector.classList
         [ ( colorToClass guessColor
           , shouldShowColor guessColor model.validation
@@ -67,7 +67,7 @@ selectedColor index model =
 needsSelectionClass : Model -> String
 needsSelectionClass model =
   "needs-selection-"
-    ++ if model.attempts % 2 == 0 then "even" else "odd"
+    ++ if modBy 2 model.attempts == 0 then "even" else "odd"
 
 
 shouldShowColor : Maybe Color -> Validation -> Bool

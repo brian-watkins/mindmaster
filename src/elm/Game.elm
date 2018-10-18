@@ -4,13 +4,13 @@ module Game exposing
   )
 
 import Game.Types exposing (Code, GameState)
-import Time exposing (Time)
+import Time exposing (Posix)
 
 
 type Msg
   = Start Code
   | Judge Code
-  | IncrementTimer Time
+  | IncrementTimer Posix
 
 
 type alias Model =

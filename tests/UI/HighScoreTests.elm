@@ -5,7 +5,8 @@ import Expect exposing (Expectation)
 import Elmer
 import Elmer.Html as Markup
 import Elmer.Html.Matchers exposing (element, hasText)
-import Elmer.Platform.Command as Command
+import Elmer.Html.Selector exposing (..)
+import Elmer.Command as Command
 import UI
 import UI.Types exposing (..)
 import Game.Types exposing (Color(..), GameState(..))
@@ -19,7 +20,7 @@ noScoresTests =
     \() ->
       Elmer.given testModel (UIHelpers.testView <| InProgress 10) testUpdate
         |> Command.send (\() -> Command.fake <| UI.highScoresTagger [])
-        |> Markup.target "#high-scores"
+        |> Markup.target << by [ id "high-scores" ]
         |> Markup.expect (element <|
           hasText "No scores recorded."
         )

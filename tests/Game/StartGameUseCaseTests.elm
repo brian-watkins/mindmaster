@@ -3,10 +3,10 @@ module Game.StartGameUseCaseTests exposing (..)
 import Test exposing (..)
 import Expect
 import Elmer
-import Elmer.Headless as Headless
+import Elmer.Program as Program
 import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Spy.Matchers exposing (wasCalled, wasCalledWith, typedArg)
-import Elmer.Platform.Command as Command
+import Elmer.Command as Command
 import Game.TestHelpers exposing (..)
 import Game.Types exposing (GameState(..), Color(..))
 import Game.Action as Game
@@ -18,9 +18,9 @@ startGameTests =
   describe "when the start game command is sent" <|
   let
     state =
-      Headless.given testModel testUpdateWithHighScores
+      Program.givenWorker testUpdateWithHighScores
         |> Spy.use [ updateScoreStoreSpy, codeGeneratorSpy ]
-        |> Elmer.init (\() -> testInit 21 [Orange])
+        |> Program.init (\() -> testInit 21 [Orange])
         |> Command.send (\() -> UseCases.evaluateGuess [ Blue ])
         |> Command.send (\() -> UseCases.evaluateGuess [ Green ])
         |> Command.send (\() -> UseCases.startGame <| gameAdaptersWithCodeSpy)

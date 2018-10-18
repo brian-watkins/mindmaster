@@ -27,7 +27,7 @@ printHistoryItem : Int -> Int -> (Code, GuessResult) -> Html Msg
 printHistoryItem codeLength index (guess, guessResult) =
   Html.li
     [ Attr.class "guess-history-item"
-    , Attr.attribute "data-guess-feedback" <| toString index
+    , Attr.attribute "data-guess-feedback" <| String.fromInt index
     ]
     [ Code.view "guess" guess
     , GuessResult.view codeLength guessResult

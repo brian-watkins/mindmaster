@@ -3,11 +3,11 @@ module Game.GameStateUseCaseTests exposing (..)
 import Test exposing (..)
 import Expect
 import Elmer exposing (TestState)
-import Elmer.Headless as Headless
+import Elmer.Program as Program
 import Elmer.Spy as Spy
 import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg)
-import Elmer.Platform.Command as Command
-import Elmer.Platform.Subscription as Subscription
+import Elmer.Command as Command
+import Elmer.Subscription as Subscription
 import TestHelpers
 import Game.TestHelpers exposing (..)
 import Game.Types exposing (GameState(..), Color(..))
@@ -22,8 +22,8 @@ gameStateTests =
   [ describe "when the page loads"
     [ test "it reports the GameState to be InProgress with the max remaining guesses" <|
       \() ->
-        Headless.given testModel testUpdate
-          |> Elmer.init (\_ -> testInit 21 [ Orange ])
+        Program.givenWorker testUpdate
+          |> Program.init (\_ -> testInit 21 [ Orange ])
           |> Elmer.expectModel (\model ->
             UseCases.gameState model
               |> Expect.equal (InProgress 21)
@@ -32,8 +32,8 @@ gameStateTests =
   , describe "when the guess is wrong"
     [ test "it decreases the number of remaining guesses by one" <|
       \() ->
-        Headless.given testModel testUpdate
-          |> Elmer.init (\_ -> testInit 21 [ Orange ])
+        Program.givenWorker testUpdate
+          |> Program.init (\_ -> testInit 21 [ Orange ])
           |> Command.send (\() -> UseCases.evaluateGuess [ Blue ])
           |> Command.send (\() -> UseCases.evaluateGuess [ Green ])
           |> Command.send (\() -> UseCases.evaluateGuess [ Red ])
@@ -45,8 +45,8 @@ gameStateTests =
   , describe "when the guess is correct" <|
     [ test "it reports the GameState to be Won" <|
       \() ->
-        Headless.given testModel testUpdate
-          |> Elmer.init (\_ -> testInit 21 [ Orange ])
+        Program.givenWorker testUpdate
+          |> Program.init (\_ -> testInit 21 [ Orange ])
           |> Command.send (\() -> UseCases.evaluateGuess [ Orange ])
           |> Elmer.expectModel (\model ->
             case UseCases.gameState model of
@@ -59,8 +59,8 @@ gameStateTests =
   , describe "when the max number of incorrect answers has been given"
     [ test "it reports the game state of Lost along with the code" <|
       \() ->
-        Headless.given testModel testUpdate
-          |> Elmer.init (\_ -> testInit 2 [ Orange ])
+        Program.givenWorker testUpdate
+          |> Program.init (\_ -> testInit 2 [ Orange ])
           |> Command.send (\() -> UseCases.evaluateGuess [ Blue ])
           |> Command.send (\() -> UseCases.evaluateGuess [ Green ])
           |> Elmer.expectModel (\model ->
@@ -77,9 +77,9 @@ scoreTests =
   [ describe "when one correct guess is made after a few seconds" <|
     let
       state =
-        Headless.given testModel testUpdateWithHighScores
+        Program.givenWorker testUpdateWithHighScores
           |> Spy.use [ timeSpy, updateScoreStoreSpy ]
-          |> Elmer.init (\_ -> testInit 2 [ Orange ])
+          |> Program.init (\_ -> testInit 2 [ Orange ])
           |> Subscription.with (\_ -> Game.Subscriptions.for)
           |> Subscription.send "time-sub" 1
           |> Subscription.send "time-sub" 1
@@ -104,9 +104,9 @@ scoreTests =
   , describe "when more than one incorrect guess is made after a few seconds" <|
     let
       state =
-        Headless.given testModel testUpdateWithHighScores
+        Program.givenWorker testUpdateWithHighScores
           |> Spy.use [ timeSpy, updateScoreStoreSpy ]
-          |> Elmer.init (\_ -> testInit 10 [ Orange ])
+          |> Program.init (\_ -> testInit 10 [ Orange ])
           |> Subscription.with (\_ -> Game.Subscriptions.for)
           |> elapseSeconds 4
           |> Command.send (\() -> UseCases.evaluateGuess [ Red ])

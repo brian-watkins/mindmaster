@@ -3,10 +3,10 @@ module Game.EvaluateGuessUseCaseTests exposing (..)
 import Test exposing (..)
 import Expect exposing (Expectation)
 import Elmer
-import Elmer.Headless as Headless
+import Elmer.Program as Program
+import Elmer.Command as Command
 import Elmer.Spy as Spy exposing (Spy)
 import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg)
-import Elmer.Platform.Command as Command
 import Game.Entity.Clue as Clue
 import Game.TestHelpers exposing (..)
 import Game.Types exposing (Code, GameState(..), Color(..), GuessResult(..))
@@ -64,9 +64,9 @@ evaluateGuessTests =
 
 expectGuessResult : Code -> Code -> GuessResult -> Expectation
 expectGuessResult code guess expectedGuessResult =
-  Headless.given testModel testUpdateWithGuessResultNotifier
+  Program.givenWorker testUpdateWithGuessResultNotifier
     |> Spy.use [ guessResultSpy ]
-    |> Elmer.init (\_ -> testInit 5 code)
+    |> Program.init (\_ -> testInit 5 code)
     |> Command.send (\() -> UseCases.evaluateGuess guess)
     |> Spy.expect "guess-result-spy" (
       wasCalledWith

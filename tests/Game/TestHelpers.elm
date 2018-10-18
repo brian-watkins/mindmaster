@@ -12,10 +12,10 @@ module Game.TestHelpers exposing
 import Game.Types exposing (..)
 import Game.Fakes.FakeCodeGenerator as FakeCodeGenerator
 import Elmer.Spy as Spy exposing (Spy, andCallFake)
-import Elmer.Platform.Command as Command
+import Elmer.Command as Command
 import Game.Action as Game
 import Time
-import Elmer.Platform.Subscription as Subscription
+import Elmer.Subscription as Subscription
 
 
 timeSpy : Spy

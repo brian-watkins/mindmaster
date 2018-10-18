@@ -18,4 +18,4 @@ remainingGuessText remainingGuesses =
   if remainingGuesses == 1 then
     "Last guess!"
   else
-    toString remainingGuesses ++ " guesses remain!"
+    String.fromInt remainingGuesses ++ " guesses remain!"

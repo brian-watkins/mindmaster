@@ -3,6 +3,7 @@ module Configuration.Program exposing
   )
 
 import Html exposing (Html)
+import Browser
 
 
 type alias ProgramDefinition config model msg =
@@ -20,7 +21,7 @@ type alias Model config model =
 
 
 with program =
-  Html.programWithFlags
+  Browser.element
     { init = storeInitialModels program.init
     , view = configurableView program.view
     , update = configurableUpdate program.update

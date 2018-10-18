@@ -2,10 +2,15 @@ module UI.Entity.Color exposing
   ( toClass
   )
 
-import Game.Types exposing (Color)
+import Game.Types exposing (Color(..))
 
 
 toClass : Color -> String
 toClass color =
-  Basics.toString color
-    |> String.toLower
+  case color of
+    None -> "none"
+    Red -> "red"
+    Orange -> "orange"
+    Yellow -> "yellow"
+    Green -> "green"
+    Blue -> "blue"

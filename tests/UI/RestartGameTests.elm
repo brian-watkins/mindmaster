@@ -6,7 +6,8 @@ import Elmer exposing (TestState, hasLength)
 import Elmer.Html as Markup
 import Elmer.Html.Matchers exposing (elements, elementExists)
 import Elmer.Html.Event as Event
-import Elmer.Platform.Command as Command
+import Elmer.Html.Selector exposing (..)
+import Elmer.Command as Command
 import UI
 import UI.Types exposing (..)
 import UI.TestHelpers as UIHelpers
@@ -41,7 +42,7 @@ restartTests testState =
   let
     newGameState =
       testState
-        |> Markup.target "#new-game"
+        |> Markup.target << by [ id "new-game" ]
         |> Event.click
   in
   [ test "it sends the command to start the game" <|
