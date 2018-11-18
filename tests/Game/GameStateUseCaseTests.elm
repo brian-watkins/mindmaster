@@ -73,7 +73,12 @@ gameStateTests =
 
 scoreTests : Test
 scoreTests =
-  describe "when the guess is correct"
+  describe "when the guess is correct" <|
+  let
+    updateScoreStoreSpy =
+      Spy.observe (\_ -> updateScoreStoreFake)
+        |> Spy.andCallThrough
+  in
   [ describe "when one correct guess is made after a few seconds" <|
     let
       state =
@@ -97,7 +102,7 @@ scoreTests =
     , test "it saves the score" <|
       \() ->
         state
-          |> Spy.expect "update-score-store-spy" (
+          |> Spy.expect (\_ -> updateScoreStoreFake) (
             wasCalledWith [ typedArg <| Just 54 ]
           )
     ]
@@ -125,7 +130,7 @@ scoreTests =
     , test "it saves the score" <|
       \() ->
         state
-          |> Spy.expect "update-score-store-spy" (
+          |> Spy.expect (\_ -> updateScoreStoreFake) (
             wasCalledWith [ typedArg <| Just 163 ]
           )
     ]

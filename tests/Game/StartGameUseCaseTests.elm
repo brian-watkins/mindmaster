@@ -4,7 +4,7 @@ import Test exposing (..)
 import Expect
 import Elmer
 import Elmer.Program as Program
-import Elmer.Spy as Spy exposing (Spy)
+import Elmer.Spy as Spy exposing (Spy, andCallThrough)
 import Elmer.Spy.Matchers exposing (wasCalled, wasCalledWith, typedArg)
 import Elmer.Command as Command
 import Game.TestHelpers exposing (..)
@@ -17,6 +17,14 @@ startGameTests : Test
 startGameTests =
   describe "when the start game command is sent" <|
   let
+    updateScoreStoreSpy =
+      Spy.observe (\_ -> updateScoreStoreFake)
+        |> andCallThrough
+
+    codeGeneratorSpy =
+      Spy.observe (\_ -> codeGeneratorFake)
+        |> andCallThrough
+
     state =
       Program.givenWorker testUpdateWithHighScores
         |> Spy.use [ updateScoreStoreSpy, codeGeneratorSpy ]
@@ -43,13 +51,13 @@ startGameTests =
   , test "it generates a new code" <|
     \() ->
       state
-        |> Spy.expect "code-generator-spy" (
+        |> Spy.expect (\_ -> codeGeneratorFake) (
           wasCalled 1
         )
   , test "it requests the high scores" <|
     \() ->
       state
-        |> Spy.expect "update-score-store-spy" (
+        |> Spy.expect (\_ -> updateScoreStoreFake) (
           wasCalledWith [ typedArg Nothing ]
         )
   ]
@@ -61,14 +69,12 @@ testInit maxGuesses code =
 
 
 gameAdaptersWithCodeSpy =
-  { codeGenerator = Spy.callable "code-generator-spy"
+  { codeGenerator = Spy.inject (\_ -> codeGeneratorFake)
   , updateScoreStore = (\_ -> Cmd.none)
   , guessResultNotifier = (\guess guessResult -> Cmd.none)
   }
 
 
-codeGeneratorSpy : Spy
-codeGeneratorSpy =
-  Spy.createWith "code-generator-spy" <|
-    \tagger ->
-      Command.fake <| tagger [ Blue ]
+codeGeneratorFake : (List Color -> msg) -> Cmd msg
+codeGeneratorFake tagger =
+  Command.fake <| tagger [ Blue ]

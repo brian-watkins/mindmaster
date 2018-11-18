@@ -68,7 +68,7 @@ expectGuessResult code guess expectedGuessResult =
     |> Spy.use [ guessResultSpy ]
     |> Program.init (\_ -> testInit 5 code)
     |> Command.send (\() -> UseCases.evaluateGuess guess)
-    |> Spy.expect "guess-result-spy" (
+    |> Spy.expect (\_ -> guessResultFake) (
       wasCalledWith
         [ typedArg guess
         , typedArg expectedGuessResult
@@ -84,13 +84,17 @@ wrong colorsCorrect positionsCorrect =
 
 guessResultSpy : Spy
 guessResultSpy =
-  Spy.createWith "guess-result-spy" <|
-    \_ _ -> Cmd.none
+  Spy.observe (\_ -> guessResultFake)
+    |> Spy.andCallThrough
+
+guessResultFake : a -> b -> Cmd msg
+guessResultFake _ _ =
+  Cmd.none
 
 
 testUpdateWithGuessResultNotifier =
   let
     adapters = gameAdapters []
   in
-    { adapters | guessResultNotifier = Spy.callable "guess-result-spy" }
+    { adapters | guessResultNotifier = Spy.inject (\_ -> guessResultFake) }
       |> Game.update

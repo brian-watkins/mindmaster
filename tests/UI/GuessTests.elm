@@ -8,7 +8,7 @@ import Elmer.Html.Event as Event
 import Elmer.Html.Matchers exposing (element, elements, hasText, hasClass, hasAttribute)
 import Elmer.Html.Element as Element
 import Elmer.Html.Selector exposing (..)
-import Elmer.Spy as Spy exposing (Spy)
+import Elmer.Spy as Spy exposing (Spy, andCallFake)
 import Elmer.Spy.Matchers exposing (wasCalledWith, typedArg, functionArg)
 import Elmer.Command as Command
 import UI
@@ -24,15 +24,19 @@ guessTests : Test
 guessTests =
   describe "when a guess is submitted" <|
   let
+    fake =
+      Spy.observe (\_ -> emptyEvaluator)
+        |> andCallFake (evaluatorFake <| wrongFeedback 0 0)
+
     state =
-      Elmer.given (testModel 5) testView (testUpdate <| Spy.callable "evaluator-spy")
-        |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
+      Elmer.given (testModel 5) testView (testUpdate <| Spy.inject (\_ -> emptyEvaluator))
+        |> Spy.use [ fake ]
         |> selectGuess [ "red", "orange", "yellow", "green", "blue" ]
   in
   [ test "it executes the playGuess use case with the given guess" <|
     \() ->
       state
-        |> Spy.expect "evaluator-spy" (
+        |> Spy.expect (\_ -> emptyEvaluator) (
           wasCalledWith [ typedArg [ Red, Orange, Yellow, Green, Blue ] ]
         )
   , test "it clears the guess input" <|
@@ -148,12 +152,28 @@ guessHistoryTests : Test
 guessHistoryTests =
   describe "when multiple guesses are submitted" <|
   let
+    selector =
+      \guess ->
+        if guess == [ Blue, Green, Green ] then
+          UI.guessResultTagger guess Right
+            |> Command.fake
+        else
+          UI.guessResultTagger guess (wrongFeedback 0 0)
+            |> Command.fake
+
+    wrongEvaluator =
+      Spy.observe (\_ -> emptyEvaluator)
+        |> Spy.andCallFake (evaluatorFake <| wrongFeedback 0 0)
+
+    rightEvaluator =
+      Spy.observe (\_ -> emptyEvaluator)
+        |> andCallFake (evaluatorFake Right)
     state =
-      Elmer.given (testModel 3) testView (testUpdate <| Spy.callable "evaluator-spy")
-        |> Spy.use [ evaluatorSpy <| wrongFeedback 0 0 ]
+      Elmer.given (testModel 3) testView (testUpdate <| Spy.inject (\_ -> emptyEvaluator))
+        |> Spy.use [ wrongEvaluator ]
         |> selectGuess [ "red", "green", "blue" ]
         |> selectGuess [ "red", "green", "green" ]
-        |> Spy.use [ evaluatorSpy Right ]
+        |> Spy.use [ rightEvaluator ]
         |> selectGuess [ "blue", "green", "green" ]
   in
   [ test "it shows the third guess first" <|
@@ -221,16 +241,15 @@ testView =
   UI.View.with <| InProgress 4
 
 
-evaluatorSpy : GuessResult -> Spy
-evaluatorSpy feedback =
-  Spy.createWith "evaluator-spy" <|
-    \guess ->
-      UI.guessResultTagger guess feedback
-        |> Command.fake
-
-emptyEvaluator : Code -> Cmd msg
+emptyEvaluator : Code -> Cmd Msg
 emptyEvaluator _ =
   Cmd.none
+
+
+evaluatorFake : GuessResult -> Code -> Cmd Msg
+evaluatorFake feedback guess =
+  UI.guessResultTagger guess feedback
+    |> Command.fake
 
 
 wrongFeedback : Int -> Int -> GuessResult
@@ -241,8 +260,13 @@ wrongFeedback colorsCorrect positionsCorrect =
 
 expectFeedback : List (String, Int) -> GuessResult -> Expectation
 expectFeedback clueElements feedback =
-  Elmer.given (testModel 5) testView (testUpdate <| Spy.callable "evaluator-spy")
-    |> Spy.use [ evaluatorSpy <| feedback ]
+  let
+    fake = 
+      Spy.observe (\_ -> emptyEvaluator)
+        |> andCallFake (evaluatorFake feedback)
+  in
+  Elmer.given (testModel 5) testView (testUpdate <| Spy.inject (\_ -> emptyEvaluator))
+    |> Spy.use [ fake ]
     |> selectGuess [ "red", "green", "blue", "yellow", "yellow" ]
     |> Markup.target << by [ attributeName "data-guess-feedback" ]
     |> Markup.expect (element <|

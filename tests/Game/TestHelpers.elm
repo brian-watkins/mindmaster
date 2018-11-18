@@ -1,6 +1,6 @@
 module Game.TestHelpers exposing
   ( timeSpy
-  , updateScoreStoreSpy
+  , updateScoreStoreFake
   , testInit
   , testModel
   , gameAdapters
@@ -20,16 +20,17 @@ import Elmer.Subscription as Subscription
 
 timeSpy : Spy
 timeSpy =
-  Spy.create "time-spy" (\_ -> Time.every)
+  Spy.observe (\_ -> Time.every)
     |> andCallFake (\_ tagger ->
       Subscription.fake "time-sub" tagger
     )
 
 
-updateScoreStoreSpy : Spy
-updateScoreStoreSpy =
-  Spy.createWith "update-score-store-spy" <|
-    \_ -> Cmd.none
+updateScoreStoreFake : a -> Cmd msg
+updateScoreStoreFake _ =
+  Cmd.none
+  -- Spy.onFake "update-score-store-spy" <|
+    -- \_ -> Cmd.none
 
 
 testInit maxGuesses code =
@@ -51,7 +52,7 @@ gameAdapters code =
 
 gameAdaptersWithHighScore code =
   { codeGenerator = FakeCodeGenerator.with code
-  , updateScoreStore = Spy.callable "update-score-store-spy"
+  , updateScoreStore = Spy.inject (\_ -> updateScoreStoreFake)
   , guessResultNotifier = (\guess guessResult -> Cmd.none)
   }
 
@@ -60,7 +61,7 @@ testUpdateWithHighScores =
   let
     adapters = gameAdapters []
   in
-    { adapters | updateScoreStore = Spy.callable "update-score-store-spy" }
+    { adapters | updateScoreStore = Spy.inject (\_ -> updateScoreStoreFake) }
       |> Game.update
 
 

@@ -28,7 +28,7 @@ type TestMsg
 
 randomSpy : Spy
 randomSpy =
-  Spy.create "random-spy" (\_ -> Random.generate)
+  Spy.observe (\_ -> Random.generate)
     |> andCallFake (\tagger generator ->
       Random.initialSeed 9126
         |> Random.step generator

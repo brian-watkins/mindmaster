@@ -24,7 +24,7 @@ requestScoresTests =
     [ test "it requests the scores" <|
       \() ->
         testState
-          |> Spy.expect "request-scores-spy" (wasCalled 1)
+          |> Spy.expect (\_ -> ScoreStore.requestScores) (wasCalled 1)
     , test "it sends the top scores in order" <|
       \() ->
         testState
@@ -47,7 +47,7 @@ storeScoresTests =
     [ test "it requests the scores" <|
       \() ->
         testState
-          |> Spy.expect "request-scores-spy" (
+          |> Spy.expect (\_ -> ScoreStore.requestScores) (
             wasCalledWith [ typedArg <| Just 217 ]
           )
     , test "it sends the top scores in order" <|
@@ -65,7 +65,7 @@ type TestMsg
 
 requestScoresSpy : Spy
 requestScoresSpy =
-  Spy.create "request-scores-spy" (\_ -> ScoreStore.requestScores)
+  Spy.observe (\_ -> ScoreStore.requestScores)
     |> andCallFake (\_ ->
       Cmd.none
     )
@@ -73,7 +73,7 @@ requestScoresSpy =
 
 getScoresSpy : Spy
 getScoresSpy =
-  Spy.create "scores-spy" (\_ -> ScoreStore.scores)
+  Spy.observe (\_ -> ScoreStore.scores)
     |> andCallFake (\tagger ->
       Subscription.fake "scores-sub" tagger
     )
