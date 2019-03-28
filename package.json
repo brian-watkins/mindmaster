@@ -4,8 +4,7 @@
   "description": "Break Codes in Elm",
   "main": "app.js",
   "scripts": {
-    "postinstall": "npm-run-all -s install:test:elm install:test:integration",
-    "install:test:elm": "cd tests && elm-install",
+    "postinstall": "npm-run-all -s install:test:integration",
     "install:test:integration": "cd integrationTests && npm install",
     "test": "npm-run-all -s test:elm test:integration",
     "test:integration": "npm-run-all -s build:integrationTest run:test:integration",
