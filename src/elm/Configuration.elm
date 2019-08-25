@@ -46,7 +46,8 @@ coreAdapters config =
   { codeGenerator = RandomCodeGenerator.generator config.codeLength defaultColor colors
   , updateUI = UI.Action.update
   , guessResultTagger = UI.guessResultTagger
-  , updateScoreStore = LocalStorageScoreStore.execute
+  , updateScoreStore = LocalStorageScoreStore.execute config.topScores
+  , displayScores = UI.highScoresTagger
   }
 
 
@@ -57,12 +58,9 @@ init adapters config =
     (UI.defaultModel <| viewConfig config)
 
 
-subscriptions : Config -> Bus.Model UI.Model -> Sub (Bus.Msg UI.Msg)
-subscriptions config model =
-  Sub.batch
-  [ Bus.subscriptions model
-  , LocalStorageScoreStore.subscriptions config.topScores (Bus.uiTagger << UI.highScoresTagger)
-  ]
+subscriptions : Config -> Bus.Model UI.Model UI.Msg -> Sub (Bus.Msg UI.Msg)
+subscriptions _ model =
+  Bus.subscriptions model
 
 
 program adapters =

@@ -14,16 +14,20 @@ import Game.Action
 import Game.Subscriptions
 import Game.UseCases
 import Util.Command as Command
+import Procedure.Program
+import Procedure
 
 
 type Msg uiMsg
   = GameMsg Game.Msg
   | UIMsg uiMsg
+  | ProcedureMsg (Procedure.Program.Msg (Msg uiMsg))
 
 
-type alias Model uiModel =
+type alias Model uiModel uiMsg =
   { game : Game.Model
   , ui : uiModel
+  , procedureModel : Procedure.Program.Model (Msg uiMsg)
   }
 
 
@@ -33,7 +37,7 @@ uiTagger =
 
 init config adapters uiModel =
   Game.Action.init config (gameAdapters adapters)
-    |> Tuple.mapFirst (\gameModel -> { game = gameModel, ui = uiModel })
+    |> Tuple.mapFirst (\gameModel -> { game = gameModel, ui = uiModel, procedureModel = Procedure.Program.init })
 
 
 view uiAdapter model =
@@ -51,15 +55,24 @@ update adapters msg model =
       adapters.updateUI (uiAdapters adapters) uiMsg model.ui
         |> storeUIModel model
 
+    ProcedureMsg pMsg ->
+      Procedure.Program.update pMsg model.procedureModel
+        |> Tuple.mapFirst (\updated -> { model | procedureModel = updated })
+
 
 subscriptions model =
-  Game.Subscriptions.for model.game
-    |> Sub.map GameMsg
+  Sub.batch
+  [ Game.Subscriptions.for model.game
+      |> Sub.map GameMsg
+  , Procedure.Program.subscriptions model.procedureModel
+  ]
 
 
 gameAdapters adapters =
   { updateScoreStore =
-      adapters.updateScoreStore
+      \maybeScore ->
+        adapters.updateScoreStore maybeScore
+          |> Procedure.run ProcedureMsg (UIMsg << adapters.displayScores)
   , guessResultNotifier =
       \guess result ->
         Command.toCmd (adapters.guessResultTagger guess) result

@@ -9,16 +9,19 @@ import Elmer.Spy.Matchers exposing (wasCalled, wasCalledWith, typedArg)
 import Elmer.Subscription as Subscription
 import ScoreStore.LocalStorageScoreStore as ScoreStore
 import Game.Types exposing (Score)
-
+import ProcedureTestHelpers as ProcTest
 
 requestScoresTests : Test
 requestScoresTests =
   describe "when no score is passed" <|
   let
     testState =
-      Command.given (\_ -> ScoreStore.execute Nothing)
-        |> Spy.use [ requestScoresSpy, getScoresSpy ]
-        |> Subscription.with (\_ -> (\_ -> ScoreStore.subscriptions 5 ScoreTagger))
+      ProcTest.prepare
+        |> Spy.use [ requestScoresSpy, getScoresSpy, ProcTest.spy ]
+        |> ProcTest.run (\_ ->
+          ScoreStore.execute 5 Nothing
+        )
+        |> Subscription.with (\_ -> ProcTest.subscriptions)
         |> Subscription.send "scores-sub" [ 190, 124, 218, 887, 332, 97, 814 ]
   in
     [ test "it requests the scores" <|
@@ -28,9 +31,7 @@ requestScoresTests =
     , test "it sends the top scores in order" <|
       \() ->
         testState
-          |> Command.expectMessages (exactly 1 <|
-              Expect.equal (ScoreTagger [ 97, 124, 190, 218, 332 ])
-          )
+          |> ProcTest.expectValue [ 97, 124, 190, 218, 332 ]
     ]
 
 
@@ -39,9 +40,12 @@ storeScoresTests =
   describe "when a score is stored" <|
   let
     testState =
-      Command.given (\_ -> ScoreStore.execute <| Just 217)
-        |> Spy.use [ requestScoresSpy, getScoresSpy ]
-        |> Subscription.with (\_ -> (\_ -> ScoreStore.subscriptions 3 ScoreTagger))
+      ProcTest.prepare
+        |> Spy.use [ requestScoresSpy, getScoresSpy, ProcTest.spy ]
+        |> ProcTest.run (\_ ->
+          ScoreStore.execute 3 <| Just 217
+        )
+        |> Subscription.with (\_ -> ProcTest.subscriptions)
         |> Subscription.send "scores-sub" [ 190, 218, 332, 217 ]
   in
     [ test "it requests the scores" <|
@@ -53,9 +57,7 @@ storeScoresTests =
     , test "it sends the top scores in order" <|
       \() ->
         testState
-          |> Command.expectMessages (exactly 1 <|
-              Expect.equal (ScoreTagger [ 190, 217, 218 ])
-          )
+          |> ProcTest.expectValue [ 190, 217, 218 ]
     ]
 
 
