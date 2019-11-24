@@ -11,6 +11,7 @@ import Game.Action as Game
 import Game.Entity.Clue as Clue
 import Game.UseCases as UseCases
 import Game.Types exposing (..)
+import Game.Helpers exposing (Msg(..), Model)
 import Runner
 
 
@@ -71,14 +72,13 @@ evaluateGuessSpec =
 
 givenGameWithCode code =
   given (
-    Subject.init (testInit 6 code)
-      |> Subject.withUpdate testUpdate
+    Game.Helpers.testSubject 6 code
   )
 
 
 whenAGuessIsEvaluated guess =
   when "a guess is evaluated"
-    [ Command.send <| Cmd.map GameMsg <| UseCases.evaluateGuess guess
+    [ Game.Helpers.evaluateGuess guess
     ]
 
 
@@ -87,51 +87,10 @@ expectGuessResult guessResult =
     |> expect (equals <| Just guessResult)
 
 
-type Msg
-  = GameMsg Game.Msg
-  | Notified Code GuessResult
-
-
-type alias Model =
-  { gameModel: Game.Model
-  , guess: Maybe Code
-  , guessResult: Maybe GuessResult
-  }
-
-
-testInit maxGuesses code =
-  gameAdapters code
-    |> Game.init { maxGuesses = maxGuesses }
-    |> Tuple.mapFirst (\gameModel ->
-      { gameModel = gameModel
-      , guess = Nothing
-      , guessResult = Nothing
-      }  
-    )
-    |> Tuple.mapSecond (Cmd.map GameMsg)
-
-
-testUpdate : Msg -> Model -> (Model, Cmd Msg)
-testUpdate msg model =
-  case msg of
-    Notified guess result ->
-      ( { model | guess = Just guess, guessResult = Just result }, Cmd.none )
-    GameMsg gameMsg ->
-      Game.update (gameAdapters []) gameMsg model.gameModel
-        |> Tuple.mapFirst (\updated -> { model | gameModel = updated })
-
-
 wrong : Int -> Int -> GuessResult
 wrong colorsCorrect positionsCorrect =
   Clue.with colorsCorrect positionsCorrect
     |> Wrong
-
-
-gameAdapters code =
-  { codeGenerator = \tagger -> Command.fake <| tagger code
-  , updateScoreStore = (\_ -> Cmd.none)
-  , guessResultNotifier = (\guess guessResult -> Command.fake <| Notified guess guessResult)
-  }
 
 
 main =
