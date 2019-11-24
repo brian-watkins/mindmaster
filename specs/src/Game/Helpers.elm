@@ -5,7 +5,9 @@ module Game.Helpers exposing
   , testSubscriptions
   , expectGameModel
   , expectStoredScore
+  , expectGameState
   , evaluateGuess
+  , startNewGame
   )
 
 import Spec exposing (Spec)
@@ -74,6 +76,17 @@ evaluateGuess guess =
   UseCases.evaluateGuess guess
     |> Cmd.map GameMsg
     |> Command.send
+
+
+startNewGame code =
+  UseCases.startGame (gameAdapters code)
+    |> Command.send
+
+
+expectGameState gameState =
+  expectGameModel <| \model ->
+    UseCases.gameState model
+      |> equals gameState
 
 
 gameAdapters code =

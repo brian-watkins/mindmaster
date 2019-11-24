@@ -22,7 +22,7 @@ gameStateSpec =
         Game.Helpers.testSubject 7 []
       )
       |> it "reports the game state as InProgress with the max remaining guesses" (
-        expectGameState <| InProgress 7
+        Game.Helpers.expectGameState <| InProgress 7
       )
     )
   , scenario "an incorrect guess" (
@@ -35,7 +35,7 @@ gameStateSpec =
         , Game.Helpers.evaluateGuess [ Green ]
         ]
       |> it "decreases the number of guesses remaining by one" (
-        expectGameState <| InProgress 14
+        Game.Helpers.expectGameState <| InProgress 14
       )
     )
   , scenario "a correct guess" (
@@ -64,7 +64,7 @@ gameStateSpec =
         , Game.Helpers.evaluateGuess [ Blue ]
         ]
       |> it "reports the game state as Lost with the code" (
-        expectGameState <| Lost [ Orange ]
+        Game.Helpers.expectGameState <| Lost [ Orange ]
       )
     )
   ]
@@ -85,7 +85,7 @@ scoreSpec =
         ]
       |> observeThat
         [ it "shows the score to be 50 plus the number of seconds" (
-            expectGameState <| Won (50 + 8)
+            Game.Helpers.expectGameState <| Won (50 + 8)
           )
         , it "records the score" (
             Game.Helpers.expectStoredScore (50 + 8)
@@ -112,7 +112,7 @@ scoreSpec =
         ]
       |> observeThat
         [ it "shows the score to be 50 * number guesses plus the number of seconds" (
-            expectGameState <| Won (50 * 3 + 14)
+            Game.Helpers.expectGameState <| Won (50 * 3 + 14)
           )
         , it "records the score" (
             Game.Helpers.expectStoredScore (50 * 3 + 14)
@@ -120,12 +120,6 @@ scoreSpec =
         ]
     )
   ]
-
-
-expectGameState gameState =
-  Game.Helpers.expectGameModel <| \model ->
-    UseCases.gameState model
-      |> equals gameState
 
 
 whenTimeElapses millis =
