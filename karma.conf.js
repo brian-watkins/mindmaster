@@ -27,7 +27,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       { pattern: 'src/elm/*.elm', included: false, served: false },
-      { pattern: 'specs/src/**/*Spec.elm', included: false, served: false },
+      { pattern: 'specs/src/**/*.elm', included: false, served: false },
       "src/style/style.scss"
     ],
 
