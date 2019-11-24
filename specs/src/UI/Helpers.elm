@@ -4,13 +4,14 @@ module UI.Helpers exposing
   , testView
   , testUpdate
   , itEvaluatesTheGuess
+  , itRestartsTheGame
   )
 
 import Spec.Witness as Witness exposing (Witness)
 import Spec.Command as Command
 import Spec.Subject as Subject
 import Spec.Extra exposing (equals)
-import Spec.Claim exposing (isList)
+import Spec.Claim exposing (isList, isListWithLength)
 import Spec.Scenario exposing (it, expect)
 import UI
 import UI.Action
@@ -20,12 +21,6 @@ import Game.Types exposing (..)
 import UI.Entity.Color as Color
 import Json.Encode as Encode
 import Json.Decode as Json
-
-
-viewDependencies =
-  { guessEvaluator = \_ -> Cmd.none
-  , restartGame = Cmd.none
-  }
 
 
 testSubject status =
@@ -50,11 +45,10 @@ testView status =
 
 testUpdate : (Code -> GuessResult) -> Witness Msg -> Msg -> Model -> (Model, Cmd Msg)
 testUpdate guessResultGenerator witness =
-  let
-    dependencies = viewDependencies
-  in
-    UI.Action.update <|
-      { dependencies | guessEvaluator = fakeEvaluator witness guessResultGenerator }
+  UI.Action.update <|
+    { guessEvaluator = fakeEvaluator witness guessResultGenerator
+    , restartGame = Witness.log "restart-game" (Encode.null) witness
+    }
 
 
 fakeEvaluator witness feedbackGenerator code =
@@ -72,4 +66,11 @@ itEvaluatesTheGuess expectedGuess =
         [ equals expectedGuess
         ]
       )
+  )
+
+
+itRestartsTheGame =
+  it "sends the command to restart the game" (
+    Witness.observe "restart-game" (Json.value)
+      |> expect (isListWithLength 1)
   )
