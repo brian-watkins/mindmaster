@@ -23,11 +23,8 @@ gameOverSpec =
   Spec.describe "the game is over"
   [ scenario "the game is won" (
       given (
-        testSubject <| Won 350
+        UI.Helpers.testSubject <| Won 350
       )
-      |> when "the high scores are updated"
-        [ Command.send <| Command.fake <| UI.highScoresTagger [ 180, 190, 210 ]
-        ]
       |> observeThat
         [ it "shows that you won" (
             Markup.observeElement
@@ -40,21 +37,11 @@ gameOverSpec =
               |> expect (Markup.hasText "Final Score: 350")
           )
         , itNoLongerShowsGuessInput
-        , it "shows the high scores" (
-            Markup.observeElement
-              |> Markup.query << by [ id "high-scores" ]
-              |> expect (Claim.satisfying
-                [ Markup.hasText "180"
-                , Markup.hasText "190"
-                , Markup.hasText "210"
-                ]
-              )
-          )
         ]
     )
   , scenario "the game is lost" (
       given (
-        testSubject <| Lost [ Orange, Blue, Yellow ]
+        UI.Helpers.testSubject <| Lost [ Orange, Blue, Yellow ]
       )
       |> observeThat
         [ it "says you lost" (
@@ -84,11 +71,6 @@ itNoLongerShowsGuessInput =
       |> Markup.query << by [ id "guess-input" ]
       |> expect Claim.isNothing
   )
-
-testSubject status =
-  Subject.initWithModel (UI.Helpers.testModel 3)
-    |> Witness.forUpdate (UI.Helpers.testUpdate (\_ -> Right))
-    |> Subject.withView (UI.Helpers.testView status)
 
 
 main =

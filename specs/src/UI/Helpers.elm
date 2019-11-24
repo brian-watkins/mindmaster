@@ -1,5 +1,6 @@
 module UI.Helpers exposing
-  ( testModel
+  ( testSubject
+  , testModel
   , testView
   , testUpdate
   , itEvaluatesTheGuess
@@ -7,6 +8,7 @@ module UI.Helpers exposing
 
 import Spec.Witness as Witness exposing (Witness)
 import Spec.Command as Command
+import Spec.Subject as Subject
 import Spec.Extra exposing (equals)
 import Spec.Claim exposing (isList)
 import Spec.Scenario exposing (it, expect)
@@ -24,6 +26,12 @@ viewDependencies =
   { guessEvaluator = \_ -> Cmd.none
   , restartGame = Cmd.none
   }
+
+
+testSubject status =
+  Subject.initWithModel (testModel 3)
+    |> Witness.forUpdate (testUpdate (\_ -> Wrong { colors = 0, positions = 0 }))
+    |> Subject.withView (testView status)
 
 
 testModel : Int -> Model
