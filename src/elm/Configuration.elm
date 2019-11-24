@@ -13,6 +13,7 @@ import CodeGenerator.RandomCodeGenerator as RandomCodeGenerator
 import ScoreStore.LocalStorageScoreStore as LocalStorageScoreStore
 import Configuration.Program as ConfigurableProgram
 import Configuration.Bus as Bus
+import Random
 
 
 colors =
@@ -43,7 +44,7 @@ gameConfig config =
 
 
 coreAdapters config =
-  { codeGenerator = RandomCodeGenerator.generator config.codeLength defaultColor colors
+  { codeGenerator = RandomCodeGenerator.generator Random.generate config.codeLength defaultColor colors
   , updateUI = UI.Action.update
   , guessResultTagger = UI.guessResultTagger
   , updateScoreStore = LocalStorageScoreStore.execute config.topScores

@@ -5,10 +5,14 @@ module CodeGenerator.RandomCodeGenerator exposing
 import Random exposing (Generator)
 
 
-generator : Int -> a -> List a -> (List a -> msg) -> Cmd msg
-generator codeLength default items tagger =
+type alias Randomizer a msg =
+  (List a -> msg) -> Generator (List a) -> Cmd msg
+
+
+generator : Randomizer a msg -> Int -> a -> List a -> (List a -> msg) -> Cmd msg
+generator randomizer codeLength default items tagger =
   codeGenerator codeLength default items
-    |> Random.generate tagger
+    |> randomizer tagger
 
 
 codeGenerator : Int -> a -> List a -> Generator (List a)
