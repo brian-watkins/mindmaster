@@ -10,17 +10,12 @@ module Game.Types exposing
   , Score
   , GameConfig
   , CodeGenerator
-  , UpdateScoreStore
   )
 
 
 type alias GameConfig =
   { maxGuesses : Int
   }
-
-
-type alias UpdateScoreStore msg =
-  Maybe Score -> Cmd msg
 
 
 type alias UseCases msg =

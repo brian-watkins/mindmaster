@@ -4,7 +4,7 @@ port module ScoreStore.LocalStorageScoreStore exposing
   , scores
   )
 
-import Game.Types exposing (Score, UpdateScoreStore)
+import Game.Types exposing (Score)
 import ScoreStore.Filter as Filter
 import Procedure exposing (Procedure)
 import Procedure.Channel as Channel
