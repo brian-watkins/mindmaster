@@ -1,7 +1,6 @@
 module Adapters.ScoreStore.HttpScoreStoreSpec exposing (main)
 
-import Spec exposing (Spec)
-import Spec.Scenario exposing (..)
+import Spec exposing (..)
 import Spec.Port as Port
 import Spec.Claim as Claim
 import Spec.Extra exposing (equals)
@@ -13,6 +12,7 @@ import Adapters.ScoreStore.Helpers as Helpers
 import Game.Types exposing (Score)
 import Runner
 import Json.Encode as Encode
+import Json.Decode as Json
 
 
 fetchFromScoreStoreSpec =
@@ -52,7 +52,7 @@ storeScoreSpec =
         [ it "creates a score entry" (
             Spec.Http.observeRequests (post "http://fake-server/scores")
               |> expect (Claim.isList
-                [ Spec.Http.hasBody "{\"score\":87}"
+                [ Spec.Http.hasJsonBody (Json.field "score" Json.int) (equals 87)
                 ]
               )
           )
@@ -71,7 +71,7 @@ storeScoreSpec =
         [ it "attempts to create a score entry" (
             Spec.Http.observeRequests (post "http://fake-server/scores")
               |> expect (Claim.isList
-                [ Spec.Http.hasBody "{\"score\":87}"
+                [ Spec.Http.hasJsonBody (Json.field "score" Json.int) (equals 87)
                 ]
               )
           )

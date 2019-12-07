@@ -1,7 +1,6 @@
 module Game.EvaluateGuessSpec exposing (main)
 
-import Spec exposing (Spec)
-import Spec.Scenario exposing (..)
+import Spec exposing (..)
 import Spec.Subject as Subject
 import Spec.Observer as Observer
 import Spec.Command as Command

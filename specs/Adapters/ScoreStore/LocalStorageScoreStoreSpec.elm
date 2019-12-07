@@ -1,7 +1,6 @@
 module Adapters.ScoreStore.LocalStorageScoreStoreSpec exposing (main)
 
-import Spec exposing (Spec)
-import Spec.Scenario exposing (..)
+import Spec exposing (..)
 import Spec.Port as Port
 import Spec.Claim as Claim
 import Spec.Extra exposing (equals)

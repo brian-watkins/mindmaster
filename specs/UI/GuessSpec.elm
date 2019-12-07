@@ -1,7 +1,6 @@
 module UI.GuessSpec exposing (main)
 
-import Spec exposing (Spec)
-import Spec.Scenario exposing (..)
+import Spec exposing (..)
 import Spec.Subject as Subject
 import Spec.Observer as Observer
 import Spec.Claim exposing (..)
@@ -39,7 +38,7 @@ guessSpecs =
                 ]
               )
           )
-        , it "shows the guess is the list" (
+        , it "shows the guess in the list" (
             expectGuessAt 0 [ "red", "orange", "yellow", "green", "blue" ]
         )
       ]

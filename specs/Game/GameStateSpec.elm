@@ -1,10 +1,9 @@
 module Game.GameStateSpec exposing (main)
 
-import Spec exposing (Spec)
-import Spec.Scenario exposing (..)
+import Spec exposing (..)
 import Spec.Subject as Subject
 import Spec.Observer as Observer
-import Spec.Observation.Report as Report
+import Spec.Report as Report
 import Spec.Claim as Claim
 import Spec.Extra exposing (equals)
 import Spec.Time as Time
@@ -77,7 +76,6 @@ scoreSpec =
       given (
         Game.Helpers.testSubject 10 [ Red, Blue ]
           |> Subject.withSubscriptions Game.Helpers.testSubscriptions
-          |> Time.fake
       )
       |> whenTimeElapses 8000
       |> when "the correct guess is submitted"
@@ -96,7 +94,6 @@ scoreSpec =
       given (
         Game.Helpers.testSubject 10 [ Red, Blue ]
           |> Subject.withSubscriptions Game.Helpers.testSubscriptions
-          |> Time.fake
       )
       |> whenTimeElapses 4000
       |> when "an incorrect guess is submitted"

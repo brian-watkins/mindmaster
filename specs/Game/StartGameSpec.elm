@@ -1,10 +1,9 @@
 module Game.StartGameSpec exposing (main)
 
-import Spec exposing (Spec)
-import Spec.Scenario exposing (..)
+import Spec exposing (..)
 import Spec.Subject as Subject
 import Spec.Observer as Observer
-import Spec.Observation.Report as Report
+import Spec.Report as Report
 import Spec.Claim as Claim
 import Spec.Extra exposing (equals)
 import Spec.Time as Time

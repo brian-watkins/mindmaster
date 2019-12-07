@@ -12,7 +12,7 @@ import Spec.Command as Command
 import Spec.Subject as Subject
 import Spec.Extra exposing (equals)
 import Spec.Claim exposing (isList, isListWithLength)
-import Spec.Scenario exposing (it, expect)
+import Spec exposing (it, expect)
 import UI
 import UI.Action
 import UI.View

@@ -11,15 +11,8 @@ module.exports = function(config) {
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: [ "elm-spec" ],
 
-    elmSpec: {
-      specRoot: './specs',
-      specs: './src/**/*Spec.elm',
-      pathToElm: 'elm'
-    },
-
     client: {
       elmSpec: {
-        tags: [],
         endOnFailure: true
       }
     },
@@ -27,7 +20,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       { pattern: 'src/elm/*.elm', included: false, served: false },
-      { pattern: 'specs/src/**/*.elm', included: false, served: false },
+      { pattern: 'specs/**/*.elm', included: false, served: false },
       "src/style/style.scss"
     ],
 

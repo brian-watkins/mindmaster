@@ -4,19 +4,19 @@ module Adapters.ScoreStore.Helpers exposing
   , expectValues
   )
 
-import Spec.Subject as Subject exposing (SubjectGenerator)
+import Spec
+import Spec.Subject as Subject exposing (SubjectProvider)
 import Spec.Step as Step
-import Spec.Scenario as Scenario
 import Spec.Claim as Claim
 import Spec.Extra exposing (equals)
 import Spec.Observer as Observer exposing (Expectation)
-import Spec.Observation.Report as Report
+import Spec.Report as Report
 import Spec.Command as Command
 import Procedure exposing (Procedure)
 import Procedure.Program
 
 
-initWithProcedure : Procedure Never a (TestMsg a) -> SubjectGenerator (TestModel a) (TestMsg a)
+initWithProcedure : Procedure Never a (TestMsg a) -> SubjectProvider (TestModel a) (TestMsg a)
 initWithProcedure procedure =
   Subject.init
       ( testModel
@@ -29,7 +29,7 @@ initWithProcedure procedure =
 expectValue : a -> Expectation (TestModel a)
 expectValue expected =
   Observer.observeModel .messages
-    |> Scenario.expect (\messages ->
+    |> Spec.expect (\messages ->
       List.head messages
         |> Maybe.map (equals expected)
         |> Maybe.withDefault (Claim.Reject <| Report.note "No messages received from procedure!")
@@ -39,7 +39,7 @@ expectValue expected =
 expectValues : List a -> Expectation (TestModel a)
 expectValues expected =
   Observer.observeModel .messages
-    |> Scenario.expect (equals expected)
+    |> Spec.expect (equals expected)
 
 
 type TestMsg a
