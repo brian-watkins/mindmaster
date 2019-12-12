@@ -16,10 +16,10 @@ To run all tests:
 $ npm test
 ```
 
-To run the elm tests:
+To run the elm specs:
 
 ```
-$ npm run test:elm
+$ npm run specs
 ```
 
 To run the integration tests:
