@@ -6,14 +6,12 @@
   "scripts": {
     "postinstall": "npm-run-all -s install:test:integration",
     "install:test:integration": "cd integrationTests && npm install",
-    "test": "npm-run-all -s test:elm test:integration",
+    "test": "npm-run-all -s specs test:integration",
     "test:integration": "npm-run-all -s build:integrationTest run:test:integration",
     "run:test:integration": "cd integrationTests && npm test",
-    "elm": "ELM_HOME=$(pwd)/node_modules/elmer-test/home elm",
-    "test:elm": "ELM_HOME=$(pwd)/node_modules/elmer-test/home elm-test",
-    "dev": "ELM_HOME=$(pwd)/node_modules/elmer-test/home webpack-dev-server --port 3000",
-    "build": "ELM_HOME=$(pwd)/node_modules/elmer-test/home webpack",
-    "build:integrationTest": "ELM_HOME=$(pwd)/node_modules/elmer-test/home ENVIRONMENT=integrationTest webpack",
+    "dev": "webpack-dev-server --port 3000",
+    "build": "webpack",
+    "build:integrationTest": "ENVIRONMENT=integrationTest webpack",
     "specs": "karma start --single-run",
     "specs:watch": "karma start"
   },
