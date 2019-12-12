@@ -2,8 +2,7 @@ port module Runner exposing
   ( program
   )
 
-import Spec.Runner
-import Spec.Message exposing (Message)
+import Spec.Runner exposing (Message)
 
 
 port elmSpecOut : Message -> Cmd msg

@@ -11,6 +11,11 @@ module.exports = function(config) {
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: [ "elm-spec" ],
 
+    elmSpec: {
+      cwd: './specs',
+      specPath: './**/*Spec.elm'
+    },
+
     client: {
       elmSpec: {
         endOnFailure: true
