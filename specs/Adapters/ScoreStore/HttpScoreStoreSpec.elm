@@ -21,7 +21,7 @@ fetchFromScoreStoreSpec =
       given (
         ScoreStore.execute "http://fake-server/scores" 5 Nothing
           |> Helpers.initWithProcedure
-          |> Spec.Http.withStubs [ successfulRequestStub [ 81, 98, 19, 27, 865, 452, 450 ] ]
+          |> Stub.serve [ successfulRequestStub [ 81, 98, 19, 27, 865, 452, 450 ] ]
       )
       |> it "returns the top scores in order" (
         Helpers.expectValue [ 19, 27, 81, 98, 450 ]
@@ -31,7 +31,7 @@ fetchFromScoreStoreSpec =
       given (
         ScoreStore.execute "http://fake-server/scores" 5 Nothing
           |> Helpers.initWithProcedure
-          |> Spec.Http.withStubs [ failedRequestStub ]
+          |> Stub.serve [ failedRequestStub ]
       )
       |> it "returns an empty list" (
         Helpers.expectValue []
@@ -46,12 +46,12 @@ storeScoreSpec =
       given (
         ScoreStore.execute "http://fake-server/scores" 5 (Just 87)
           |> Helpers.initWithProcedure
-          |> Spec.Http.withStubs [ storeScoreStub, successfulRequestStub [ 81, 98, 19, 27, 865, 452, 450, 87 ] ]
+          |> Stub.serve [ storeScoreStub, successfulRequestStub [ 81, 98, 19, 27, 865, 452, 450, 87 ] ]
       )
       |> observeThat
         [ it "creates a score entry" (
             Spec.Http.observeRequests (post "http://fake-server/scores")
-              |> expect (Claim.isList
+              |> expect (Claim.isListWhere
                 [ Spec.Http.hasJsonBody (Json.field "score" Json.int) (equals 87)
                 ]
               )
@@ -65,12 +65,12 @@ storeScoreSpec =
       given (
         ScoreStore.execute "http://fake-server/scores" 5 (Just 87)
           |> Helpers.initWithProcedure
-          |> Spec.Http.withStubs [ storeScoreErrorStub, successfulRequestStub [ 81, 98, 19, 27, 865, 452, 450, 87 ] ]
+          |> Stub.serve [ storeScoreErrorStub, successfulRequestStub [ 81, 98, 19, 27, 865, 452, 450, 87 ] ]
       )
       |> observeThat
         [ it "attempts to create a score entry" (
             Spec.Http.observeRequests (post "http://fake-server/scores")
-              |> expect (Claim.isList
+              |> expect (Claim.isListWhere
                 [ Spec.Http.hasJsonBody (Json.field "score" Json.int) (equals 87)
                 ]
               )

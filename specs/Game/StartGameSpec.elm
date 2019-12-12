@@ -1,7 +1,7 @@
 module Game.StartGameSpec exposing (main)
 
 import Spec exposing (..)
-import Spec.Subject as Subject
+import Spec.Setup as Setup
 import Spec.Observer as Observer
 import Spec.Report as Report
 import Spec.Claim as Claim

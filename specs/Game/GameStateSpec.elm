@@ -1,7 +1,7 @@
 module Game.GameStateSpec exposing (main)
 
 import Spec exposing (..)
-import Spec.Subject as Subject
+import Spec.Setup as Setup
 import Spec.Observer as Observer
 import Spec.Report as Report
 import Spec.Claim as Claim
@@ -75,7 +75,7 @@ scoreSpec =
   [ scenario "one correct guess after a few seconds" (
       given (
         Game.Helpers.testSubject 10 [ Red, Blue ]
-          |> Subject.withSubscriptions Game.Helpers.testSubscriptions
+          |> Setup.withSubscriptions Game.Helpers.testSubscriptions
       )
       |> whenTimeElapses 8000
       |> when "the correct guess is submitted"
@@ -93,7 +93,7 @@ scoreSpec =
   , scenario "several incorrect guesses before the correct one" (
       given (
         Game.Helpers.testSubject 10 [ Red, Blue ]
-          |> Subject.withSubscriptions Game.Helpers.testSubscriptions
+          |> Setup.withSubscriptions Game.Helpers.testSubscriptions
       )
       |> whenTimeElapses 4000
       |> when "an incorrect guess is submitted"

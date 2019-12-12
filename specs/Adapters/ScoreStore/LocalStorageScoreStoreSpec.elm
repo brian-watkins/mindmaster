@@ -25,7 +25,7 @@ scoreStoreSpec =
       |> observeThat
         [ it "requests the scores" (
             Port.observe "requestScores" (Json.nullable Json.int)
-              |> expect (Claim.isList [ Claim.isNothing ])
+              |> expect (Claim.isListWhere [ Claim.isNothing ])
           )
         , it "sends the top scores in order" (
             Helpers.expectValue [ 97, 124, 190, 218, 332 ]
@@ -44,7 +44,7 @@ scoreStoreSpec =
       |> observeThat
         [ it "requests the scores" (
             Port.observe "requestScores" (Json.nullable Json.int)
-              |> expect (Claim.isList [ equals <| Just 781 ])
+              |> expect (Claim.isListWhere [ equals <| Just 781 ])
           )
         , it "sends the top scores in order" (
             Helpers.expectValue [ 97, 124, 190, 218, 332 ]

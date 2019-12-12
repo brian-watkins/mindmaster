@@ -1,7 +1,7 @@
 module UI.HighScoreSpec exposing (main)
 
 import Spec exposing (..)
-import Spec.Subject as Subject
+import Spec.Setup as Setup
 import Spec.Observer as Observer
 import Spec.Markup as Markup
 import Spec.Markup.Selector exposing (..)

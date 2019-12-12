@@ -11,7 +11,7 @@ module Game.Helpers exposing
   )
 
 import Spec exposing (..)
-import Spec.Subject as Subject
+import Spec.Setup as Setup
 import Spec.Observer as Observer
 import Spec.Command as Command
 import Spec.Extra exposing (equals)
@@ -38,8 +38,8 @@ type alias Model =
 
 
 testSubject maxGuesses code =
-  Subject.init (testInit maxGuesses code)
-    |> Subject.withUpdate testUpdate
+  Setup.init (testInit maxGuesses code)
+    |> Setup.withUpdate testUpdate
 
 
 testInit maxGuesses code =

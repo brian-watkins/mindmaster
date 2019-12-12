@@ -1,7 +1,7 @@
 module UI.InputSpec exposing (main)
 
 import Spec exposing (..)
-import Spec.Subject as Subject
+import Spec.Setup as Setup
 import Spec.Observer as Observer
 import Spec.Markup as Markup
 import Spec.Markup.Selector exposing (..)
@@ -73,7 +73,7 @@ expectGuess cssCodes =
   Markup.observeElements
     |> Markup.query
         << by [ attributeName "data-guess-input-element" ]
-    |> expect (Claim.isList <|
+    |> expect (Claim.isListWhere <|
       List.map (\c -> Markup.hasAttribute ("class", c)) cssCodes  
     )
 
@@ -96,9 +96,9 @@ selectGuessElement position maybeClass =
 
 
 testSubject =
-  Subject.initWithModel (UI.Helpers.testModel 5)
+  Setup.initWithModel (UI.Helpers.testModel 5)
     |> Witness.forUpdate (UI.Helpers.testUpdate (\_ -> Wrong { colors = 0, positions = 0 }))
-    |> Subject.withView (UI.Helpers.testView <| InProgress 4)
+    |> Setup.withView (UI.Helpers.testView <| InProgress 4)
 
 
 main =

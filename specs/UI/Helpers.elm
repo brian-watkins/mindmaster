@@ -9,9 +9,9 @@ module UI.Helpers exposing
 
 import Spec.Witness as Witness exposing (Witness)
 import Spec.Command as Command
-import Spec.Subject as Subject
+import Spec.Setup as Setup
 import Spec.Extra exposing (equals)
-import Spec.Claim exposing (isList, isListWithLength)
+import Spec.Claim exposing (isListWhere, isListWithLength)
 import Spec exposing (it, expect)
 import UI
 import UI.Action
@@ -24,9 +24,9 @@ import Json.Decode as Json
 
 
 testSubject status =
-  Subject.initWithModel (testModel 3)
+  Setup.initWithModel (testModel 3)
     |> Witness.forUpdate (testUpdate (\_ -> Wrong { colors = 0, positions = 0 }))
-    |> Subject.withView (testView status)
+    |> Setup.withView (testView status)
 
 
 testModel : Int -> Model
@@ -62,7 +62,7 @@ fakeEvaluator witness feedbackGenerator code =
 itEvaluatesTheGuess expectedGuess =
   it "sends the guess to the evaluator" (
     Witness.observe "guess-to-evaluate" (Json.list Json.string)
-      |> expect (isList
+      |> expect (isListWhere
         [ equals expectedGuess
         ]
       )

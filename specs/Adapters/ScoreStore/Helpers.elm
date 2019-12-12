@@ -5,7 +5,7 @@ module Adapters.ScoreStore.Helpers exposing
   )
 
 import Spec
-import Spec.Subject as Subject exposing (SubjectProvider)
+import Spec.Setup as Setup exposing (Setup)
 import Spec.Step as Step
 import Spec.Claim as Claim
 import Spec.Extra exposing (equals)
@@ -16,14 +16,14 @@ import Procedure exposing (Procedure)
 import Procedure.Program
 
 
-initWithProcedure : Procedure Never a (TestMsg a) -> SubjectProvider (TestModel a) (TestMsg a)
+initWithProcedure : Procedure Never a (TestMsg a) -> Setup (TestModel a) (TestMsg a)
 initWithProcedure procedure =
-  Subject.init
+  Setup.init
       ( testModel
       , Procedure.run ProcedureMsg GotMessage procedure
       )
-    |> Subject.withUpdate testUpdate
-    |> Subject.withSubscriptions testSubscriptions
+    |> Setup.withUpdate testUpdate
+    |> Setup.withSubscriptions testSubscriptions
 
 
 expectValue : a -> Expectation (TestModel a)

@@ -1,7 +1,7 @@
 module UI.GuessSpec exposing (main)
 
 import Spec exposing (..)
-import Spec.Subject as Subject
+import Spec.Setup as Setup
 import Spec.Observer as Observer
 import Spec.Claim exposing (..)
 import Spec.Markup as Markup
@@ -29,7 +29,7 @@ guessSpecs =
         , it "clears the guess input" (
             Markup.observeElements
               |> Markup.query << by [ attributeName "data-guess-input-element" ]
-              |> expect (isList
+              |> expect (isListWhere
                 [ Markup.hasAttribute ("class", "empty")
                 , Markup.hasAttribute ("class", "empty")
                 , Markup.hasAttribute ("class", "empty")
@@ -51,7 +51,7 @@ guessSpecs =
       |> it "identifies elements the user needs to select" (
         Markup.observeElements
           |> Markup.query << by [ attributeName "data-guess-input-element" ]
-          |> expect (isList
+          |> expect (isListWhere
             [ Markup.hasAttribute ("class", "needs-selection-odd" )
             , Markup.hasAttribute ("class", "red" )
             , Markup.hasAttribute ("class", "needs-selection-odd" )
@@ -68,7 +68,7 @@ guessSpecs =
       |> it "switches the class on the elements the user needs to select" (
         Markup.observeElements
           |> Markup.query << by [ attributeName "data-guess-input-element" ]
-          |> expect (isList
+          |> expect (isListWhere
             [ Markup.hasAttribute ("class", "needs-selection-even" )
             , Markup.hasAttribute ("class", "red" )
             , Markup.hasAttribute ("class", "needs-selection-even" )
@@ -85,7 +85,7 @@ guessSpecs =
       |> it "clears the inputs" (
         Markup.observeElements
           |> Markup.query << by [ attributeName "data-guess-input-element" ]
-          |> expect (isList
+          |> expect (isListWhere
             [ Markup.hasAttribute ("class", "empty" )
             , Markup.hasAttribute ("class", "empty" )
             , Markup.hasAttribute ("class", "empty" )
@@ -210,9 +210,9 @@ testSubjectWithResult positions guessesRemaining result =
 
 
 testSubjectWithEvaluator positions guessesRemaining evaluator =
-  Subject.initWithModel (UI.Helpers.testModel positions)
+  Setup.initWithModel (UI.Helpers.testModel positions)
     |> Witness.forUpdate (UI.Helpers.testUpdate evaluator)
-    |> Subject.withView (testView guessesRemaining)
+    |> Setup.withView (testView guessesRemaining)
 
 
 expectGuessAt index cssCodes =
@@ -220,7 +220,7 @@ expectGuessAt index cssCodes =
     |> Markup.query
         << descendantsOf [ attribute ("data-guess-feedback", String.fromInt index) ]
         << by [ attributeName "data-guess-element" ]
-    |> expect (isList <|
+    |> expect (isListWhere <|
       List.map (\c -> Markup.hasAttribute ("class", c)) cssCodes  
     )
 

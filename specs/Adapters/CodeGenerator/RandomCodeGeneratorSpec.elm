@@ -1,7 +1,7 @@
 module Adapters.CodeGenerator.RandomCodeGeneratorSpec exposing (main)
 
 import Spec exposing (..)
-import Spec.Subject as Subject
+import Spec.Setup as Setup
 import Spec.Observer as Observer
 import Spec.Command as Command
 import Spec.Extra exposing (equals)
@@ -15,8 +15,8 @@ generateCodeSpec =
   Spec.describe "random code generator"
   [ scenario "a code is generated" (
       given (
-        Subject.init ( testModel, RandomCodeGenerator.generator testGenerator 5 0 [ 1, 2, 3, 4 ] CodeTagger )
-          |> Subject.withUpdate testUpdate
+        Setup.init ( testModel, RandomCodeGenerator.generator testGenerator 5 0 [ 1, 2, 3, 4 ] CodeTagger )
+          |> Setup.withUpdate testUpdate
       )
       |> it "returns a random code" (
         Observer.observeModel .generatedCode

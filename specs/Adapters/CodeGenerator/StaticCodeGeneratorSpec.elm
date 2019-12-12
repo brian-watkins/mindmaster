@@ -1,7 +1,7 @@
 module Adapters.CodeGenerator.StaticCodeGeneratorSpec exposing (main)
 
 import Spec exposing (..)
-import Spec.Subject as Subject
+import Spec.Setup as Setup
 import Spec.Observer as Observer
 import Spec.Extra exposing (equals)
 import Runner
@@ -13,8 +13,8 @@ generateCodeSpec =
   Spec.describe "static code generator"
   [ scenario "a code is provided" (
       given (
-        Subject.init ( testModel, StaticCodeGenerator.generator [ 1, 2, 3 ] CodeTagger )
-          |> Subject.withUpdate testUpdate
+        Setup.init ( testModel, StaticCodeGenerator.generator [ 1, 2, 3 ] CodeTagger )
+          |> Setup.withUpdate testUpdate
       )
       |> it "returns the provided code" (
         Observer.observeModel .generatedCode

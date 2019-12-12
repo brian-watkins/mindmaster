@@ -1,7 +1,7 @@
 module UI.GameOverSpec exposing (main)
 
 import Spec exposing (..)
-import Spec.Subject as Subject
+import Spec.Setup as Setup
 import Spec.Observer as Observer
 import Spec.Markup as Markup
 import Spec.Markup.Selector exposing (..)
@@ -51,7 +51,7 @@ gameOverSpec =
         , it "shows the correct code" (
             Markup.observeElements
               |> Markup.query << by [ attributeName "data-code-element" ]
-              |> expect (Claim.isList
+              |> expect (Claim.isListWhere
                 [ Markup.hasAttribute ("class", "orange")
                 , Markup.hasAttribute ("class", "blue")
                 , Markup.hasAttribute ("class", "yellow")
