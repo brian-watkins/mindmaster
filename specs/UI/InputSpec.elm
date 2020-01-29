@@ -6,7 +6,7 @@ import Spec.Observer as Observer
 import Spec.Markup as Markup
 import Spec.Markup.Selector exposing (..)
 import Spec.Markup.Event as Event
-import Spec.Claim as Claim
+import Spec.Claim as Claim exposing (isSomethingWhere)
 import Spec.Command as Command
 import Spec.Witness as Witness
 import Spec.Extra exposing (..)
@@ -74,7 +74,7 @@ expectGuess cssCodes =
     |> Markup.query
         << by [ attributeName "data-guess-input-element" ]
     |> expect (Claim.isListWhere <|
-      List.map (\c -> Markup.hasAttribute ("class", c)) cssCodes  
+      List.map hasClass cssCodes
     )
 
 

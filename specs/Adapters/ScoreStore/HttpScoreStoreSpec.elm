@@ -52,7 +52,7 @@ storeScoreSpec =
         [ it "creates a score entry" (
             Spec.Http.observeRequests (post "http://fake-server/scores")
               |> expect (Claim.isListWhere
-                [ Spec.Http.hasJsonBody (Json.field "score" Json.int) (equals 87)
+                [ Spec.Http.jsonBody (Json.field "score" Json.int) (equals 87)
                 ]
               )
           )
@@ -71,7 +71,7 @@ storeScoreSpec =
         [ it "attempts to create a score entry" (
             Spec.Http.observeRequests (post "http://fake-server/scores")
               |> expect (Claim.isListWhere
-                [ Spec.Http.hasJsonBody (Json.field "score" Json.int) (equals 87)
+                [ Spec.Http.jsonBody (Json.field "score" Json.int) (equals 87)
                 ]
               )
           )

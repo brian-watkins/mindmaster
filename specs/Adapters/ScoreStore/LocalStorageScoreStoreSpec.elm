@@ -17,7 +17,6 @@ scoreStoreSpec =
       given (
         ScoreStore.execute 5 Nothing
           |> Helpers.initWithProcedure
-          |> Port.record "requestScores"
       )
       |> when "the scores are returned"
         [ Port.send "scores" <| Encode.list Encode.int [ 190, 124, 218, 887, 332, 97, 814 ]
@@ -36,7 +35,6 @@ scoreStoreSpec =
       given (
         ScoreStore.execute 5 (Just 781)
           |> Helpers.initWithProcedure
-          |> Port.record "requestScores"
       )
       |> when "the scores are returned"
         [ Port.send "scores" <| Encode.list Encode.int [ 190, 124, 218, 887, 332, 97, 814 ]

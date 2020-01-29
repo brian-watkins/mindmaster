@@ -28,12 +28,12 @@ gameOverSpec =
         [ it "shows that you won" (
             Markup.observeElement
               |> Markup.query << by [ id "game-over-message" ]
-              |> expect (Markup.hasText "You won!")
+              |> expectElement (hasText "You won!")
           )
         , it "shows your score" (
             Markup.observeElement
               |> Markup.query << by [ id "final-score" ]
-              |> expect (Markup.hasText "Final Score: 350")
+              |> expectElement (hasText "Final Score: 350")
           )
         , itNoLongerShowsGuessInput
         ]
@@ -46,15 +46,15 @@ gameOverSpec =
         [ it "says you lost" (
             Markup.observeElement
               |> Markup.query << by [ id "game-over-message" ]
-              |> expect (Markup.hasText "You lost!")
+              |> expectElement (hasText "You lost!")
           )
         , it "shows the correct code" (
             Markup.observeElements
               |> Markup.query << by [ attributeName "data-code-element" ]
               |> expect (Claim.isListWhere
-                [ Markup.hasAttribute ("class", "orange")
-                , Markup.hasAttribute ("class", "blue")
-                , Markup.hasAttribute ("class", "yellow")
+                [ hasClass "orange"
+                , hasClass "blue"
+                , hasClass "yellow"
                 ]
               )
           )
@@ -66,7 +66,7 @@ gameOverSpec =
 
 itNoLongerShowsGuessInput =
   it "no longer shows the guess input" (
-    Markup.observe
+    Markup.observeElement
       |> Markup.query << by [ id "guess-input" ]
       |> expect Claim.isNothing
   )

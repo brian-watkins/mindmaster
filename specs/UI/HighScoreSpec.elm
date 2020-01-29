@@ -29,7 +29,7 @@ highScoreSpec =
       |> it "indicates that there are no high scores" (
         Markup.observeElement
           |> Markup.query << by [ id "high-scores" ]
-          |> expect (Markup.hasText "No scores recorded.")
+          |> expectElement (hasText "No scores recorded.")
       )
     )
   , scenario "some high scores" (
@@ -42,10 +42,10 @@ highScoreSpec =
       |> it "shows the high scores" (
         Markup.observeElement
           |> Markup.query << by [ id "high-scores" ]
-          |> expect (Claim.satisfying
-            [ Markup.hasText "180"
-            , Markup.hasText "190"
-            , Markup.hasText "210"
+          |> expectElement (Claim.satisfying
+            [ hasText "180"
+            , hasText "190"
+            , hasText "210"
             ]
           )
       )

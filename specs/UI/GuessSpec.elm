@@ -30,11 +30,11 @@ guessSpecs =
             Markup.observeElements
               |> Markup.query << by [ attributeName "data-guess-input-element" ]
               |> expect (isListWhere
-                [ Markup.hasAttribute ("class", "empty")
-                , Markup.hasAttribute ("class", "empty")
-                , Markup.hasAttribute ("class", "empty")
-                , Markup.hasAttribute ("class", "empty")
-                , Markup.hasAttribute ("class", "empty")
+                [ hasClass "empty"
+                , hasClass "empty"
+                , hasClass "empty"
+                , hasClass "empty"
+                , hasClass "empty"
                 ]
               )
           )
@@ -52,9 +52,9 @@ guessSpecs =
         Markup.observeElements
           |> Markup.query << by [ attributeName "data-guess-input-element" ]
           |> expect (isListWhere
-            [ Markup.hasAttribute ("class", "needs-selection-odd" )
-            , Markup.hasAttribute ("class", "red" )
-            , Markup.hasAttribute ("class", "needs-selection-odd" )
+            [ hasClass "needs-selection-odd"
+            , hasClass "red"
+            , hasClass "needs-selection-odd"
             ]
           )
       )
@@ -69,9 +69,9 @@ guessSpecs =
         Markup.observeElements
           |> Markup.query << by [ attributeName "data-guess-input-element" ]
           |> expect (isListWhere
-            [ Markup.hasAttribute ("class", "needs-selection-even" )
-            , Markup.hasAttribute ("class", "red" )
-            , Markup.hasAttribute ("class", "needs-selection-even" )
+            [ hasClass "needs-selection-even"
+            , hasClass "red"
+            , hasClass "needs-selection-even"
             ]
           )
       )
@@ -86,9 +86,9 @@ guessSpecs =
         Markup.observeElements
           |> Markup.query << by [ attributeName "data-guess-input-element" ]
           |> expect (isListWhere
-            [ Markup.hasAttribute ("class", "empty" )
-            , Markup.hasAttribute ("class", "empty" )
-            , Markup.hasAttribute ("class", "empty" )
+            [ hasClass "empty"
+            , hasClass "empty"
+            , hasClass "empty"
             ]
           )
       )
@@ -106,7 +106,7 @@ guessesRemainingSpec =
       |> it "shows the remaining guesses" (
         Markup.observeElement
           |> Markup.query << by [ id "game-progress" ]
-          |> expect (Markup.hasText "4 guesses remain!")
+          |> expectElement (hasText "4 guesses remain!")
       )
     )
   , scenario "one guess remains" (
@@ -116,7 +116,7 @@ guessesRemainingSpec =
       |> it "shows this is the last guess" (
         Markup.observeElement
           |> Markup.query << by [ id "game-progress" ]
-          |> expect (Markup.hasText "Last guess!")
+          |> expectElement (hasText "Last guess!")
       )
     )
   ]
@@ -221,7 +221,7 @@ expectGuessAt index cssCodes =
         << descendantsOf [ attribute ("data-guess-feedback", String.fromInt index) ]
         << by [ attributeName "data-guess-element" ]
     |> expect (isListWhere <|
-      List.map (\c -> Markup.hasAttribute ("class", c)) cssCodes  
+      List.map hasClass cssCodes
     )
 
 

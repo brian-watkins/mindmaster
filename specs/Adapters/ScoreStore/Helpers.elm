@@ -4,12 +4,12 @@ module Adapters.ScoreStore.Helpers exposing
   , expectValues
   )
 
-import Spec
+import Spec exposing (Expectation)
 import Spec.Setup as Setup exposing (Setup)
 import Spec.Step as Step
 import Spec.Claim as Claim
 import Spec.Extra exposing (equals)
-import Spec.Observer as Observer exposing (Expectation)
+import Spec.Observer as Observer
 import Spec.Report as Report
 import Spec.Command as Command
 import Procedure exposing (Procedure)
