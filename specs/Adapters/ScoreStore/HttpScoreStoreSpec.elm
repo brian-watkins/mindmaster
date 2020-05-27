@@ -4,7 +4,7 @@ import Spec exposing (..)
 import Spec.Port as Port
 import Spec.Claim as Claim
 import Spec.Extra exposing (equals)
-import Spec.Http
+import Spec.Http exposing (asJson)
 import Spec.Http.Stub as Stub
 import Spec.Http.Route exposing (..)
 import ScoreStore.HttpScoreStore as ScoreStore
@@ -52,7 +52,7 @@ storeScoreSpec =
         [ it "creates a score entry" (
             Spec.Http.observeRequests (post "http://fake-server/scores")
               |> expect (Claim.isListWhere
-                [ Spec.Http.jsonBody (Json.field "score" Json.int) (equals 87)
+                [ Spec.Http.body (asJson <| Json.field "score" Json.int) (equals 87)
                 ]
               )
           )
@@ -71,7 +71,7 @@ storeScoreSpec =
         [ it "attempts to create a score entry" (
             Spec.Http.observeRequests (post "http://fake-server/scores")
               |> expect (Claim.isListWhere
-                [ Spec.Http.jsonBody (Json.field "score" Json.int) (equals 87)
+                [ Spec.Http.body (asJson <| Json.field "score" Json.int) (equals 87)
                 ]
               )
           )
@@ -85,7 +85,7 @@ storeScoreSpec =
 
 successfulRequestStub scores =
   Stub.for (get "http://fake-server/scores")
-    |> Stub.withBody (bodyForScores scores)
+    |> Stub.withBody (Stub.withJson <| bodyForScores scores)
 
 
 failedRequestStub =
@@ -95,7 +95,7 @@ failedRequestStub =
 
 storeScoreStub =
   Stub.for (post "http://fake-server/scores")
-    |> Stub.withBody "{}"
+    |> Stub.withBody (Stub.withText "{}")
 
 
 storeScoreErrorStub =
@@ -103,10 +103,8 @@ storeScoreErrorStub =
     |> Stub.withStatus 500
 
 
-bodyForScores : List Score -> String
 bodyForScores scores =
   Encode.list (\s -> Encode.object [ ("score", Encode.int s) ]) scores
-    |> Encode.encode 0
 
 
 main =

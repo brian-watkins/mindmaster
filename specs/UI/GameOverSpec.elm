@@ -5,11 +5,10 @@ import Spec.Setup as Setup
 import Spec.Observer as Observer
 import Spec.Markup as Markup
 import Spec.Markup.Selector exposing (..)
-import Spec.Witness as Witness
 import Spec.Claim as Claim
 import Spec.Command as Command
 import Spec.Extra exposing (..)
-import UI.Types exposing (..)
+import UI.Types as UITypes
 import Game.Types exposing (..)
 import Game.Types exposing (GameState(..), Color(..))
 import UI
@@ -17,7 +16,7 @@ import UI.Helpers
 import Runner
 
 
-gameOverSpec : Spec Model Msg
+gameOverSpec : Spec UITypes.Model UITypes.Msg
 gameOverSpec =
   Spec.describe "the game is over"
   [ scenario "the game is won" (

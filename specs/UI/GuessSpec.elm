@@ -7,16 +7,15 @@ import Spec.Claim exposing (..)
 import Spec.Markup as Markup
 import Spec.Markup.Selector exposing (..)
 import Spec.Markup.Event as Event
-import Spec.Witness as Witness exposing (Witness)
 import Spec.Extra exposing (..)
 import Runner
-import UI.Types exposing (..)
+import UI.Types as UITypes
 import UI.Helpers
 import Game.Types exposing (..)
 import Game.Entity.Clue as Clue
 
 
-guessSpecs : Spec Model Msg
+guessSpecs : Spec UITypes.Model UITypes.Msg
 guessSpecs =
   Spec.describe "Make a Guess"
   [ scenario "a valid guess" (
@@ -96,7 +95,7 @@ guessSpecs =
   ]
 
 
-guessesRemainingSpec : Spec Model Msg
+guessesRemainingSpec : Spec UITypes.Model UITypes.Msg
 guessesRemainingSpec =
   Spec.describe "guesses remaining"
   [ scenario "multiple guesses remain" (
@@ -122,7 +121,7 @@ guessesRemainingSpec =
   ]
 
 
-clueSpec : Spec Model Msg
+clueSpec : Spec UITypes.Model UITypes.Msg
 clueSpec =
   Spec.describe "clues"
   [ scenario "the guess is correct" (
@@ -144,7 +143,7 @@ clueSpec =
   ]
 
 
-guessHistorySpec : Spec Model Msg
+guessHistorySpec : Spec UITypes.Model UITypes.Msg
 guessHistorySpec =
   Spec.describe "guess history"
   [ scenario "multiple guesses are submitted" (
@@ -211,7 +210,7 @@ testSubjectWithResult positions guessesRemaining result =
 
 testSubjectWithEvaluator positions guessesRemaining evaluator =
   Setup.initWithModel (UI.Helpers.testModel positions)
-    |> Witness.forUpdate (UI.Helpers.testUpdate evaluator)
+    |> Setup.withUpdate (UI.Helpers.testUpdate evaluator)
     |> Setup.withView (testView guessesRemaining)
 
 

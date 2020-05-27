@@ -8,9 +8,8 @@ import Spec.Markup.Selector exposing (..)
 import Spec.Markup.Event as Event
 import Spec.Claim as Claim
 import Spec.Command as Command
-import Spec.Witness as Witness
 import Spec.Extra exposing (..)
-import UI.Types exposing (..)
+import UI.Types as UITypes
 import Game.Types exposing (..)
 import Game.Types exposing (GameState(..), Color(..))
 import UI
@@ -18,7 +17,7 @@ import UI.Helpers
 import Runner
 
 
-restartSpec : Spec Model Msg
+restartSpec : Spec UITypes.Model UITypes.Msg
 restartSpec =
   Spec.describe "restart game"
   [ scenario "after winning" (

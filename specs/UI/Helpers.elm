@@ -7,7 +7,8 @@ module UI.Helpers exposing
   , itRestartsTheGame
   )
 
-import Spec.Witness as Witness exposing (Witness)
+import Spec.Witness.Extra as Witness
+import Spec.Witness
 import Spec.Command as Command
 import Spec.Setup as Setup
 import Spec.Extra exposing (equals)
@@ -25,7 +26,7 @@ import Json.Decode as Json
 
 testSubject status =
   Setup.initWithModel (testModel 3)
-    |> Witness.forUpdate (testUpdate (\_ -> Wrong { colors = 0, positions = 0 }))
+    |> Setup.withUpdate (testUpdate (\_ -> Wrong { colors = 0, positions = 0 }))
     |> Setup.withView (testView status)
 
 
@@ -43,25 +44,25 @@ testView status =
   UI.View.with status
 
 
-testUpdate : (Code -> GuessResult) -> Witness Msg -> Msg -> Model -> (Model, Cmd Msg)
-testUpdate guessResultGenerator witness =
+testUpdate : (Code -> GuessResult) -> Msg -> Model -> (Model, Cmd Msg)
+testUpdate guessResultGenerator =
   UI.Action.update <|
-    { guessEvaluator = fakeEvaluator witness guessResultGenerator
-    , restartGame = Witness.log "restart-game" (Encode.null) witness
+    { guessEvaluator = fakeEvaluator guessResultGenerator
+    , restartGame = Witness.record "restart-game" (Encode.null)
     }
 
 
-fakeEvaluator witness feedbackGenerator code =
+fakeEvaluator feedbackGenerator code =
   Cmd.batch
   [ UI.guessResultTagger code (feedbackGenerator code)
       |> Command.fake
-  , Witness.log "guess-to-evaluate" (Encode.list (\color -> Color.toClass color |> Encode.string) code) witness
+  , Witness.record "guess-to-evaluate" (Encode.list (\color -> Color.toClass color |> Encode.string) code)
   ]
 
 
 itEvaluatesTheGuess expectedGuess =
   it "sends the guess to the evaluator" (
-    Witness.observe "guess-to-evaluate" (Json.list Json.string)
+    Spec.Witness.observe "guess-to-evaluate" (Json.list Json.string)
       |> expect (isListWhere
         [ equals expectedGuess
         ]
@@ -71,6 +72,6 @@ itEvaluatesTheGuess expectedGuess =
 
 itRestartsTheGame =
   it "sends the command to restart the game" (
-    Witness.observe "restart-game" (Json.value)
+    Spec.Witness.observe "restart-game" (Json.value)
       |> expect (isListWithLength 1)
   )

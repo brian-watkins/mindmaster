@@ -8,7 +8,7 @@ import Spec.Markup.Selector exposing (..)
 import Spec.Claim as Claim
 import Spec.Command as Command
 import Spec.Extra exposing (..)
-import UI.Types exposing (..)
+import UI.Types as UITypes
 import Game.Types exposing (..)
 import Game.Types exposing (GameState(..), Color(..))
 import UI
@@ -16,7 +16,7 @@ import UI.Helpers
 import Runner
 
 
-highScoreSpec : Spec Model Msg
+highScoreSpec : Spec UITypes.Model UITypes.Msg
 highScoreSpec =
   Spec.describe "high scores"
   [ scenario "no high scores" (

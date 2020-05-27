@@ -8,9 +8,8 @@ import Spec.Markup.Selector exposing (..)
 import Spec.Markup.Event as Event
 import Spec.Claim as Claim exposing (isSomethingWhere)
 import Spec.Command as Command
-import Spec.Witness as Witness
 import Spec.Extra exposing (..)
-import UI.Types exposing (..)
+import UI.Types as UITypes
 import Game.Types exposing (..)
 import Game.Types exposing (GameState(..), Color(..))
 import UI
@@ -18,7 +17,7 @@ import UI.Helpers
 import Runner
 
 
-selectElementSpec : Spec Model Msg
+selectElementSpec : Spec UITypes.Model UITypes.Msg
 selectElementSpec =
   Spec.describe "selecting elements for a guess"
   [ scenario "red is selected" (
@@ -97,7 +96,7 @@ selectGuessElement position maybeClass =
 
 testSubject =
   Setup.initWithModel (UI.Helpers.testModel 5)
-    |> Witness.forUpdate (UI.Helpers.testUpdate (\_ -> Wrong { colors = 0, positions = 0 }))
+    |> Setup.withUpdate (UI.Helpers.testUpdate (\_ -> Wrong { colors = 0, positions = 0 }))
     |> Setup.withView (UI.Helpers.testView <| InProgress 4)
 
 
